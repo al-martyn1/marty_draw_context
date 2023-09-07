@@ -88,7 +88,7 @@ struct DrawCoord
     // template<typename T>
     // DrawCoord( const T &t ) : x(t), y(t) {}
 
-    DrawCoord(const DrawCoord &c) : x(c.x), y(c.y) {}
+    //DrawCoord(const DrawCoord &c) : x(c.x), y(c.y) {}
 
 
     // Расстояние со знаком для точек на горизонтальной/вертикальной прямой, или 0 если такого нет

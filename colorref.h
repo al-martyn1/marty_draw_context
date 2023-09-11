@@ -63,9 +63,11 @@ StreamType& printTo(StreamType& s, const char* msg, const ColorHsv &hls)
 
 struct ColorRef
 {
-    std::uint8_t  r; // 0xFF0000
-    std::uint8_t  g; // 0x00FF00
-    std::uint8_t  b; // 0x0000FF
+    std::uint8_t  r = 0; // 0xFF0000
+    std::uint8_t  g = 0; // 0x00FF00
+    std::uint8_t  b = 0; // 0x0000FF
+
+    std::uint8_t  a = 0; // Пока игнорируем
 
 #if 0
     operator ColorRgb() const

@@ -253,7 +253,7 @@ struct DrawColor : public ColorRef
         return (int)(std::int32_t)toUnsigned();
     }
 
-    static ssq::Class expose(ssq::VM& vm, const ssq::sqstring &className = _SC("DrawColor"))
+    static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("DrawColor"))
     {
         const bool staticMethod = true ;
         const bool classMethod  = false;
@@ -387,7 +387,7 @@ struct DrawCoords
 
     }
 
-    static ssq::Class expose(ssq::VM& vm, const ssq::sqstring &className = _SC("DrawCoords"))
+    static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("DrawCoords"))
     {
         const bool staticMethod = true ;
         const bool classMethod  = false;

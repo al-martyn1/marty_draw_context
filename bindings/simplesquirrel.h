@@ -8,6 +8,9 @@
 #include <simplesquirrel/simplesquirrel.hpp>
 
 #include <cstdint>
+#include <string>
+#include <exception>
+#include <stdexcept>
 
 // 
 #include "../colorref.h"
@@ -343,7 +346,22 @@ struct DrawCoords
             case ssq::Type::STRING:
                 {
                     auto str = o.toString();
-                    return std::stof(str);
+                    try
+                    {
+                        return std::stof(str);
+                    }
+                    catch(const std::invalid_argument &)
+                    {
+                        throw ssq::TypeException("invalid argument", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
+                    }
+                    catch(const std::out_of_range &)
+                    {
+                        throw ssq::TypeException("out of range", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
+                    }
+                    catch(...)
+                    {
+                        throw ssq::TypeException("unknown error", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
+                    }
                 }
 
             case ssq::Type::BOOL:

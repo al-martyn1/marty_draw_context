@@ -197,6 +197,43 @@ struct CToWide
 //------------------------------
 
 
+
+//------------------------------
+#if !defined(SQUNICODE)
+
+    template<typename CharType>
+    inline std::string to_sqstring(const CharType* pStr)
+    {
+        return to_ascii(pStr);
+    }
+
+    template<typename StringType>
+    inline std::string to_sqstring(const StringType &str)
+    {
+        return to_ascii(str);
+    }
+
+#else
+
+    template<typename CharType>
+    inline std::wstring to_sqstring(const CharType* pStr)
+    {
+        return to_wide(pStr);
+    }
+
+    template<typename StringType>
+    inline std::wstring to_sqstring(const StringType &str)
+    {
+        return to_wide(str);
+    }
+
+#endif
+
+//------------------------------
+
+
+
+
 } // namespace utils
 
 //----------------------------------------------------------------------------
@@ -278,14 +315,7 @@ struct DrawColor : public ColorRef
                    , [](DrawColor* self) -> ssq::sqstring
                      {
                          MARTY_DC_BIND_SQUIRREL_ASSERT(self);
-
-                         std::string strName = self->serialize();
-
-                         #if !defined(SQUNICODE)
-                             return strName;
-                         #else
-                             return utils::to_wide(strName);
-                         #endif
+                         return utils::to_sqstring(self->serialize());
                      }
                    );
 
@@ -396,19 +426,7 @@ struct DrawCoords
         auto cls = vm.addClass( className.c_str()
                               , []( ssq::Object ox, ssq::Object oy  /* float x, float y */  ) -> DrawCoords*
                                 {
-                                    // (void)x;
-                                    // (void)y;
-                                    //  
-                                    // toInt(), toFloat()
-                                    //  
-                                    // isEmpty()
-                                    // isNull()
-
-                                    //return new DrawCoords{x, y};
-                                    //return new DrawCoords();
-
                                     return new DrawCoords{convertHelper(ox, _SC("x")), convertHelper(oy, _SC("y"))};
-
                                 }
                               , true // release
                               );
@@ -422,6 +440,51 @@ struct DrawCoords
 }; // struct DrawCoords
 
 //----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+struct HorAlign
+{
+    typedef marty_draw_context::HorAlign   EnumType;
+
+    const int   invalid = (int)EnumType::invalid;
+    const int   left    = (int)EnumType::left   ;
+    const int   center  = (int)EnumType::center ;
+    const int   right   = (int)EnumType::right  ;
+
+    static int fromString(const ssq::Class&, const ssq::sqstring &str)
+    {
+        return (int)enum_deserialize(utils::to_ascii(str), EnumType::invalid);
+    }
+
+    static ssq::sqstring toString(const ssq::Class&, int v)
+    {
+        return utils::to_sqstring(enum_serialize((EnumType)v));
+    }
+
+    static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("HorAlign"))
+    {
+        auto cls = vm.addClass( className.c_str(), []() { return new HorAlign(); }, true /* release */ );
+
+        cls.addFunc( _SC("fromString"), &HorAlign::fromString);
+        cls.addFunc( _SC("toString"  ), &HorAlign::toString  );
+
+        cls.addConstVar(_SC("Invalid"), &HorAlign::invalid, true);
+        cls.addConstVar(_SC("Left"   ), &HorAlign::left   , true);
+        cls.addConstVar(_SC("Center" ), &HorAlign::center , true);
+        cls.addConstVar(_SC("Right"  ), &HorAlign::right  , true);
+
+        return cls;
+    }
+
+}; // struct HorAlign
+
+// static SQInteger base_getconsttable(HSQUIRRELVM v)
+// {
+//     v->Push(_ss(v)->_consts);
+//     return 1;
+// }
 
 
 

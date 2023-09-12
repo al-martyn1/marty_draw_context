@@ -29,33 +29,31 @@ enum class HorAlign : std::uint32_t
 
 }; // enum class HorAlign : std::uint32_t
 
-MARTY_CPP_MAKE_ENUM_FLAGS(HorAlign)
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( HorAlign, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::left      , "Left"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::center    , "Center"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::right     , "Right"   );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( HorAlign, std::map, 1 )
 
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( HorAlign, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( HorAlign::left      , "Left"    );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( HorAlign::invalid   , "Invalid" );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( HorAlign::center    , "Center"  );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( HorAlign::right     , "Right"   );
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( HorAlign, std::map, 1 )
-
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::left      , "left"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::left      , "align-left"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::left      , "align_left"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::left      , "alignleft"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::invalid   , "invalid"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::invalid   , "align-invalid" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::invalid   , "align_invalid" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::invalid   , "aligninvalid"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::center    , "center"        );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::center    , "align-center"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::center    , "align_center"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::center    , "aligncenter"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::right     , "right"         );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::right     , "align-right"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::right     , "align_right"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( HorAlign::right     , "alignright"    );
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( HorAlign, std::map, 1 )
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "left"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "align-left"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "align_left"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "alignleft"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "invalid"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "align-invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "align_invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "aligninvalid"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "center"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "align-center"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "align_center"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "aligncenter"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "right"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align-right"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align_right"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "alignright"    );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( HorAlign, std::map, 1 )
 
 
 enum class FontStyleFlags : std::uint32_t

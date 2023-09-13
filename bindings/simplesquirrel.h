@@ -11,6 +11,8 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include <functional>
+#include <utility>
 
 // 
 #include "../colorref.h"
@@ -444,7 +446,103 @@ struct DrawCoords
 
 
 //----------------------------------------------------------------------------
-struct HorAlign
+// https://learn.microsoft.com/ru-ru/cpp/cpp/ellipses-and-variadic-templates?view=msvc-170
+
+inline
+void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec)
+{
+    (void)vec;
+}
+
+template<typename EnumVal> inline
+void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, EnumVal val)
+{
+    auto strVal = enum_serialize(val);
+    vec.emplace_back(strVal, (int)val);
+}
+
+template<typename First, typename... EnumVal> inline
+void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, First first, EnumVal... vals)
+{
+    makeEnumValuesVectorHelper(vec, first);
+    makeEnumValuesVectorHelper(vec, vals...);
+}
+
+template<typename... EnumVal> inline
+std::vector< std::pair<std::string, int> > makeEnumValuesVector( EnumVal... vals )
+{
+    std::vector< std::pair<std::string, int> > vec;
+    makeEnumValuesVectorHelper(vec, vals...);
+    return vec;
+}
+
+template<typename First, typename... EnumVal> inline
+std::vector< std::pair<std::string, int> > makeEnumValuesVector( First first, EnumVal... vals )
+{
+    std::vector< std::pair<std::string, int> > vec;
+    makeEnumValuesVectorHelper(vec, first);
+    makeEnumValuesVectorHelper(vec, vals...);
+    return vec;
+}
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+template<typename... EnumVal> inline
+ssq::sqstring makeEnumScriptString( const std::string &enumName, char itemSep, char enumSep, EnumVal... vals)
+{
+    std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
+
+    std::string res = "enum " + enumName + "{";
+
+    for(auto p: valNameVec)
+    {
+        res.append(p.first);
+        res.append("=");
+        res.append(std::to_string(p.second));
+        res.append(1, itemSep );
+    }
+
+    res.append("}");
+    res.append(1, enumSep );
+
+    return utils::to_sqstring(res);
+}
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+inline
+ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::string &prefix = "DrawContext")
+{
+    ssq::sqstring scriptText = 
+                      makeEnumScriptString( prefix+"HorAlign"    , itemSep, enumSep, HorAlign::left, HorAlign::center, HorAlign::right);
+    scriptText.append(makeEnumScriptString( prefix+"FontWeight"  , itemSep, enumSep, FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal, FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy));
+    scriptText.append(makeEnumScriptString( prefix+"GradientType", itemSep, enumSep, GradientType::vertical, GradientType::horizontal));
+    //scriptText.append(makeEnumScriptString( prefix+"FontStyleFlags", FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout));
+    //scriptText.append(makeEnumScriptString( prefix+"GradientRoundRectFillFlags", GradientRoundRectFillFlags::round, GradientRoundRectFillFlags::squareBegin, GradientRoundRectFillFlags::squareEnd, GradientRoundRectFillFlags::noFillBegin, GradientRoundRectFillFlags::noFillEnd));
+    //scriptText.append(makeEnumScriptString( prefix+"", ));
+
+    return scriptText;
+}
+
+//----------------------------------------------------------------------------
+inline
+void exposeEnums(ssq::VM &vm, const std::string &prefix = "DrawContext")
+{
+    ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', prefix);
+    ssq::Script script = vm.compileSource(scriptText.c_str());
+    vm.run(script);
+}
+
+
+
+//----------------------------------------------------------------------------
+struct HorAlignEnumStruct
 {
     typedef marty_draw_context::HorAlign   EnumType;
 
@@ -467,18 +565,18 @@ struct HorAlign
     {
         auto cls = vm.addClass( className.c_str(), []() { return new HorAlign(); }, true /* release */ );
 
-        cls.addFunc( _SC("fromString"), &HorAlign::fromString);
-        cls.addFunc( _SC("toString"  ), &HorAlign::toString  );
+        cls.addFunc( _SC("fromString"), &HorAlignEnumStruct::fromString);
+        cls.addFunc( _SC("toString"  ), &HorAlignEnumStruct::toString  );
 
-        cls.addConstVar(_SC("Invalid"), &HorAlign::invalid, true);
-        cls.addConstVar(_SC("Left"   ), &HorAlign::left   , true);
-        cls.addConstVar(_SC("Center" ), &HorAlign::center , true);
-        cls.addConstVar(_SC("Right"  ), &HorAlign::right  , true);
+        cls.addConstVar(_SC("Invalid"), &HorAlignEnumStruct::invalid, true);
+        cls.addConstVar(_SC("Left"   ), &HorAlignEnumStruct::left   , true);
+        cls.addConstVar(_SC("Center" ), &HorAlignEnumStruct::center , true);
+        cls.addConstVar(_SC("Right"  ), &HorAlignEnumStruct::right  , true);
 
         return cls;
     }
 
-}; // struct HorAlign
+}; // struct HorAlignEnumStruct
 
 // static SQInteger base_getconsttable(HSQUIRRELVM v)
 // {
@@ -486,7 +584,44 @@ struct HorAlign
 //     return 1;
 // }
 
+#if 0
 
+    Table::Table(HSQUIRRELVM vm):Object(vm) {
+        sq_newtable(vm);
+        sq_getstackobj(vm, -1, &obj);
+        sq_addref(vm, &obj);
+        sq_pop(vm,1); // Pop table
+    }
+
+    Enum::Enum(HSQUIRRELVM vm):Object(vm) {
+        sq_newtable(vm);
+        sq_getstackobj(vm, -1, &obj);
+        sq_addref(vm, &obj);
+        sq_pop(vm,1); // Pop enum table
+    }
+
+    Enum VM::addEnum(const SQChar* name) {
+        Enum enm(vm);
+        sq_pushconsttable(vm);
+        sq_pushstring(vm, name, scstrlen(name));
+        detail::push<Object>(vm, enm);
+        sq_newslot(vm, -3, false);
+        sq_pop(vm,1); // pop table
+        return std::move(enm);
+    }
+
+        template<typename T, typename... Args>
+        Class addClass(const SQChar* name, const std::function<T*(Args...)>& allocator = std::bind(&detail::defaultClassAllocator<T>), bool release = true){
+            sq_pushobject(vm, obj);
+            Class cls(detail::addClass(vm, name, allocator, release));
+            sq_pop(vm, 1);
+            return cls;
+        }
+
+NewSlotA
+NEW_SLOT_STATIC_FLAG
+
+#endif
 
 //----------------------------------------------------------------------------
 

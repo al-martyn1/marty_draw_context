@@ -231,5 +231,160 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no_fill_end"   );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
 
+
+enum class LineType : std::uint32_t
+{
+    invalid      = (std::uint32_t)(-1),
+    unknown      = (std::uint32_t)(-1),
+    diagonal     = 0,
+    vertical     = 1,
+    horizontal   = 2
+
+}; // enum class LineType : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineType::invalid      , "Invalid"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineType::diagonal     , "Diagonal"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineType::vertical     , "Vertical"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineType::horizontal   , "Horizontal" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( LineType, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( LineType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineType::invalid      , "invalid"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineType::invalid      , "unknown"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineType::diagonal     , "diagonal"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineType::vertical     , "vertical"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineType::horizontal   , "horizontal" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( LineType, std::map, 1 )
+
+
+enum class LineDirection : std::uint32_t
+{
+    invalid           = (std::uint32_t)(-1),
+    unknown           = (std::uint32_t)(-1),
+    fromLeftToRight   = 0,
+    fromTopToBottom   = 0,
+    fromRightToLeft   = 1,
+    fromBottomToTop   = 1
+
+}; // enum class LineDirection : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineDirection, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineDirection::invalid           , "Invalid"         );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineDirection::fromLeftToRight   , "FromLeftToRight" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineDirection::fromRightToLeft   , "FromRightToLeft" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( LineDirection, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( LineDirection, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::invalid           , "invalid"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::invalid           , "unknown"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::fromLeftToRight   , "fromlefttoright" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::fromLeftToRight   , "fromtoptobottom" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::fromRightToLeft   , "fromrighttoleft" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineDirection::fromRightToLeft   , "frombottomtotop" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( LineDirection, std::map, 1 )
+
+
+enum class LineEndcapStyle : std::uint32_t
+{
+    invalid   = (std::uint32_t)(-1),
+    unknown   = (std::uint32_t)(-1),
+    round     = 0,
+    square    = 1,
+    flat      = 2
+
+}; // enum class LineEndcapStyle : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineEndcapStyle, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineEndcapStyle::invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineEndcapStyle::round     , "Round"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineEndcapStyle::square    , "Square"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineEndcapStyle::flat      , "Flat"    );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( LineEndcapStyle, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( LineEndcapStyle, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::invalid   , "invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::invalid   , "unknown" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::round     , "round"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::square    , "square"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::flat      , "flat"    );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( LineEndcapStyle, std::map, 1 )
+
+
+enum class LineJoinStyle : std::uint32_t
+{
+    invalid   = (std::uint32_t)(-1),
+    unknown   = (std::uint32_t)(-1),
+    bevel     = 0,
+    mitter    = 1,
+    round     = 2
+
+}; // enum class LineJoinStyle : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineJoinStyle, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::mitter    , "Mitter"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::round     , "Round"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::bevel     , "Bevel"   );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( LineJoinStyle, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( LineJoinStyle, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineJoinStyle::mitter    , "mitter"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineJoinStyle::invalid   , "invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineJoinStyle::invalid   , "unknown" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineJoinStyle::round     , "round"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineJoinStyle::bevel     , "bevel"   );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( LineJoinStyle, std::map, 1 )
+
+
+enum class BkMode : std::uint32_t
+{
+    invalid       = (std::uint32_t)(-1),
+    unknown       = (std::uint32_t)(-1),
+    opaque        = 0,
+    transparent   = 1
+
+}; // enum class BkMode : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( BkMode, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::invalid       , "Invalid"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::opaque        , "Opaque"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::transparent   , "Transparent" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( BkMode, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( BkMode, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::invalid       , "invalid"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::invalid       , "unknown"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::opaque        , "opaque"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::transparent   , "transparent" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( BkMode, std::map, 1 )
+
+
+enum class ArcDirectionEnum : std::uint32_t
+{
+    Invalid            = (std::uint32_t)(-1),
+    Unknown            = (std::uint32_t)(-1),
+    Cw                 = 0,
+    Clockwise          = 0,
+    Ccw                = 1,
+    CounterClockwise   = 1
+
+}; // enum class ArcDirectionEnum : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Cw        , "Cw"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "Ccw"     );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ArcDirectionEnum, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "invalid"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "unknown"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "cw"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "clockwise"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "ccw"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "counterclockwise" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ArcDirectionEnum, std::map, 1 )
+
 } // namespace marty_draw_context
 

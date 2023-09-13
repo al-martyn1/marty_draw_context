@@ -16,6 +16,10 @@
 @set FMTHEX=--enum-flags=fmt-hex
 @set SERIALIZE=--enum-flags=serialize,deserialize,lowercase
 
+@set VALUES_CAMEL=--enum-values-style=CamelStyle
+@set VALUES_PASCAL=--enum-values-style=PascalStyle 
+@set SERIALIZE_PASCAL=--serialize-style=PascalStyle 
+
 
 umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\color_raw_enum.h
 
@@ -38,11 +42,37 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set GRADIENTROUNDRECTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex
 @set GRADIENTROUNDRECTFLAGS_DEF=invalid,unknown=-1;round,roundBoth,fillFull=0;squareBegin;squareEnd;noFillBegin;noFillEnd
 
+@set LINETYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set LINETYPE_DEF=invalid,unknown=-1;diagonal=0;vertical;horizontal;
+
+@set LINEDIRECTION_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set LINEDIRECTION_DEF=invalid,unknown=-1;fromLeftToRight,fromTopToBottom;fromRightToLeft,fromBottomToTop
+
+@set LINEENDCAPSTYLE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set LINEENDCAPSTYLE_DEF=invalid,unknown=-1;round;square;flat
+
+@set LINEJOINSTYLE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set LINEJOINSTYLE_DEF=invalid,unknown=-1;bevel;mitter;round
+
+@set BKMODE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set BKMODE_DEF=invalid,unknown=-1;opaque;transparent
+
+@set ARCDIRECTION_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_PASCAL% %SERIALIZE_PASCAL%
+@set ARCDIRECTION_DEF=invalid,unknown=-1;Cw,Clockwise;Ccw,CounterClockwise
+
+
+
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %HORALIGN_GEN_FLAGS%                %UINT32% -E=HorAlign                         -F=%HORALIGN_DEF%               ^
 %FONTSTYLEFLAGS_GEN_FLAGS%          %UINT32% -E=FontStyleFlags                   -F=%FONTSTYLEFLAGS_DEF%         ^
 %FONTWEIGHT_GEN_FLAGS%              %INT% --enum-generation-flags=unsigned-vals  -E=FontWeight  -F=%FONTWEIGHT_DEF% ^
 %GRADIENTTYPE_GEN_FLAGS%            %UINT32% -E=GradientType                     -F=%GRADIENTTYPE_DEF%           ^
 %GRADIENTROUNDRECTFLAGS_GEN_FLAGS%  %UINT32% -E=GradientRoundRectFillFlags       -F=%GRADIENTROUNDRECTFLAGS_DEF% ^
+%LINETYPE_GEN_FLAGS%                %UINT32% -E=LineType                         -F=%LINETYPE_DEF% ^
+%LINEDIRECTION_GEN_FLAGS%           %UINT32% -E=LineDirection                    -F=%LINEDIRECTION_DEF% ^
+%LINEENDCAPSTYLE_GEN_FLAGS%         %UINT32% -E=LineEndcapStyle                  -F=%LINEENDCAPSTYLE_DEF% ^
+%LINEJOINSTYLE_GEN_FLAGS%           %UINT32% -E=LineJoinStyle                    -F=%LINEJOINSTYLE_DEF% ^
+%BKMODE_GEN_FLAGS%                  %UINT32% -E=BkMode                           -F=%BKMODE_DEF% ^
+%ARCDIRECTION_GEN_FLAGS%            %UINT32% -E=ArcDirectionEnum                 -F=%ARCDIRECTION_DEF% ^
 ..\draw_context_enums.h
 

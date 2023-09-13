@@ -338,65 +338,6 @@ DrawCoord::value_type drawCoordValueTypeFromString(const std::string &str)
 
 
 
-enum class LineType
-{
-    diagonal  ,
-    vertical  ,
-    horizontal
-};
-
-
-// enum class GradientType
-// {
-//     invalid   ,
-//     vertical  ,
-//     horizontal
-// };
-
-enum class LineDirection
-{
-    unknown   ,
-
-    fromLeftToRight ,
-    fromTopToBottom = fromLeftToRight,
-
-    fromRightToLeft ,
-    fromBottomToTop = fromRightToLeft
-};
-
-enum class LineEndcapStyle
-{
-    round ,
-    square,
-    flat
-
-};
-
-enum class LineJoinStyle
-{
-    bevel ,
-    mitter,
-    round
-};
-
-
-enum class BkMode
-{
-    opaque,
-    transparent
-};
-
-
-
-// enum class HorAlign
-// {
-//     left,
-//     center,
-//     right
-// };
-
-
-
 
 namespace ArcDirection {
 
@@ -411,36 +352,6 @@ static const bool Cw               = false;
 
 //                        directionCounterclockwise = true;
 
-/*
-namespace FontStyleFlags
-{
-    static const int normal     = 0;
-    static const int italic     = 1;
-    static const int underlined = 2;
-    static const int strikeout  = 4;
-};
-*/
-
-/*
-namespace FontWeight {
-
-    static const int thin        = 100;   //  91%
-    static const int extralight  = 200;
-    static const int ultralight  = 200;   //  94%
-    static const int light       = 300;   //  97%
-    static const int normal      = 400;   // 100%
-    static const int regular     = 400;
-    static const int medium      = 500;   // 103%
-    static const int semibold    = 600;   // 106%
-    static const int demibold    = 600;
-    static const int bold        = 700;   // 110%
-    static const int extrabold   = 800;   // 113%
-    static const int ultrabold   = 800;
-    static const int heavy       = 900;   // 116%
-    static const int black       = 900;
-
-} // namespace FontWeight
-*/
 
 inline
 int getFontWeightWidthScale(FontWeight fw)
@@ -586,57 +497,6 @@ typedef FontParamsT<std::string >   FontParamsA;
 typedef FontParamsT<std::wstring>   FontParamsW;
 
 
-// typedef DrawCoord::value_type    color_component_type;
-
-
-//struct ColorRef;
-//struct ColorRgb;
-//struct ColorHsl;
-
-#if 0
-inline
-color_component_type scaleColorComponent(color_component_type c, color_component_type scale)
-{
-    color_component_type res = c*scale;
-    if (res<0)
-        res = 0;
-    if (res>1)
-        res = 1;
-
-    return res;
-}
-#endif
-
-// https://en.wikipedia.org/wiki/HSL_and_HSV
-// https://ru.wikipedia.org/wiki/HSV_(%D1%86%D0%B2%D0%B5%D1%82%D0%BE%D0%B2%D0%B0%D1%8F_%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D1%8C)
-// https://ru.wikipedia.org/wiki/HSL
-
-#if 0
-struct ColorRgb
-{
-    color_component_type  r;
-    color_component_type  g;
-    color_component_type  b;
-};
-
-/*
-*/
-
-
-struct ColorHsb
-{
-    color_component_type  r;
-    color_component_type  g;
-    color_component_type  b;
-
-    operator ColorRgb()
-    {}
-
-    ColorHsl(const ColorRgb &rgb)
-    {}
-};
-#endif
-
 
 
 enum class SmoothingMode
@@ -747,6 +607,7 @@ bool isLineTypeVH( LineType lt )
     {
         case LineType::vertical: case LineType::horizontal: return true;
         case LineType::diagonal: [[fallthrough]];
+        case LineType::invalid : [[fallthrough]];
         default: return false;
     }
 }
@@ -760,7 +621,8 @@ DrawCoord::value_type getVhLineLen( const DrawCoord &p1, const DrawCoord &p2, Li
     {
         case LineType::vertical  : l = p1.y-p2.y; break;
         case LineType::horizontal: l = p1.x-p2.x; break;
-        case LineType::diagonal: [[fallthrough]];
+        case LineType::diagonal  : [[fallthrough]];
+        case LineType::invalid   : [[fallthrough]];
         default: {}
     }
 
@@ -778,7 +640,8 @@ LineDirection getVhLineDirection( const DrawCoord &sp, const DrawCoord &ep, Line
     {
         case LineType::vertical  : l = ep.y-sp.y; break;
         case LineType::horizontal: l = ep.x-sp.x; break;
-        case LineType::diagonal: [[fallthrough]];
+        case LineType::diagonal  : [[fallthrough]];
+        case LineType::invalid   : [[fallthrough]];
         default: {}
         //default: //DrawCoord(0);
     }
@@ -823,6 +686,7 @@ bool extractCoordVals( const DrawCoord &p1, const DrawCoord &p2, LineType lt
              break;
 
         case LineType::diagonal: [[fallthrough]];
+        case LineType::invalid : [[fallthrough]];
 
         default:
              coordCommon = 0;
@@ -863,6 +727,7 @@ bool makeCoordsFromVals( const DrawCoord::value_type coordCommon, const DrawCoor
              break;
 
         case LineType::diagonal: [[fallthrough]];
+        case LineType::invalid : [[fallthrough]];
 
         default:
              return false;

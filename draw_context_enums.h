@@ -60,6 +60,7 @@ enum class FontStyleFlags : std::uint32_t
 {
     invalid      = (std::uint32_t)(-1),
     normal       = 0x00,
+    none         = 0x00,
     italic       = 0x01,
     underlined   = 0x02,
     strikeout    = 0x04
@@ -79,6 +80,7 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( FontStyleFlags, std::map, 1 )
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( FontStyleFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::invalid      , "invalid"    );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::normal       , "normal"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::normal       , "none"       );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::italic       , "italic"     );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::strikeout    , "strikeout"  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::underlined   , "underlined" );
@@ -189,6 +191,7 @@ enum class GradientRoundRectFillFlags : std::uint32_t
     round         = 0x00,
     roundBoth     = 0x00,
     fillFull      = 0x00,
+    none          = 0x00,
     squareBegin   = 0x01,
     squareEnd     = 0x02,
     noFillBegin   = 0x04,
@@ -219,6 +222,7 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square-begin"  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square_begin"  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "squarebegin"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "none"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round_both"    );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round-both"    );

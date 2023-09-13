@@ -486,14 +486,84 @@ std::vector< std::pair<std::string, int> > makeEnumValuesVector( First first, En
 }
 
 //----------------------------------------------------------------------------
+inline
+void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec)
+{
+    (void)vec;
+}
+
+template<typename EnumVal> inline
+void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, EnumVal val)
+{
+    auto strVal = enum_serialize_flags(val);
+    //auto strVal = enum_serialize(val);
+    if (strVal.empty())
+    {
+        strVal = "0";
+    }
+
+    vec.emplace_back(strVal, (int)val);
+}
+
+template<typename First, typename... EnumVal> inline
+void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, First first, EnumVal... vals)
+{
+    makeFlagValuesVectorHelper(vec, first);
+    makeFlagValuesVectorHelper(vec, vals...);
+}
+
+template<typename... EnumVal> inline
+std::vector< std::pair<std::string, int> > makeFlagValuesVector( EnumVal... vals )
+{
+    std::vector< std::pair<std::string, int> > vec;
+    makeFlagValuesVectorHelper(vec, vals...);
+    return vec;
+}
+
+template<typename First, typename... EnumVal> inline
+std::vector< std::pair<std::string, int> > makeFlagValuesVector( First first, EnumVal... vals )
+{
+    std::vector< std::pair<std::string, int> > vec;
+    makeFlagValuesVectorHelper(vec, first);
+    makeFlagValuesVectorHelper(vec, vals...);
+    return vec;
+}
+
+//----------------------------------------------------------------------------
 
 
 
 //----------------------------------------------------------------------------
 template<typename... EnumVal> inline
-ssq::sqstring makeEnumScriptString( const std::string &enumName, char itemSep, char enumSep, EnumVal... vals)
+ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, EnumVal... vals)
 {
+    std::string enumName = enumPrefix+enumNameOnly;
+
     std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
+
+    std::string res = "enum " + enumName + "{";
+
+    for(auto p: valNameVec)
+    {
+        res.append(p.first);
+        res.append("=");
+        res.append(std::to_string(p.second));
+        res.append(1, itemSep );
+    }
+
+    res.append("}");
+    res.append(1, enumSep );
+
+    return utils::to_sqstring(res);
+}
+
+//----------------------------------------------------------------------------
+template<typename... EnumVal> inline
+ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, EnumVal... vals)
+{
+    std::string enumName = enumPrefix+enumNameOnly;
+
+    std::vector< std::pair<std::string, int> > valNameVec = makeFlagValuesVector(vals...);
 
     std::string res = "enum " + enumName + "{";
 
@@ -519,12 +589,32 @@ ssq::sqstring makeEnumScriptString( const std::string &enumName, char itemSep, c
 inline
 ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::string &prefix = "DrawContext")
 {
+
+    // auto strVal = enum_serialize_flags(FontStyleFlags::italic);
+    // //auto strVal = enum_serialize(val);
+    // (void)strVal;
+
     ssq::sqstring scriptText = 
-                      makeEnumScriptString( prefix+"HorAlign"    , itemSep, enumSep, HorAlign::left, HorAlign::center, HorAlign::right);
-    scriptText.append(makeEnumScriptString( prefix+"FontWeight"  , itemSep, enumSep, FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal, FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy));
-    scriptText.append(makeEnumScriptString( prefix+"GradientType", itemSep, enumSep, GradientType::vertical, GradientType::horizontal));
-    //scriptText.append(makeEnumScriptString( prefix+"FontStyleFlags", FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout));
-    //scriptText.append(makeEnumScriptString( prefix+"GradientRoundRectFillFlags", GradientRoundRectFillFlags::round, GradientRoundRectFillFlags::squareBegin, GradientRoundRectFillFlags::squareEnd, GradientRoundRectFillFlags::noFillBegin, GradientRoundRectFillFlags::noFillEnd));
+                      makeEnumScriptString( prefix, "HorAlign"                   , itemSep, enumSep, HorAlign::left, HorAlign::center, HorAlign::right);
+
+    scriptText.append(makeEnumScriptString( prefix, "FontWeight"                 , itemSep, enumSep
+                                          , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
+                                          , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy)
+                     );
+
+    scriptText.append(makeEnumScriptString( prefix, "GradientType"               , itemSep, enumSep, GradientType::vertical, GradientType::horizontal));
+
+    scriptText.append(makeFlagScriptString( prefix, "FontStyleFlags"             , itemSep, enumSep
+                                          , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout));
+
+    scriptText.append(makeFlagScriptString( prefix, "GradientRoundRectFillFlags" , itemSep, enumSep
+                                          , GradientRoundRectFillFlags::round
+                                          , GradientRoundRectFillFlags::squareBegin
+                                          , GradientRoundRectFillFlags::squareEnd
+                                          , GradientRoundRectFillFlags::noFillBegin
+                                          , GradientRoundRectFillFlags::noFillEnd)
+                     );
+
     //scriptText.append(makeEnumScriptString( prefix+"", ));
 
     return scriptText;

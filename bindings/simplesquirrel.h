@@ -566,17 +566,6 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           );
 
-    scriptText.append(makeEnumScriptString( prefix, "FontWeight"     , itemSep, enumSep, knownEnumNames
-                                          , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
-                                          , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
-                                          )
-                     );
-
-    scriptText.append(makeEnumScriptString( prefix, "GradientType"   , itemSep, enumSep, knownEnumNames
-                                          , GradientType::vertical, GradientType::horizontal
-                                          )
-                     );
-
     scriptText.append(makeEnumScriptString( prefix, "FontStyleFlags" , itemSep, enumSep, knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
@@ -591,7 +580,50 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    //scriptText.append(makeEnumScriptString( prefix+"", ));
+    scriptText.append(makeEnumScriptString( prefix, "FontWeight"     , itemSep, enumSep, knownEnumNames
+                                          , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
+                                          , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
+                                          )
+                     );
+
+    scriptText.append(makeEnumScriptString( prefix, "GradientType"   , itemSep, enumSep, knownEnumNames
+                                          , GradientType::vertical, GradientType::horizontal
+                                          )
+                     );
+
+    scriptText.append(makeEnumScriptString( prefix, "LineType"   , itemSep, enumSep, knownEnumNames
+                                          , LineType::diagonal, LineType::vertical, LineType::horizontal
+                                          )
+                     );
+
+    // Автоматом в алиасы генератор не умеет, запилил руцами
+    scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
+    // scriptText.append(makeEnumScriptString( prefix, "LineDirection"   , itemSep, enumSep, knownEnumNames
+    //                                       , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
+    //                                       )
+    //                  );
+
+    scriptText.append(makeEnumScriptString( prefix, "LineEndcapStyle"   , itemSep, enumSep, knownEnumNames
+                                          , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
+                                          )
+                     );
+
+    scriptText.append(makeEnumScriptString( prefix, "LineJoinStyle"   , itemSep, enumSep, knownEnumNames
+                                          , LineJoinStyle::bevel, LineJoinStyle::mitter, LineJoinStyle::round
+                                          )
+                     );
+
+    scriptText.append(makeEnumScriptString( prefix, "BkMode"   , itemSep, enumSep, knownEnumNames
+                                          , BkMode::opaque, BkMode::transparent
+                                          )
+                     );
+
+    // Автоматом в алиасы генератор не умеет, запилил руцами
+    scriptText.append(_SC("enum ArcDirection{Cw=0 Clockwise=0 Ccw=1 CounterClockwise=1};"));
+    // scriptText.append(makeEnumScriptString( prefix, "ArcDirectionEnum"   , itemSep, enumSep, knownEnumNames
+    //                                       , ArcDirectionEnum::Cw, ArcDirectionEnum::Cсw
+    //                                       )
+    //                  );
 
     if (pKnownEnumNames)
     {
@@ -692,6 +724,10 @@ Enum'ы у нас зарегистрированы как DrawContextEnumName (�
 
 !!! Могут быть проблемы, если где-то в строковых литералах будут встречаться строки вида xxx.EnumName.
 Но это довольно маловероятная ситуация
+
+
+//TODO: !!! Попробовать переделать через static поля классов - http://www.squirrel-lang.org/squirreldoc/reference/language/classes.html#static-variables
+Надо будет нагенерить классов
 */
 inline
 ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::string &prefix = "DrawContext",  bool prependWithEnums = true)

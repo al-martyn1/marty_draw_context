@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <functional>
 #include <utility>
+#include <algorithm>
 
 // 
 #include "../colorref.h"
@@ -458,6 +459,10 @@ template<typename EnumVal> inline
 void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, EnumVal val)
 {
     auto strVal = enum_serialize(val);
+    if (strVal.empty() || strVal=="0")
+    {
+        strVal = "None";
+    }
     vec.emplace_back(strVal, (int)val);
 }
 
@@ -486,57 +491,15 @@ std::vector< std::pair<std::string, int> > makeEnumValuesVector( First first, En
 }
 
 //----------------------------------------------------------------------------
-inline
-void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec)
-{
-    (void)vec;
-}
-
-template<typename EnumVal> inline
-void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, EnumVal val)
-{
-    auto strVal = enum_serialize_flags(val);
-    //auto strVal = enum_serialize(val);
-    if (strVal.empty())
-    {
-        strVal = "0";
-    }
-
-    vec.emplace_back(strVal, (int)val);
-}
-
-template<typename First, typename... EnumVal> inline
-void makeFlagValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, First first, EnumVal... vals)
-{
-    makeFlagValuesVectorHelper(vec, first);
-    makeFlagValuesVectorHelper(vec, vals...);
-}
-
-template<typename... EnumVal> inline
-std::vector< std::pair<std::string, int> > makeFlagValuesVector( EnumVal... vals )
-{
-    std::vector< std::pair<std::string, int> > vec;
-    makeFlagValuesVectorHelper(vec, vals...);
-    return vec;
-}
-
-template<typename First, typename... EnumVal> inline
-std::vector< std::pair<std::string, int> > makeFlagValuesVector( First first, EnumVal... vals )
-{
-    std::vector< std::pair<std::string, int> > vec;
-    makeFlagValuesVectorHelper(vec, first);
-    makeFlagValuesVectorHelper(vec, vals...);
-    return vec;
-}
-
-//----------------------------------------------------------------------------
 
 
 
 //----------------------------------------------------------------------------
 template<typename... EnumVal> inline
-ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, EnumVal... vals)
+ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
 {
+    known.insert(utils::to_sqstring(enumNameOnly));
+
     std::string enumName = enumPrefix+enumNameOnly;
 
     std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
@@ -559,8 +522,10 @@ ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::st
 
 //----------------------------------------------------------------------------
 template<typename... EnumVal> inline
-ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, EnumVal... vals)
+ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
 {
+    known.insert(utils::to_sqstring(enumNameOnly));
+
     std::string enumName = enumPrefix+enumNameOnly;
 
     std::vector< std::pair<std::string, int> > valNameVec = makeFlagValuesVector(vals...);
@@ -587,37 +552,51 @@ ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::st
 
 //----------------------------------------------------------------------------
 inline
-ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::string &prefix = "DrawContext")
+ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sqstring> *pKnownEnumNames = 0, const std::string &prefix = "DrawContext")
 {
 
     // auto strVal = enum_serialize_flags(FontStyleFlags::italic);
     // //auto strVal = enum_serialize(val);
     // (void)strVal;
 
-    ssq::sqstring scriptText = 
-                      makeEnumScriptString( prefix, "HorAlign"                   , itemSep, enumSep, HorAlign::left, HorAlign::center, HorAlign::right);
+    std::set<ssq::sqstring> knownEnumNames;
 
-    scriptText.append(makeEnumScriptString( prefix, "FontWeight"                 , itemSep, enumSep
+    ssq::sqstring scriptText = 
+                      makeEnumScriptString( prefix, "HorAlign"       , itemSep, enumSep, knownEnumNames
+                                          , HorAlign::left, HorAlign::center, HorAlign::right
+                                          );
+
+    scriptText.append(makeEnumScriptString( prefix, "FontWeight"     , itemSep, enumSep, knownEnumNames
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
-                                          , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy)
+                                          , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
+                                          )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "GradientType"               , itemSep, enumSep, GradientType::vertical, GradientType::horizontal));
+    scriptText.append(makeEnumScriptString( prefix, "GradientType"   , itemSep, enumSep, knownEnumNames
+                                          , GradientType::vertical, GradientType::horizontal
+                                          )
+                     );
 
-    scriptText.append(makeFlagScriptString( prefix, "FontStyleFlags"             , itemSep, enumSep
-                                          , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout));
+    scriptText.append(makeEnumScriptString( prefix, "FontStyleFlags" , itemSep, enumSep, knownEnumNames
+                                          , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
+                                          )
+                     );
 
-    #if 0
-    scriptText.append(makeFlagScriptString( prefix, "GradientRoundRectFillFlags" , itemSep, enumSep
+    scriptText.append(makeEnumScriptString( prefix, "GradientRoundRectFillFlags" , itemSep, enumSep, knownEnumNames
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
                                           , GradientRoundRectFillFlags::squareEnd
                                           , GradientRoundRectFillFlags::noFillBegin
-                                          , GradientRoundRectFillFlags::noFillEnd)
+                                          , GradientRoundRectFillFlags::noFillEnd
+                                          )
                      );
-    #endif
 
     //scriptText.append(makeEnumScriptString( prefix+"", ));
+
+    if (pKnownEnumNames)
+    {
+        *pKnownEnumNames = knownEnumNames;
+    }
 
     return scriptText;
 }
@@ -626,12 +605,203 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::strin
 inline
 void exposeEnums(ssq::VM &vm, const std::string &prefix = "DrawContext")
 {
-    ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', prefix);
+    ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', 0, prefix);
     ssq::Script script = vm.compileSource(scriptText.c_str());
     vm.run(script);
 }
 
+//----------------------------------------------------------------------------
+// first - индекс текст. фрагмента, second - найденное положение
+inline
+std::vector< std::pair<std::size_t, std::size_t> > findAllOccurencies(const ssq::sqstring &text, const ssq::sqstring &item, std::size_t itemIndex)
+{
+    std::vector< std::pair<std::size_t, std::size_t> > resVec;
 
+    std::size_t pos = text.find(item, 0);
+    while(pos!=text.npos)
+    {
+        resVec.emplace_back(itemIndex, pos);
+        pos = text.find(item, pos+item.size());
+    }
+
+    return resVec;
+}
+
+//----------------------------------------------------------------------------
+inline
+std::vector< std::pair<std::size_t, std::size_t> > mergeOccurenciesVectors( const std::vector< std::pair<std::size_t, std::size_t> > &v1
+                                                                          , const std::vector< std::pair<std::size_t, std::size_t> > &v2
+                                                                          )
+{
+    std::vector< std::pair<std::size_t, std::size_t> > resVec; resVec.reserve(v1.size()+v2.size());
+
+    std::vector< std::pair<std::size_t, std::size_t> >::const_iterator it1 = v1.begin();
+    std::vector< std::pair<std::size_t, std::size_t> >::const_iterator it2 = v2.begin();
+
+    // Основной цикл - пока оба итератора не дошли до конца - так мы можем обращаться по любому из них
+    while(it1!=v1.end() && it2!=v2.end())
+    {
+        if (it1->second < it2->second)
+        {
+            resVec.emplace_back(*it1);
+            ++it1;
+        }
+        else
+        {
+            resVec.emplace_back(*it2);
+            ++it2;
+        }
+    }
+
+    // Добавляем хвосты, если есть
+
+    resVec.insert(resVec.end(), it1, v1.end());
+    resVec.insert(resVec.end(), it2, v2.end());
+
+    return resVec;
+}
+
+//----------------------------------------------------------------------------
+//! Производит переименование enum'ов, также может добавлять в начало скрипта скрипт задания enum'ов
+/*!
+Мы можем обращаться с enum'ам только через "namespace" DrawContext.EnumName.value
+Или, мы сделали алиас таблицы:
+local dc = DrawContext
+
+Используем так
+... = dc.EnumName.value
+
+Или с полным именем namespace:
+... = DrawContext.EnumName.value
+
+
+Других вариантов вроде нет
+
+Когда обращаемся по имени голобального enum, это выглядит так:
+... = DrawContextEnumName.value
+... = DrawContext_EnumName.value
+
+Enum'ы у нас зарегистрированы как DrawContextEnumName (или DrawContext_EnumName?)
+При обращении к EnumName через namespace перед EnumName должна быть точка.
+Если точки нет - то это ображение через глобальное имя, ничего не делаем.
+Если точка есть - то идем к началу строки, допустимые символы A-Zaz0-9 и символ подчеркивания, 
+останавливаемся, если достигли начало строки, или встретили недопустимый символ.
+После этого заменяем подстроку xxx.EnumName.value на DrawContext_EnumName.value
+
+Замену производим с конца, так как, если менять с начала, то "поедут" последующие индексы
+
+!!! Могут быть проблемы, если где-то в строковых литералах будут встречаться строки вида xxx.EnumName.
+Но это довольно маловероятная ситуация
+*/
+inline
+ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::string &prefix = "DrawContext",  bool prependWithEnums = true)
+{
+    std::set<ssq::sqstring> knownEnumNames;
+    ssq::sqstring scriptEnumsStr = enumsExposeMakeScript(' ', ';', &knownEnumNames, prefix);
+
+    ssq::sqstring sqPrefix = utils::to_sqstring(prefix);
+
+    // first - индекс текст. фрагмента, second - найденное положение
+    std::vector< std::pair<std::size_t, std::size_t> > allOccurencies;
+
+    // переделываем в вектор, чтобы обращаться по индексу
+    std::vector<ssq::sqstring> knownEnumNamesVec = std::vector<ssq::sqstring>(knownEnumNames.begin(), knownEnumNames.end());
+    std::vector<ssq::sqstring> replaceToNamesVec; replaceToNamesVec.reserve(knownEnumNamesVec.size());
+    for(const auto n: knownEnumNamesVec)
+    {
+        replaceToNamesVec.emplace_back(sqPrefix+n);
+    }
+
+    for( std::size_t nameIdx=0; nameIdx!=knownEnumNamesVec.size(); ++nameIdx )
+    {
+        //std::vector< std::pair<std::size_t, std::size_t> > tmp = findAllOccurencies(scriptText, knownEnumNamesVec[nameIdx], nameIdx);
+        allOccurencies = mergeOccurenciesVectors(allOccurencies, findAllOccurencies(scriptText, knownEnumNamesVec[nameIdx], nameIdx));
+    }
+
+    // У нас тут есть вектор вхождений всех интересующих нас имён, отсортированный по возрастанию позиции
+    std::reverse(allOccurencies.begin(), allOccurencies.end());
+    // А теперь вектор отсортирован по убыванию позиции
+
+    // A-Zaz0-9 и символ подчеркивания
+    auto isValidNameChar = [](SQChar ch) -> bool
+    {
+        if ((ch>=_SC('A') && ch<=_SC('Z')) || (ch>=_SC('a') && ch<=_SC('z')) || (ch>=_SC('0') && ch<=_SC('9')) || ch==_SC('_'))
+        {
+            return true;
+        }
+
+        return false;
+    };
+
+    
+
+    ssq::sqstring scriptTextResult = scriptText;
+
+    for(std::vector< std::pair<std::size_t, std::size_t> >::const_iterator ait = allOccurencies.begin(); ait!=allOccurencies.end(); ++ait)
+    {
+        std::size_t nameIdx = ait->first;
+        const ssq::sqstring &name = knownEnumNamesVec[nameIdx];
+        std::size_t nameLen = name.size();
+        std::size_t pos     = ait->second;
+        std::size_t namePos = pos;
+
+        if (pos==0)
+        {
+            continue; // Имя найдено в самом начале, тут ничего не заменить
+        }
+
+        --pos;
+        if (scriptTextResult[pos]!=_SC('.'))
+        {
+            continue; // Точка не найдена перед именем enum'а
+        }
+
+        if (pos==0)
+        {
+            continue; // Точка найдена в самом начале, тут ничего не заменить
+        }
+
+        --pos;
+
+        while(true)
+        {
+            if (!isValidNameChar(scriptTextResult[pos]))
+            {
+                ++pos; // Откатываемся вперёд на первый символ имени
+                break;
+            }
+
+            if (pos==0)
+            {
+                break; // вниз двигаться больше нельзя, стоим на нулевой позиции, вперёд откат не нужен
+            }
+
+            --pos; // идём дальше "вниз"
+        }
+
+        std::size_t foundExtraLen = namePos - pos;
+
+        if (foundExtraLen<2)
+        {
+            continue; // найдена только точка или вообще ничего
+        }
+
+        scriptTextResult.replace(pos, foundExtraLen+nameLen, replaceToNamesVec[nameIdx]);
+
+    } // for
+
+    if (prependWithEnums)
+    {
+        scriptTextResult = scriptEnumsStr + scriptTextResult;
+    }
+    
+    return scriptTextResult;
+}
+
+
+//TODO: !!! Надо попробовать сериализацию флагов через enum_serialize, а не через enum_serialize_flags - 
+// нам не нужно наборы флагов сериализовывать, а только отдельные флаги
+// Заодно, если установлено несколько флагов, то по идее, должна выскочить ошибка, надо проверить
 
 //----------------------------------------------------------------------------
 struct HorAlignEnumStruct

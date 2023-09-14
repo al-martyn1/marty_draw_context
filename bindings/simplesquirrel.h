@@ -607,6 +607,7 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::strin
     scriptText.append(makeFlagScriptString( prefix, "FontStyleFlags"             , itemSep, enumSep
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout));
 
+    #if 0
     scriptText.append(makeFlagScriptString( prefix, "GradientRoundRectFillFlags" , itemSep, enumSep
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
@@ -614,6 +615,7 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, const std::strin
                                           , GradientRoundRectFillFlags::noFillBegin
                                           , GradientRoundRectFillFlags::noFillEnd)
                      );
+    #endif
 
     //scriptText.append(makeEnumScriptString( prefix+"", ));
 

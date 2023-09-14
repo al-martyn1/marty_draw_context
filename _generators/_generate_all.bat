@@ -8,7 +8,10 @@
 @set HEX6=--hex-width=6
 @set HEX8=--hex-width=8
 
-@set EXTRA=--enum-flags=extra
+@rem set EXTRA=--enum-flags=extra
+@same but more detailed
+@set FLAGENUM_EXTRA=--enum-flags=serialize-set,deserialize-set
+
 @set FLAGS=--enum-flags=flags
 @set DECL=--enum-flags=type-decl
 @set CLS=--enum-flags=enum-class
@@ -30,17 +33,17 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set HORALIGN_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
 @set HORALIGN_DEF=invalid,alignInvalid=-1;left,alignLeft=0;center,alignCenter;right,alignRight;
 
-@set FONTSTYLEFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex,extra
+@set FONTSTYLEFLAGS_GEN_FLAGS=        --enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA%
 @set FONTSTYLEFLAGS_DEF=invalid=-1;normal,none=0;italic=1;underlined=2;strikeout=4;
+
+@set GRADIENTROUNDRECTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA%
+@set GRADIENTROUNDRECTFLAGS_DEF=invalid,unknown=-1;round,roundBoth,fillFull,none=0;squareBegin;squareEnd;noFillBegin;noFillEnd
 
 @set FONTWEIGHT_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class
 @set FONTWEIGHT_DEF=invalid=-1;thin,100=100;extralight,ultralight,200=200;light,300=300;normal,400,regular=400;medium,500=500;semibold,600,demibold=600;bold,700=700;extrabold,800,ultrabold=800;heavy,900,black=900;
 
 @set GRADIENTTYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
 @set GRADIENTTYPE_DEF=invalid,unknown=-1;vertical=0;horizontal;
-
-@set GRADIENTROUNDRECTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex
-@set GRADIENTROUNDRECTFLAGS_DEF=invalid,unknown=-1;round,roundBoth,fillFull,none=0;squareBegin;squareEnd;noFillBegin;noFillEnd
 
 @set LINETYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
 @set LINETYPE_DEF=invalid,unknown=-1;diagonal=0;vertical;horizontal;
@@ -65,9 +68,9 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %HORALIGN_GEN_FLAGS%                %UINT32% -E=HorAlign                         -F=%HORALIGN_DEF%               ^
 %FONTSTYLEFLAGS_GEN_FLAGS%          %UINT32% -E=FontStyleFlags                   -F=%FONTSTYLEFLAGS_DEF%         ^
+%GRADIENTROUNDRECTFLAGS_GEN_FLAGS%  %UINT32% -E=GradientRoundRectFillFlags       -F=%GRADIENTROUNDRECTFLAGS_DEF% ^
 %FONTWEIGHT_GEN_FLAGS%              %INT% --enum-generation-flags=unsigned-vals  -E=FontWeight  -F=%FONTWEIGHT_DEF% ^
 %GRADIENTTYPE_GEN_FLAGS%            %UINT32% -E=GradientType                     -F=%GRADIENTTYPE_DEF%           ^
-%GRADIENTROUNDRECTFLAGS_GEN_FLAGS%  %UINT32% -E=GradientRoundRectFillFlags       -F=%GRADIENTROUNDRECTFLAGS_DEF% ^
 %LINETYPE_GEN_FLAGS%                %UINT32% -E=LineType                         -F=%LINETYPE_DEF% ^
 %LINEDIRECTION_GEN_FLAGS%           %UINT32% -E=LineDirection                    -F=%LINEDIRECTION_DEF% ^
 %LINEENDCAPSTYLE_GEN_FLAGS%         %UINT32% -E=LineEndcapStyle                  -F=%LINEENDCAPSTYLE_DEF% ^

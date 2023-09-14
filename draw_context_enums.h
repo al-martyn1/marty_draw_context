@@ -91,6 +91,62 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(FontStyleFlags, std::set)
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(FontStyleFlags, std::set)
 
 
+enum class GradientRoundRectFillFlags : std::uint32_t
+{
+    invalid       = (std::uint32_t)(-1),
+    unknown       = (std::uint32_t)(-1),
+    round         = 0x00,
+    roundBoth     = 0x00,
+    fillFull      = 0x00,
+    none          = 0x00,
+    squareBegin   = 0x01,
+    squareEnd     = 0x02,
+    noFillBegin   = 0x04,
+    noFillEnd     = 0x08
+
+}; // enum class GradientRoundRectFillFlags : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_FLAGS(GradientRoundRectFillFlags)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "NoFillBegin" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "Invalid"     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "SquareEnd"   );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "SquareBegin" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "Round"       );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "NoFillEnd"   );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no-fill-begin" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "nofillbegin"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no_fill_begin" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "invalid"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "unknown"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square-end"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square_end"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "squareend"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square-begin"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square_begin"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "squarebegin"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "none"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round_both"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round-both"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "roundboth"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill-full"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill_full"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fillfull"      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no-fill-end"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "nofillend"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no_fill_end"   );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(GradientRoundRectFillFlags, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(GradientRoundRectFillFlags, std::set)
+
+
 enum class FontWeight : int
 {
     invalid      = (int)(-1),
@@ -182,58 +238,6 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( GradientType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( GradientType::vertical     , "vertical"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( GradientType::horizontal   , "horizontal" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( GradientType, std::map, 1 )
-
-
-enum class GradientRoundRectFillFlags : std::uint32_t
-{
-    invalid       = (std::uint32_t)(-1),
-    unknown       = (std::uint32_t)(-1),
-    round         = 0x00,
-    roundBoth     = 0x00,
-    fillFull      = 0x00,
-    none          = 0x00,
-    squareBegin   = 0x01,
-    squareEnd     = 0x02,
-    noFillBegin   = 0x04,
-    noFillEnd     = 0x08
-
-}; // enum class GradientRoundRectFillFlags : std::uint32_t
-
-MARTY_CPP_MAKE_ENUM_FLAGS(GradientRoundRectFillFlags)
-
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "NoFillBegin" );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "Invalid"     );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "SquareEnd"   );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "SquareBegin" );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "Round"       );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "NoFillEnd"   );
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
-
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no-fill-begin" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "nofillbegin"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no_fill_begin" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "invalid"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "unknown"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square-end"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square_end"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "squareend"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square-begin"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square_begin"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "squarebegin"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "none"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round_both"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round"         );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round-both"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "roundboth"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill-full"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill_full"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fillfull"      );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no-fill-end"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "nofillend"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no_fill_end"   );
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
 
 
 enum class LineType : std::uint32_t

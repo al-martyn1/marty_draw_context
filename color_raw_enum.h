@@ -4,11 +4,9 @@
 
 #include <exception>
 #include <map>
-#include <set>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 
 
 
@@ -643,10 +641,6 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::YellowGreen           , "yellow_green"            );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::YellowGreen           , "yellowgreen"             );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( EColorRawEnum, std::map, 1 )
-
-MARTY_CPP_ENUM_CLASS_SERIALIZE_SET(EColorRawEnum, std::set)
-
-MARTY_CPP_ENUM_CLASS_DESERIALIZE_SET(EColorRawEnum, std::set)
 
 } // namespace marty_draw_context
 

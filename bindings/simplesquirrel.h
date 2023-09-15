@@ -333,7 +333,7 @@ int fromObjectConvertHelper<int>(ssq::Object &o, const SQChar *paramName)
     switch(t)
     {
         case ssq::Type::INTEGER:
-            return o.toInt();
+            return (int)o.toInt();
 
         case ssq::Type::FLOAT:
             {
@@ -964,10 +964,160 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
 
     std::set<ssq::sqstring> knownEnumNames;
 
+
     ssq::sqstring scriptText = 
-                      makeEnumScriptString( prefix, "HorAlign"       , itemSep, enumSep, knownEnumNames
-                                          , HorAlign::left, HorAlign::center, HorAlign::right
+                      makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
+                                          , EColorRawEnum::AliceBlue
+                                          , EColorRawEnum::AntiqueWhite
+                                          , EColorRawEnum::Aqua                
+                                          , EColorRawEnum::Aquamarine          
+                                          , EColorRawEnum::Azure               
+                                          , EColorRawEnum::Beige               
+                                          , EColorRawEnum::Bisque              
+                                          , EColorRawEnum::Black               
+                                          , EColorRawEnum::BlanchedAlmond      
+                                          , EColorRawEnum::Blue                
+                                          , EColorRawEnum::BlueViolet          
+                                          , EColorRawEnum::Brown               
+                                          , EColorRawEnum::BurlyWood           
+                                          , EColorRawEnum::CadetBlue           
+                                          , EColorRawEnum::Chartreuse          
+                                          , EColorRawEnum::Chocolate           
+                                          , EColorRawEnum::Coral               
+                                          , EColorRawEnum::CornflowerBlue      
+                                          , EColorRawEnum::Cornsilk            
+                                          , EColorRawEnum::DarkCyan            
+                                          , EColorRawEnum::DarkGoldenRod       
+                                          , EColorRawEnum::DarkGray            
+                                          , EColorRawEnum::DarkGrey            
+                                          , EColorRawEnum::DarkGreen           
+                                          , EColorRawEnum::DarkKhaki           
+                                          , EColorRawEnum::DarkMagenta         
+                                          , EColorRawEnum::DarkOliveGreen      
+                                          , EColorRawEnum::DarkOrange          
+                                          , EColorRawEnum::DarkOrchid          
+                                          , EColorRawEnum::DarkRed             
+                                          , EColorRawEnum::DarkSalmon          
+                                          , EColorRawEnum::DarkSeaGreen        
+                                          , EColorRawEnum::DarkSlateBlue       
+                                          , EColorRawEnum::DarkSlateGray       
+                                          , EColorRawEnum::DarkSlateGrey       
+                                          , EColorRawEnum::DarkTurquoise       
+                                          , EColorRawEnum::DarkViolet          
+                                          , EColorRawEnum::DeepPink            
+                                          , EColorRawEnum::DeepSkyBlue         
+                                          , EColorRawEnum::DimGray             
+                                          , EColorRawEnum::DimGrey             
+                                          , EColorRawEnum::DodgerBlue          
+                                          , EColorRawEnum::FireBrick           
+                                          , EColorRawEnum::FloralWhite         
+                                          , EColorRawEnum::ForestGreen         
+                                          , EColorRawEnum::Fuchsia             
+                                          , EColorRawEnum::Gainsboro           
+                                          , EColorRawEnum::GhostWhite          
+                                          , EColorRawEnum::Gold                
+                                          , EColorRawEnum::GoldenRod           
+                                          , EColorRawEnum::Gray                
+                                          , EColorRawEnum::Grey                
+                                          , EColorRawEnum::Green               
+                                          , EColorRawEnum::GreenYellow         
+                                          , EColorRawEnum::HoneyDew            
+                                          , EColorRawEnum::HotPink             
+                                          , EColorRawEnum::IndianRed           
+                                          , EColorRawEnum::Indigo              
+                                          , EColorRawEnum::Ivory               
+                                          , EColorRawEnum::Khaki               
+                                          , EColorRawEnum::Lavender            
+                                          , EColorRawEnum::LavenderBlush       
+                                          , EColorRawEnum::LawnGreen           
+                                          , EColorRawEnum::LemonChiffon        
+                                          , EColorRawEnum::LightBlue           
+                                          , EColorRawEnum::LightCoral          
+                                          , EColorRawEnum::LightCyan           
+                                          , EColorRawEnum::LightGoldenRodYellow
+                                          , EColorRawEnum::LightGray           
+                                          , EColorRawEnum::LightGrey           
+                                          , EColorRawEnum::LightGreen          
+                                          , EColorRawEnum::LightPink           
+                                          , EColorRawEnum::LightSalmon         
+                                          , EColorRawEnum::LightSeaGreen       
+                                          , EColorRawEnum::LightSkyBlue        
+                                          , EColorRawEnum::LightSlateGray      
+                                          , EColorRawEnum::LightSlateGrey      
+                                          , EColorRawEnum::LightSteelBlue      
+                                          , EColorRawEnum::LightYellow         
+                                          , EColorRawEnum::Lime                
+                                          , EColorRawEnum::LimeGreen           
+                                          , EColorRawEnum::Linen               
+                                          , EColorRawEnum::Magenta             
+                                          , EColorRawEnum::Maroon              
+                                          , EColorRawEnum::MediumAquaMarine    
+                                          , EColorRawEnum::MediumBlue          
+                                          , EColorRawEnum::MediumOrchid        
+                                          , EColorRawEnum::MediumPurple        
+                                          , EColorRawEnum::MediumSeaGreen      
+                                          , EColorRawEnum::MediumSlateBlue     
+                                          , EColorRawEnum::MediumSpringGreen   
+                                          , EColorRawEnum::MediumTurquoise     
+                                          , EColorRawEnum::MediumVioletRed     
+                                          , EColorRawEnum::MidnightBlue        
+                                          , EColorRawEnum::MintCream           
+                                          , EColorRawEnum::MistyRose           
+                                          , EColorRawEnum::Moccasin            
+                                          , EColorRawEnum::NavajoWhite         
+                                          , EColorRawEnum::Navy                
+                                          , EColorRawEnum::OldLace             
+                                          , EColorRawEnum::Olive               
+                                          , EColorRawEnum::OliveDrab           
+                                          , EColorRawEnum::Orange              
+                                          , EColorRawEnum::OrangeRed           
+                                          , EColorRawEnum::Orchid              
+                                          , EColorRawEnum::PaleGoldenRod       
+                                          , EColorRawEnum::PaleGreen           
+                                          , EColorRawEnum::PaleTurquoise       
+                                          , EColorRawEnum::PaleVioletRed       
+                                          , EColorRawEnum::PapayaWhip          
+                                          , EColorRawEnum::PeachPuff           
+                                          , EColorRawEnum::Peru                
+                                          , EColorRawEnum::Pink                
+                                          , EColorRawEnum::Plum                
+                                          , EColorRawEnum::PowderBlue          
+                                          , EColorRawEnum::Purple              
+                                          , EColorRawEnum::RebeccaPurple       
+                                          , EColorRawEnum::Red                 
+                                          , EColorRawEnum::RosyBrown           
+                                          , EColorRawEnum::RoyalBlue           
+                                          , EColorRawEnum::SaddleBrown         
+                                          , EColorRawEnum::Salmon              
+                                          , EColorRawEnum::SandyBrown          
+                                          , EColorRawEnum::SeaGreen            
+                                          , EColorRawEnum::SeaShell            
+                                          , EColorRawEnum::Sienna              
+                                          , EColorRawEnum::Silver              
+                                          , EColorRawEnum::SkyBlue             
+                                          , EColorRawEnum::SlateBlue           
+                                          , EColorRawEnum::SlateGray           
+                                          , EColorRawEnum::SlateGrey           
+                                          , EColorRawEnum::Snow                
+                                          , EColorRawEnum::SpringGreen         
+                                          , EColorRawEnum::SteelBlue           
+                                          , EColorRawEnum::Tan                 
+                                          , EColorRawEnum::Teal                
+                                          , EColorRawEnum::Thistle             
+                                          , EColorRawEnum::Tomato              
+                                          , EColorRawEnum::Turquoise           
+                                          , EColorRawEnum::Violet              
+                                          , EColorRawEnum::Wheat               
+                                          , EColorRawEnum::White               
+                                          , EColorRawEnum::WhiteSmoke          
+                                          , EColorRawEnum::Yellow              
+                                          , EColorRawEnum::YellowGreen         
                                           );
+
+    scriptText.append(makeEnumScriptString( prefix, "HorAlign"       , itemSep, enumSep, knownEnumNames
+                                          , HorAlign::left, HorAlign::center, HorAlign::right
+                                          )
+                      );
 
     scriptText.append(makeEnumScriptString( prefix, "FontStyleFlags" , itemSep, enumSep, knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout

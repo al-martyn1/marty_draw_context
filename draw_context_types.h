@@ -499,22 +499,22 @@ typedef FontParamsT<std::wstring>   FontParamsW;
 
 
 
-enum class SmoothingMode
-{
-    invalid              = -1,
-    defMode              =  0,
-
-    highSpeed            =  1,
-    lowQuality           =  1,
-
-    highQuality          =  2,
-    lowSpeed             =  2,
-
-    none                 =  3,
-
-    antiAlias            =  4,
-
-};
+// enum class SmoothingMode
+// {
+//     invalid              = -1,
+//     defMode              =  0,
+//  
+//     highSpeed            =  1,
+//     lowQuality           =  1,
+//  
+//     highQuality          =  2,
+//     lowSpeed             =  2,
+//  
+//     none                 =  3,
+//  
+//     antiAlias            =  4,
+//  
+// };
 
 
 

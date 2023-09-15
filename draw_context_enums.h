@@ -394,5 +394,43 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "counterclockwise" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ArcDirectionEnum, std::map, 1 )
 
+
+enum class SmoothingMode : std::uint32_t
+{
+    invalid       = (std::uint32_t)(-1),
+    unknown       = (std::uint32_t)(-1),
+    defMode       = 0,
+    highSpeed     = 1,
+    lowQuality    = 1,
+    highQuality   = 2,
+    lowSpeed      = 2,
+    noSmoothing   = 3,
+    none          = 3,
+    antiAlias     = 4
+
+}; // enum class SmoothingMode : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( SmoothingMode, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::highSpeed     , "HighSpeed"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::invalid       , "Invalid"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::antiAlias     , "AntiAlias"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::defMode       , "DefMode"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::highQuality   , "HighQuality" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::noSmoothing   , "NoSmoothing" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( SmoothingMode, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( SmoothingMode, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::highSpeed     , "highspeed"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::highSpeed     , "lowquality"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::invalid       , "invalid"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::invalid       , "unknown"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::antiAlias     , "antialias"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::defMode       , "defmode"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::highQuality   , "highquality" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::highQuality   , "lowspeed"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::noSmoothing   , "nosmoothing" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::noSmoothing   , "none"        );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( SmoothingMode, std::map, 1 )
+
 } // namespace marty_draw_context
 

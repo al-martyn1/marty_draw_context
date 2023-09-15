@@ -508,7 +508,7 @@ struct DrawingColor : public ColorRef
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Color"))
     {
         const bool staticMethod = true ;
-        const bool classMethod  = false;
+        //const bool classMethod  = false;
 
         auto cls = vm.addClass( className.c_str()
                               , []() -> DrawingColor*
@@ -582,8 +582,8 @@ struct DrawingCoords
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Coords"))
     {
-        const bool staticMethod = true ;
-        const bool classMethod  = false;
+        // const bool staticMethod = true ;
+        // const bool classMethod  = false;
 
         auto cls = vm.addClass( className.c_str()
                               , []( ssq::Object ox, ssq::Object oy  /* float x, float y */  ) -> DrawingCoords*

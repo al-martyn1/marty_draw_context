@@ -605,10 +605,21 @@ struct DrawingCoords
     float x;
     float y;
 
-    // DrawingCoords() : x(0.0), y(0.0) {}
-    // DrawingCoords(float x_, float y_) : x(x_), y(y_) {}
-    // DrawingCoords(const DrawingCoords &c) : x(c.x), y(c.y) {}
-    // DrawingCoords(DrawingCoords&&) = default;
+    DrawingCoords() : x(0.0), y(0.0) {}
+    DrawingCoords(float x_, float y_) : x(x_), y(y_) {}
+    DrawingCoords(const DrawCoord &c) : x(floatToFloat(c.x)), y(floatToFloat(c.y)) {}
+    DrawingCoords(const DrawingCoords &c) : x(c.x), y(c.y) {}
+    DrawingCoords(DrawingCoords&&) = default;
+
+    DrawingCoords& operator=(const DrawingCoords &c) = default;
+    DrawingCoords& operator=(DrawingCoords &&) = default;
+
+    DrawingCoords& operator=(const DrawCoord &c)
+    {
+        x = floatToFloat(c.x);
+        y = floatToFloat(c.y);
+        return *this;
+    }
 
     operator marty_draw_context::DrawCoord() const
     {
@@ -655,6 +666,30 @@ struct DrawingFontParams
     int                    fontStyleFlags = 0;
     ssq::sqstring          fontFace       = _SC("Courier");
 
+    DrawingFontParams() {}
+
+    DrawingFontParams(float h, int e, int o, int w, int fsf, const ssq::sqstring &fface)
+    : height        (h)
+    , escapement    (e)
+    , orientation   (o)
+    , weight        (w)
+    , fontStyleFlags(fsf)
+    , fontFace      (fface)
+    {}
+
+    DrawingFontParams(const FontParamsT<ssq::sqstring> &fp)
+    : height        (floatToFloat(fp.height))
+    , escapement    (fp.escapement )
+    , orientation   (fp.orientation)
+    , weight        ((int)fp.weight)
+    , fontStyleFlags((int)fp.fontStyleFlags)
+    , fontFace      (fp.fontFace)
+    {}
+
+    DrawingFontParams(const DrawingFontParams&) = default;
+    DrawingFontParams(DrawingFontParams&&) = default;
+
+
     operator marty_draw_context::FontParamsT<ssq::sqstring>() const
     {
         marty_draw_context::FontParamsT<ssq::sqstring> fpRes;
@@ -682,7 +717,7 @@ struct DrawingFontParams
                                     int           fontStyleFlags_ = fromObjectConvertHelper<int>(style, _SC("style"));
                                     ssq::sqstring fontFace_       = fromObjectConvertHelper<ssq::sqstring>(face , _SC("face"));
 
-                                    return new DrawingFontParams{height_, 0, 0, weight_, fontStyleFlags_, fontFace_ };
+                                    return new DrawingFontParams(height_, 0, 0, weight_, fontStyleFlags_, fontFace_);
                                 }
                               , true // release
                               );
@@ -802,97 +837,81 @@ struct DrawingContext
     DrawingContext() {}
     DrawingContext(IDrawContext *pDc_) : pDc(pDc_) {}
 
-    
-    // virtual SmoothingMode setSmoothingMode( SmoothingMode m ) = 0;
-    // virtual SmoothingMode getSmoothingMode( ) = 0;
 
-    // virtual DrawSize getDialigBaseUnits() = 0;
-    //  
-    // virtual DrawCoord mapRawToLogicPos( const DrawCoord &c  ) = 0;
-    // virtual DrawCoord mapRawToLogicSize( const DrawCoord &c ) = 0;
-    //  
-    // virtual DrawCoord getScaledPos( const DrawCoord &c  ) const = 0;
-    // virtual DrawCoord getScaledSize( const DrawCoord &c ) const = 0;
-    //  
-    //  
-    // virtual DrawCoord setOffset( const DrawCoord &c ) = 0;
-    // virtual DrawCoord getOffset( ) = 0;
-    //  
-    // virtual DrawScale setScale( const DrawScale &scale ) = 0;
-    // virtual DrawScale getScale( ) = 0;
-    //  
-    // virtual float_t setPenScale( float_t scale ) = 0;
-    // virtual float_t getPenScale( ) = 0;
-
-
-    int createSolidPen( DrawingPenParams penParams, DrawingColor colorRef ) const
+    bool setCollectMarkers(bool cmMode) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->createSolidPen( penParams, colorRef );
+        if (!pDc)
+            return false;
+        return pDc->setCollectMarkers(cmMode);
     }
 
-    int selectPen( int penId ) const
+    bool getCollectMarkers() const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->selectPen( penId );
+        if (!pDc)
+            return false;
+        return pDc->getCollectMarkers();
     }
 
-    int selectNewSolidPen( PenParams penParams, ColorRef colorRef ) const
+    bool markerAdd( const DrawCoord &pos ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->selectNewSolidPen( penParams, colorRef );
+        if (!pDc)
+            return false;
+        return pDc->markerAdd(pos);
     }
 
-    int getCurPen() const
+    bool markerAddEx( const DrawCoord &pos, float size ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->getCurPen();     
+        if (!pDc)
+            return false;
+        return pDc->markerAdd(pos, (DrawCoord::value_type)size);
     }
 
-    ColorRef getPenColor(int penId) const
+    bool markersClear() const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->getPenColor(penId);     
+        if (!pDc)
+            return false;
+        pDc->markersClear();
+        return true;
     }
 
-    int setDefaultCosmeticPen( int penId ) const
+    bool markersDraw() const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->setDefaultCosmeticPen(penId);     
+        if (!pDc)
+            return false;
+        pDc->markersDraw(-1);
+        return true;
     }
 
-    int getDefaultCosmeticPen( ) const
+    bool markersDrawEx(int penId) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->getDefaultCosmeticPen();     
+        if (!pDc)
+            return false;
+        pDc->markersDraw(penId);
+        return true;
     }
 
-
-    // virtual int createSolidBrush( const ColorRef &rgb ) = 0;
-    // virtual int createSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
-    // virtual int selectBrush( int brushId ) = 0;
-    //  
-    // // returns new brushId, not prev
-    // virtual int selectNewSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
-    // virtual int selectNewSolidBrush( const ColorRef &rgb ) = 0;
-    //  
-    // virtual int getCurBrush() = 0;
-
-
-
-
-    bool moveTo( DrawingCoords to ) const
+    float markerSetDefSize( float size ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->moveTo(to);     
+        if (!pDc)
+            return false;
+        return floatToFloat((pDc->markerSetDefSize((DrawCoord::value_type)size)));
     }
 
-    bool lineTo( DrawingCoords to ) const
+    float markerGetDefSize( ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
-        return pDc->lineTo(to);     
+        if (!pDc)
+            return false;
+        return floatToFloat((pDc->markerGetDefSize()));
     }
-
 
 
     // virtual bool setCollectMarkers( bool cmMode ) = 0;
@@ -906,20 +925,570 @@ struct DrawingContext
     // virtual DrawCoord::value_type markerGetDefSize( ) = 0;
 
 
+    int setSmoothingMode( int m ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return (int)SmoothingMode::invalid;
+        return (int)pDc->setSmoothingMode((SmoothingMode)m);
+    }
+
+    int getSmoothingMode() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return (int)SmoothingMode::invalid;
+        return (int)pDc->getSmoothingMode();
+    }
+    
+
+    DrawingColor setTextColor(DrawingColor clr) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingColor();
+        return pDc->setTextColor(clr);
+    }
+
+    DrawingColor getTextColor( ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingColor();
+        return pDc->getTextColor();
+    }
+
+    DrawingColor setBkColor(DrawingColor clr) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingColor();
+        return pDc->setBkColor(clr);
+    }
+
+    int setBkMode(int mode) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return (int)pDc->setBkMode((BkMode)mode);
+    }
+
+    DrawingCoords getDialigBaseUnits() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getDialigBaseUnits();
+    }
+
+    DrawingCoords mapRawToLogicPos ( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->mapRawToLogicPos(c);
+    }
+
+    DrawingCoords mapRawToLogicSize( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->mapRawToLogicSize(c);
+    }
+
+    DrawingCoords getScaledPos ( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getScaledPos(c);
+    }
+
+    DrawingCoords getScaledSize( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getScaledSize(c);
+    }
+
+    DrawingCoords setOffset( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->setOffset(c);
+    }
+
+    DrawingCoords getOffset( ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getOffset();
+    }
+
+    DrawingCoords setScale( DrawingCoords c ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->setScale(c);
+    }
+
+    DrawingCoords getScale( ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getScale();
+    }
+
+    float setPenScale( ssq::Object scale ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return 0.0f;
+        auto fScale = fromObjectConvertHelper<float>(scale, _SC("scale"));
+        return floatToFloat(pDc->setPenScale(fScale));
+    }
+
+    float getPenScale( ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return 0.0f;
+        return floatToFloat(pDc->getPenScale());
+    }
+
+
+    int createSolidPen( DrawingPenParams penParams, DrawingColor colorRef ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->createSolidPen( penParams, colorRef );
+    }
+
+    int selectPen( int penId ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectPen( penId );
+    }
+
+    int selectNewSolidPen( PenParams penParams, DrawingColor colorRef ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectNewSolidPen( penParams, colorRef );
+    }
+
+    int getCurPen() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->getCurPen();     
+    }
+
+    ColorRef getPenColor(int penId) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return ColorRef();
+        return pDc->getPenColor(penId);     
+    }
+
+    int setDefaultCosmeticPen( int penId ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->setDefaultCosmeticPen(penId);     
+    }
+
+    int getDefaultCosmeticPen( ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->getDefaultCosmeticPen();     
+    }
+
+
+    int createSolidBrush( DrawingColor rgb ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->createSolidBrush(rgb);     
+    }
+    
+    int selectBrush( int brushId ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectBrush(brushId);     
+    }
+
+    int selectNewSolidBrush( DrawingColor rgb ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectNewSolidBrush(rgb);     
+    }
+
+    int getCurBrush() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->getCurPen();     
+    }
+
+    //DrawingFontParams(const FontParamsT<ssq::sqstring> &fp)
+
+    int createFont(DrawingFontParams dfp) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int createFontEx(DrawingFontParams dfp, float height) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        dfp.height = height;
+        return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int createOrFindFont(DrawingFontParams dfp) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int createOrFindFontEx(DrawingFontParams dfp, float height) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        dfp.height = height;
+        return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int selectFont( int fontId ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectFont( fontId );
+    }
+
+    int selectNewFont(DrawingFontParams dfp) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int selectNewFontEx(DrawingFontParams dfp, float height) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        dfp.height = height;
+        return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int  getCurFont() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return pDc->getCurFont();
+    }
+
+    // virtual bool getFontParamsById( int id, FontParamsA &fp ) = 0;
+    DrawingFontParams getFontParamsById(int id) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingFontParams();
+
+        FontParamsT<ssq::sqstring> fp;
+        pDc->getFontParamsById(id, fp);
+        return static_cast<DrawingFontParams>(fp);
+    }
+
+    bool beginPath() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->beginPath();
+    }
+
+    bool beginPathFrom(DrawingCoords c) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->beginPath(c);
+    }
+
+    bool endPath( bool bStroke, bool bFill ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->endPath(bStroke, bFill);
+    }
+
+    bool closeFigure() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->closeFigure();
+    }
+
+    bool isPathStarted() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->isPathStarted();
+    }
+
+
+    bool moveTo( DrawingCoords to ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->moveTo(to);     
+    }
+
+    bool lineTo( DrawingCoords to ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->lineTo(to);     
+    }
+
+
+    bool ellipticArcTo( DrawingCoords leftTop
+                      , DrawingCoords rightBottom
+                      , DrawingCoords arcStartRefPoint
+                      , DrawingCoords arcEndRefPoint
+                      , bool          directionCounterclockwise
+                      ) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->ellipticArcTo(leftTop, rightBottom, arcStartRefPoint, arcEndRefPoint, directionCounterclockwise);
+    }
+
+    mutable DrawingCoords lastArcEndPos;
+
+    DrawingCoords getLastArcEndPos() const
+    {
+        return lastArcEndPos;
+    }
+
+    bool arcToPos(DrawingCoords centerPos, DrawingCoords endPos, bool directionCounterclockwise) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        DrawCoord calculatedEndPos;
+        bool res = pDc->arcTo(centerPos, endPos, directionCounterclockwise, &calculatedEndPos);
+        if (res)
+        {
+            lastArcEndPos = static_cast<DrawingCoords>(calculatedEndPos);
+        }
+
+        return res;
+    }
+
+    bool arcByAngleDeg(DrawingCoords centerPos, float angle) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        DrawCoord calculatedEndPos;
+        bool res = pDc->arcTo(centerPos, (DrawCoord::value_type)angle, &calculatedEndPos);
+        if (res)
+        {
+            lastArcEndPos = calculatedEndPos;
+        }
+
+        return res;
+    }
+
+    // //! Рисует набор горизонтальных и вертикальных линий, если две точки задают диагональную линию - это ошибка
+    // virtual bool roundRectFigure( const DrawCoord::value_type &cornersR
+    //                             , std::size_t numPoints
+    //                             , const DrawCoord             *pPoints
+    //                             ) = 0;
+
+    bool roundRect(float r, DrawingCoords leftTop, DrawingCoords rightBottom) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->roundRect((DrawCoord::value_type)r, leftTop, rightBottom);
+    }
+
+    bool rect(DrawingCoords leftTop, DrawingCoords rightBottom) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->rect(leftTop, rightBottom);
+    }
+
+    bool fillRect(DrawingCoords leftTop, DrawingCoords rightBottom) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->fillRect(leftTop, rightBottom);
+    }
+
+    bool fillGradientRect(DrawingCoords leftTop, DrawingCoords rightBottom, DrawingGradientParams gradientParams, int gradientType, bool excludeFrame) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->fillGradientRect( leftTop, rightBottom, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
+                                    , (DrawCoord::value_type)gradientParams.midPoint, (GradientType)gradientType, excludeFrame
+                                    );
+    }
+
+    bool fillGradientRoundRect( float r, DrawingCoords leftTop, DrawingCoords rightBottom, DrawingGradientParams gradientParams, int gradientType, bool excludeFrame
+                              , float fillBreakPos, int fillFlags) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->fillGradientRoundRect( (DrawCoord::value_type)r
+                                    , leftTop, rightBottom, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
+                                    , (DrawCoord::value_type)gradientParams.midPoint, (GradientType)gradientType, excludeFrame
+                                    , (DrawCoord::value_type)fillBreakPos, (GradientRoundRectFillFlags)fillFlags
+                                    );
+    }
+
+    bool fillGradientCircle(DrawingCoords pos, float r, DrawingGradientParams gradientParams, bool excludeFrame) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->fillGradientCircle( pos, (DrawCoord::value_type)r, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
+                                    , (DrawCoord::value_type)gradientParams.midPoint, excludeFrame
+                                    );
+    }
+
+
+
+
+
+
+
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
     {
         auto cls = vm.addClass( className.c_str(), []() { return new DrawingContext(); }, true /* release */ );
 
-        cls.addFunc( _SC("createSolidPen")         , &DrawingContext::createSolidPen);
-        cls.addFunc( _SC("selectPen")              , &DrawingContext::selectPen);
-        cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen);
-        cls.addFunc( _SC("getCurPen")              , &DrawingContext::getCurPen);
-        cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor);
+        cls.addFunc( _SC("setCollectMarkers")      , &DrawingContext::setCollectMarkers    );
+        cls.addFunc( _SC("getCollectMarkers")      , &DrawingContext::getCollectMarkers    );
+        cls.addFunc( _SC("markerAdd")              , &DrawingContext::markerAdd            );
+        cls.addFunc( _SC("markerAddEx")            , &DrawingContext::markerAddEx          );
+        cls.addFunc( _SC("markersClear")           , &DrawingContext::markersClear         );
+        cls.addFunc( _SC("markersDraw")            , &DrawingContext::markersDraw          );
+        cls.addFunc( _SC("markersDrawEx")          , &DrawingContext::markersDrawEx        );
+        cls.addFunc( _SC("markerSetDefSize")       , &DrawingContext::markerSetDefSize     );
+        cls.addFunc( _SC("markerGetDefSize")       , &DrawingContext::markerGetDefSize     );
+
+        cls.addFunc( _SC("setSmoothingMode")       , &DrawingContext::setSmoothingMode     );
+        cls.addFunc( _SC("getSmoothingMode")       , &DrawingContext::getSmoothingMode     );
+        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
+        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
+        cls.addFunc( _SC("setBkColor")             , &DrawingContext::setBkColor           );
+        //TODO: !!! Надо реализовать getBkColor
+        cls.addFunc( _SC("setBkMode")              , &DrawingContext::setBkMode            );
+        //TODO: !!! Надо реализовать getBkMode
+        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
+        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
+        cls.addFunc( _SC("getDialigBaseUnits")     , &DrawingContext::getDialigBaseUnits   );
+        cls.addFunc( _SC("mapRawToLogicPos")       , &DrawingContext::mapRawToLogicPos     );
+        cls.addFunc( _SC("mapRawToLogicSize")      , &DrawingContext::mapRawToLogicSize    );
+        cls.addFunc( _SC("getScaledPos")           , &DrawingContext::getScaledPos         );
+        cls.addFunc( _SC("getScaledSize")          , &DrawingContext::getScaledSize        );
+        cls.addFunc( _SC("setOffset")              , &DrawingContext::setOffset            );
+        cls.addFunc( _SC("getOffset")              , &DrawingContext::getOffset            );
+        cls.addFunc( _SC("setScale")               , &DrawingContext::setScale             );
+        cls.addFunc( _SC("getScale")               , &DrawingContext::getScale             );
+        cls.addFunc( _SC("setPenScale")            , &DrawingContext::setPenScale          );
+        cls.addFunc( _SC("getPenScale")            , &DrawingContext::getPenScale          );
+        cls.addFunc( _SC("createSolidPen")         , &DrawingContext::createSolidPen       );
+        cls.addFunc( _SC("selectPen")              , &DrawingContext::selectPen            );
+        cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen    );
+        cls.addFunc( _SC("getCurPen")              , &DrawingContext::getCurPen            );
+        cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor          );
         cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen);
         cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen);
-        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo);
-        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo);
+        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo               );
+        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo               );
+        cls.addFunc( _SC("createSolidBrush")       , &DrawingContext::createSolidBrush     );
+        cls.addFunc( _SC("selectBrush")            , &DrawingContext::selectBrush          );
+        cls.addFunc( _SC("selectNewSolidBrush")    , &DrawingContext::selectNewSolidBrush  );
+        cls.addFunc( _SC("getCurBrush")            , &DrawingContext::getCurBrush          );
+        cls.addFunc( _SC("createFont")             , &DrawingContext::createFont           );
+        cls.addFunc( _SC("createFontEx")           , &DrawingContext::createFontEx         );
+        cls.addFunc( _SC("createOrFindFont")       , &DrawingContext::createOrFindFont     );
+        cls.addFunc( _SC("createOrFindFontEx")     , &DrawingContext::createOrFindFontEx   );
+        cls.addFunc( _SC("selectFont")             , &DrawingContext::selectFont           );
+        cls.addFunc( _SC("selectNewFont")          , &DrawingContext::selectNewFont        );
+        cls.addFunc( _SC("selectNewFontEx")        , &DrawingContext::selectNewFontEx      );
+        cls.addFunc( _SC("getCurFont")             , &DrawingContext::getCurFont           );
+        cls.addFunc( _SC("getFontParamsById")      , &DrawingContext::getFontParamsById    );
+        cls.addFunc( _SC("beginPath")              , &DrawingContext::beginPath            );
+        cls.addFunc( _SC("beginPathFrom")          , &DrawingContext::beginPathFrom        );
+        cls.addFunc( _SC("endPath")                , &DrawingContext::endPath              );
+        cls.addFunc( _SC("closeFigure")            , &DrawingContext::closeFigure          );
+        cls.addFunc( _SC("isPathStarted")          , &DrawingContext::isPathStarted        );
+        cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo        );
+        cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos     );
+        cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos             );
+        cls.addFunc( _SC("arcByAngleDeg")          , &DrawingContext::arcByAngleDeg        );
+        cls.addFunc( _SC("roundRect")              , &DrawingContext::roundRect            );
+        cls.addFunc( _SC("rect")                   , &DrawingContext::rect                 );
+        cls.addFunc( _SC("fillRect")               , &DrawingContext::fillRect             );
+        cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect     );
+        cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect);
+        cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle   );
         //cls.addFunc( _SC("")  , &DrawingContext::);
+        //cls.addFunc( _SC("")  , &DrawingContext::);
+        //cls.addFunc( _SC("")  , &DrawingContext::);
+
 
         return cls;
     }

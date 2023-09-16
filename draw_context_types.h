@@ -272,31 +272,31 @@ float floatToFloat<marty::Decimal>( marty::Decimal f)
 
 
 template<typename FloatType> inline
-float floatToDouble( FloatType f)
+double floatToDouble( FloatType f)
 {
     return float(f);
 }
 
 template<> inline
-float floatToDouble<float>( float f)
+double floatToDouble<float>( float f)
 {
     return (float)f;
 }
 
 template<> inline
-float floatToDouble<double>( double f)
+double floatToDouble<double>( double f)
 {
     return (float)f;
 }
 
 template<> inline
-float floatToDouble<int>( int f)
+double floatToDouble<int>( int f)
 {
     return (float)f;
 }
 
 template<> inline
-float floatToDouble<marty::Decimal>( marty::Decimal f)
+double floatToDouble<marty::Decimal>( marty::Decimal f)
 {
     return (float)f.toDouble(); // int(f.round(0, marty::Decimal::RoundingMethod::roundMath));
 }

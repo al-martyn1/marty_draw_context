@@ -803,6 +803,27 @@ struct DrawingContext
     DrawingContext(IDrawContext *pDc_) : pDc(pDc_) {}
 
     
+    // virtual SmoothingMode setSmoothingMode( SmoothingMode m ) = 0;
+    // virtual SmoothingMode getSmoothingMode( ) = 0;
+
+    // virtual DrawSize getDialigBaseUnits() = 0;
+    //  
+    // virtual DrawCoord mapRawToLogicPos( const DrawCoord &c  ) = 0;
+    // virtual DrawCoord mapRawToLogicSize( const DrawCoord &c ) = 0;
+    //  
+    // virtual DrawCoord getScaledPos( const DrawCoord &c  ) const = 0;
+    // virtual DrawCoord getScaledSize( const DrawCoord &c ) const = 0;
+    //  
+    //  
+    // virtual DrawCoord setOffset( const DrawCoord &c ) = 0;
+    // virtual DrawCoord getOffset( ) = 0;
+    //  
+    // virtual DrawScale setScale( const DrawScale &scale ) = 0;
+    // virtual DrawScale getScale( ) = 0;
+    //  
+    // virtual float_t setPenScale( float_t scale ) = 0;
+    // virtual float_t getPenScale( ) = 0;
+
 
     int createSolidPen( DrawingPenParams penParams, DrawingColor colorRef ) const
     {
@@ -846,6 +867,20 @@ struct DrawingContext
         return pDc->getDefaultCosmeticPen();     
     }
 
+
+    // virtual int createSolidBrush( const ColorRef &rgb ) = 0;
+    // virtual int createSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
+    // virtual int selectBrush( int brushId ) = 0;
+    //  
+    // // returns new brushId, not prev
+    // virtual int selectNewSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
+    // virtual int selectNewSolidBrush( const ColorRef &rgb ) = 0;
+    //  
+    // virtual int getCurBrush() = 0;
+
+
+
+
     bool moveTo( DrawingCoords to ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
@@ -860,6 +895,15 @@ struct DrawingContext
 
 
 
+    // virtual bool setCollectMarkers( bool cmMode ) = 0;
+    // virtual bool getCollectMarkers( ) = 0;
+    // virtual bool markerAdd( const DrawCoord &pos, const DrawCoord::value_type sz ) = 0;
+    // virtual bool markerAdd( const DrawCoord &pos ) = 0;
+    // virtual void markersClear( ) = 0;
+    // virtual void markersDraw( int penId ) = 0;
+    //  
+    // virtual DrawCoord::value_type markerSetDefSize( const DrawCoord::value_type &sz ) = 0;
+    // virtual DrawCoord::value_type markerGetDefSize( ) = 0;
 
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
@@ -936,6 +980,7 @@ std::vector< std::pair<std::string, int> > makeEnumValuesVector( First first, En
 
 
 
+
 //----------------------------------------------------------------------------
 template<typename... EnumVal> inline
 ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
@@ -989,6 +1034,38 @@ ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::st
 }
 
 //----------------------------------------------------------------------------
+template<typename... EnumVal> inline
+ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
+{
+    //known.insert(utils::to_sqstring(enumNameOnly));
+    (void)known;
+
+    std::string enumName = enumPrefix+enumNameOnly;
+
+    std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
+
+    std::string res = "class " + enumName + "{";
+
+    for(auto p: valNameVec)
+    {
+        res.append("static ");
+        res.append(p.first);
+        //res.append("<-");
+        res.append("=");
+        res.append(itemTypeString);
+        res.append("(");
+        res.append(std::to_string(p.second));
+        res.append(")");
+        res.append(1, itemSep );
+    }
+
+    res.append("}");
+    res.append(1, enumSep );
+
+    return utils::to_sqstring(res);
+}
+
+//----------------------------------------------------------------------------
 
 
 
@@ -1003,9 +1080,10 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
 
     std::set<ssq::sqstring> knownEnumNames;
 
-
+    // ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
     ssq::sqstring scriptText = 
-                      makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
+                      //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
+                      makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep, knownEnumNames
                                           , EColorRawEnum::AliceBlue       , EColorRawEnum::AntiqueWhite   , EColorRawEnum::Aqua             , EColorRawEnum::Aquamarine          
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               

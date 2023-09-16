@@ -498,6 +498,20 @@ struct DrawingColor : public ColorRef
         return (DrawingColor)ColorRef::fromUnsigned((std::uint32_t)(std::int32_t)iclr);
     }
 
+    static
+    DrawingColor fromRgb( const ssq::Class&, int r, int g, int b )
+    {
+        ColorRef clr;
+
+        clr.r = (std::uint8_t)(std::uint32_t)r;
+        clr.g = (std::uint8_t)(std::uint32_t)g;
+        clr.b = (std::uint8_t)(std::uint32_t)b;
+
+        clr.a = 0;
+
+        return (DrawingColor)clr;
+    }
+
     int toIntBindHelper() const
     {
         return (int)(std::int32_t)toUnsigned();
@@ -556,6 +570,9 @@ struct DrawingColor : public ColorRef
                                 }
                               , true // release
                               );
+
+
+        cls.addFunc( _SC("fromRgb")     , &DrawingColor::fromRgb);
 
         cls.addFunc( _SC("toUnsigned")  , &DrawingColor::toUnsigned);
         cls.addFunc( _SC("fromUnsigned"), &DrawingColor::fromUnsignedBindHelper);
@@ -788,6 +805,13 @@ struct DrawingPenParams
     int           endcaps;
     int           join   ;
 
+    DrawingPenParams() : width(1.0), endcaps(0), join(0) {}
+    DrawingPenParams(float width_, int endcaps_, int join_) : width(width_), endcaps(endcaps_), join(join_) {}
+    DrawingPenParams(const PenParams &pp) : width(floatToFloat(pp.width)), endcaps((int)pp.endcaps), join((int)pp.join) {}
+    DrawingPenParams(const DrawingPenParams &) = default;
+    DrawingPenParams(DrawingPenParams &&) = default;
+
+
     operator marty_draw_context::PenParams() const
     {
         marty_draw_context::PenParams pp;
@@ -806,7 +830,7 @@ struct DrawingPenParams
                                     int           endcaps_   = fromObjectConvertHelper<int>(ecaps, _SC("endcaps"));
                                     int           join_      = fromObjectConvertHelper<int>(j, _SC("join"));
 
-                                    return new DrawingPenParams{width_, endcaps_, join_ };
+                                    return new DrawingPenParams(width_, endcaps_, join_ );
                                 }
                               , true // release
                               );
@@ -1080,7 +1104,7 @@ struct DrawingContext
         return pDc->selectPen( penId );
     }
 
-    int selectNewSolidPen( PenParams penParams, DrawingColor colorRef ) const
+    int selectNewSolidPen( DrawingPenParams penParams, DrawingColor colorRef ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
@@ -1213,6 +1237,26 @@ struct DrawingContext
         dfp.height = height;
         return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
+
+    //---
+    int createFontWithFace(DrawingFontParams dfp, ssq::sqstring face) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        dfp.fontFace = face;
+        return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+
+    int createOrFindFontWithFace(DrawingFontParams dfp, ssq::sqstring face) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        dfp.fontFace = face;
+        return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    }
+    //---
 
     int  getCurFont() const
     {
@@ -1465,6 +1509,8 @@ struct DrawingContext
         cls.addFunc( _SC("createFontEx")           , &DrawingContext::createFontEx         );
         cls.addFunc( _SC("createOrFindFont")       , &DrawingContext::createOrFindFont     );
         cls.addFunc( _SC("createOrFindFontEx")     , &DrawingContext::createOrFindFontEx   );
+        cls.addFunc( _SC("createFontWithFace")        , &DrawingContext::createFontWithFace      );
+        cls.addFunc( _SC("createOrFindFontWithFace")  , &DrawingContext::createOrFindFontWithFace);
         cls.addFunc( _SC("selectFont")             , &DrawingContext::selectFont           );
         cls.addFunc( _SC("selectNewFont")          , &DrawingContext::selectNewFont        );
         cls.addFunc( _SC("selectNewFontEx")        , &DrawingContext::selectNewFontEx      );

@@ -906,9 +906,27 @@ struct DrawingPenParams
 struct DrawingContext
 {
     IDrawContext *pDc = 0;
+    int           ctxSizeX = 0;
+    int           ctxSizeY = 0;
 
     DrawingContext() {}
-    DrawingContext(IDrawContext *pDc_) : pDc(pDc_) {}
+    DrawingContext(IDrawContext *pDc_) : pDc(pDc_), ctxSizeX(0), ctxSizeY(0) {}
+
+    DrawingCoords getRawSize() const
+    {
+        return DrawingCoords{(float)ctxSizeX, (float)ctxSizeY};
+    }
+
+    DrawingCoords getSize() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords(0,0);
+
+        //auto retVal = pDc->getScaledSize( DrawCoord{ctxSizeX, ctxSizeY} );
+        auto retVal = pDc->mapRawToLogicSize( DrawCoord{ctxSizeX, ctxSizeY} );
+        return retVal;
+    }
 
 
     bool setCollectMarkers(bool cmMode) const
@@ -1556,6 +1574,9 @@ struct DrawingContext
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
     {
         auto cls = vm.addClass( className.c_str(), []() { return new DrawingContext(); }, true /* release */ );
+
+        cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize);
+        cls.addFunc( _SC("getSize")                , &DrawingContext::getSize);
 
         cls.addFunc( _SC("setCollectMarkers")      , &DrawingContext::setCollectMarkers    );
         cls.addFunc( _SC("getCollectMarkers")      , &DrawingContext::getCollectMarkers    );

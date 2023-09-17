@@ -107,7 +107,8 @@ Lime                 =  0x00FF00;
 LimeGreen            =  0x32CD32;
 
 Linen                =  0xFAF0E6;
-Magenta              =  0xFF00FF;
+// Magenta is 0xFF00FF, but fuchsia has the same value, so we assign magenta to 0xFE00FE to make difference
+Magenta              =  0xFE00FE;
 Maroon               =  0x800000;
 
 MediumAquaMarine     =  0x66CDAA;

@@ -96,7 +96,7 @@ enum class EColorRawEnum : std::uint32_t
     Lime                   = 0x00FF00,
     LimeGreen              = 0x32CD32,
     Linen                  = 0xFAF0E6,
-    Magenta                = 0xFF00FF,
+    Magenta                = 0xFE00FE,
     Maroon                 = 0x800000,
     MediumAquaMarine       = 0x66CDAA,
     MediumBlue             = 0x0000CD,
@@ -184,6 +184,7 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::BlueViolet            , "BlueViolet"           );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Brown                 , "Brown"                );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::RebeccaPurple         , "RebeccaPurple"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Magenta               , "Magenta"              );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::BurlyWood             , "BurlyWood"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::CadetBlue             , "CadetBlue"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::GhostWhite            , "GhostWhite"           );
@@ -354,6 +355,7 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::RebeccaPurple         , "rebecca-purple"          );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::RebeccaPurple         , "rebecca_purple"          );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::RebeccaPurple         , "rebeccapurple"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Magenta               , "magenta"                 );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::BurlyWood             , "burly-wood"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::BurlyWood             , "burly_wood"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::BurlyWood             , "burlywood"               );
@@ -382,7 +384,6 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Gray                  , "gray"                    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Gray                  , "grey"                    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Fuchsia               , "fuchsia"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Fuchsia               , "magenta"                 );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkTurquoise         , "dark-turquoise"          );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkTurquoise         , "dark_turquoise"          );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkTurquoise         , "darkturquoise"           );

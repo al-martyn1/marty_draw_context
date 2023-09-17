@@ -65,6 +65,16 @@
 
 
 
+//----------------------------------------------------------------------------
+// #if !defined(_SC)
+//  
+// #endif
+//  
+// #define _SC(a) L##a
+// #define _SC(a) a
+
+
+
 
 //----------------------------------------------------------------------------
 
@@ -646,6 +656,31 @@ struct DrawingCoords
         return res;
     }
 
+    DrawingCoords addImpl(DrawingCoords c)
+    {
+        return DrawingCoords(x+c.x, y+c.y);
+    }
+
+    DrawingCoords subImpl(DrawingCoords c)
+    {
+        return DrawingCoords(x-c.x, y-c.y);
+    }
+
+    DrawingCoords unmImpl()
+    {
+        return DrawingCoords(-x, -y);
+    }
+
+    DrawingCoords mulImpl(DrawingCoords c)
+    {
+        return DrawingCoords(x*c.x, y*c.y);
+    }
+
+    DrawingCoords divImpl(DrawingCoords c)
+    {
+        return DrawingCoords(x/c.x, y/c.y);
+    }
+
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Coords"))
     {
@@ -662,6 +697,13 @@ struct DrawingCoords
 
         cls.addVar(_SC("x"), &DrawingCoords::x);
         cls.addVar(_SC("y"), &DrawingCoords::y);
+
+        // operators override
+        cls.addFunc( _SC("_add") , &DrawingCoords::addImpl);
+        cls.addFunc( _SC("_sub") , &DrawingCoords::subImpl);
+        cls.addFunc( _SC("_unm") , &DrawingCoords::unmImpl);
+        cls.addFunc( _SC("_mul") , &DrawingCoords::mulImpl);
+        cls.addFunc( _SC("_div") , &DrawingCoords::divImpl);
 
         return cls;
     }
@@ -782,7 +824,14 @@ struct DrawingGradientParams
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("GradientParams"))
     {
-        auto cls = vm.addClass( className.c_str(), []() { return new DrawingGradientParams(); }, true /* release */ );
+        auto cls = vm.addClass( className.c_str()
+                              , [](DrawingColor b, DrawingColor m, DrawingColor e, ssq::Object mp)
+                                {
+                                    float mp_         = fromObjectConvertHelper<float>(mp, _SC("midPont"));
+                                    return new DrawingGradientParams{b, m, e, mp_};
+                                }
+                              , true /* release */
+                              );
 
         cls.addVar(_SC("colorBegin") , &DrawingGradientParams::colorBegin );
         cls.addVar(_SC("colorMid")   , &DrawingGradientParams::colorMid   );
@@ -878,7 +927,7 @@ struct DrawingContext
         return pDc->getCollectMarkers();
     }
 
-    bool markerAdd( const DrawCoord &pos ) const
+    bool markerAdd( DrawingCoords pos ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
@@ -886,12 +935,12 @@ struct DrawingContext
         return pDc->markerAdd(pos);
     }
 
-    bool markerAddEx( const DrawCoord &pos, float size ) const
+    bool markerAddEx( DrawingCoords pos, ssq::Object size ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->markerAdd(pos, (DrawCoord::value_type)size);
+        return pDc->markerAdd(pos, (DrawCoord::value_type)fromObjectConvertHelper<float>(size, _SC("size")));
     }
 
     bool markersClear() const
@@ -921,12 +970,12 @@ struct DrawingContext
         return true;
     }
 
-    float markerSetDefSize( float size ) const
+    float markerSetDefSize( ssq::Object size ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return floatToFloat((pDc->markerSetDefSize((DrawCoord::value_type)size)));
+        return floatToFloat((pDc->markerSetDefSize((DrawCoord::value_type)fromObjectConvertHelper<float>(size, _SC("size")))));
     }
 
     float markerGetDefSize( ) const
@@ -936,17 +985,6 @@ struct DrawingContext
             return false;
         return floatToFloat((pDc->markerGetDefSize()));
     }
-
-
-    // virtual bool setCollectMarkers( bool cmMode ) = 0;
-    // virtual bool getCollectMarkers( ) = 0;
-    // virtual bool markerAdd( const DrawCoord &pos, const DrawCoord::value_type sz ) = 0;
-    // virtual bool markerAdd( const DrawCoord &pos ) = 0;
-    // virtual void markersClear( ) = 0;
-    // virtual void markersDraw( int penId ) = 0;
-    //  
-    // virtual DrawCoord::value_type markerSetDefSize( const DrawCoord::value_type &sz ) = 0;
-    // virtual DrawCoord::value_type markerGetDefSize( ) = 0;
 
 
     int setSmoothingMode( int m ) const
@@ -1187,12 +1225,12 @@ struct DrawingContext
         return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
-    int createFontEx(DrawingFontParams dfp, float height) const
+    int createFontEx(DrawingFontParams dfp, ssq::Object height) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = height;
+        dfp.height = fromObjectConvertHelper<float>(height, _SC("height"));
         return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1204,12 +1242,12 @@ struct DrawingContext
         return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
-    int createOrFindFontEx(DrawingFontParams dfp, float height) const
+    int createOrFindFontEx(DrawingFontParams dfp, ssq::Object height) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = height;
+        dfp.height = fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
         return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1229,12 +1267,12 @@ struct DrawingContext
         return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
-    int selectNewFontEx(DrawingFontParams dfp, float height) const
+    int selectNewFontEx(DrawingFontParams dfp, ssq::Object height) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = height;
+        dfp.height = fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
         return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1372,14 +1410,14 @@ struct DrawingContext
         return res;
     }
 
-    bool arcByAngleDeg(DrawingCoords centerPos, float angle) const
+    bool arcByAngleDeg(DrawingCoords centerPos, ssq::Object angle) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
 
-        DrawCoord calculatedEndPos;
-        bool res = pDc->arcTo(centerPos, (DrawCoord::value_type)angle, &calculatedEndPos);
+        DrawCoord calculatedEndPos; // 
+        bool res = pDc->arcTo(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(angle, _SC("angle")), &calculatedEndPos);
         if (res)
         {
             lastArcEndPos = calculatedEndPos;
@@ -1389,17 +1427,62 @@ struct DrawingContext
     }
 
     // //! Рисует набор горизонтальных и вертикальных линий, если две точки задают диагональную линию - это ошибка
-    // virtual bool roundRectFigure( const DrawCoord::value_type &cornersR
+    bool roundRectFigure( ssq::Object cornersR, ssq::Object points ) const
+    {
+        if (points.isNull() || points.isEmpty())
+        {
+            return true;
+        }
+
+        ssq::Type t = points.getType();
+        if (t!=ssq::Type::ARRAY)
+        {
+            return false;
+        }
+
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+
+        ssq::Array a = points.toArray();
+
+        std::size_t size = a.size();
+
+        std::vector<DrawCoord> drawCoordPoints;
+
+        for(std::size_t i=0; i!=size; ++i)
+        {
+            DrawingCoords drawingCoords = a.get<DrawingCoords>(i);
+            drawCoordPoints.emplace_back(static_cast<DrawCoord>(drawingCoords));
+        }
+
+
+        //std::vector<Object> Array::convertRaw() {
+
+        // template<typename T>
+        // T get(size_t index) {
+
+        if (drawCoordPoints.empty())
+        {
+            return true;
+        }
+
+        return pDc->roundRectFigure((DrawCoord::value_type)fromObjectConvertHelper<float>(cornersR, _SC("cornersR")), drawCoordPoints.size(), &drawCoordPoints[0]);
+
+    }
+
+    // virtual bool roundRectFigure( float cornersR
     //                             , std::size_t numPoints
     //                             , const DrawCoord             *pPoints
     //                             ) = 0;
 
-    bool roundRect(float r, DrawingCoords leftTop, DrawingCoords rightBottom) const
+    bool roundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->roundRect((DrawCoord::value_type)r, leftTop, rightBottom);
+        return pDc->roundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
     }
 
     bool rect(DrawingCoords leftTop, DrawingCoords rightBottom) const
@@ -1428,32 +1511,45 @@ struct DrawingContext
                                     );
     }
 
-    bool fillGradientRoundRect( float r, DrawingCoords leftTop, DrawingCoords rightBottom, DrawingGradientParams gradientParams, int gradientType, bool excludeFrame
-                              , float fillBreakPos, int fillFlags) const
+    bool fillGradientRoundRect( ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom, DrawingGradientParams gradientParams, int gradientType, bool excludeFrame
+                              , ssq::Object fillBreakPos, int fillFlags) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->fillGradientRoundRect( (DrawCoord::value_type)r
+        return pDc->fillGradientRoundRect( (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR"))
                                     , leftTop, rightBottom, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
                                     , (DrawCoord::value_type)gradientParams.midPoint, (GradientType)gradientType, excludeFrame
-                                    , (DrawCoord::value_type)fillBreakPos, (GradientRoundRectFillFlags)fillFlags
+                                    , (DrawCoord::value_type)fromObjectConvertHelper<float>(fillBreakPos, _SC("fillBreakPos")), (GradientRoundRectFillFlags)fillFlags
                                     );
     }
 
-    bool fillGradientCircle(DrawingCoords pos, float r, DrawingGradientParams gradientParams, bool excludeFrame) const
+    bool fillGradientCircle(DrawingCoords pos, ssq::Object r, DrawingGradientParams gradientParams, bool excludeFrame) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->fillGradientCircle( pos, (DrawCoord::value_type)r, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
+        return pDc->fillGradientCircle( pos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("radius")), gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
                                     , (DrawCoord::value_type)gradientParams.midPoint, excludeFrame
                                     );
     }
 
 
+    bool textOut(DrawingCoords pos, ssq::sqstring text) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->textOut(pos, text);
+    }
 
-
+    bool textOutWithFontAndColor(DrawingCoords pos, int fontId, DrawingColor rgb, ssq::sqstring text) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->textOut(pos, fontId, rgb, text);
+    }
 
 
 
@@ -1499,8 +1595,6 @@ struct DrawingContext
         cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor          );
         cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen);
         cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen);
-        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo               );
-        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo               );
         cls.addFunc( _SC("createSolidBrush")       , &DrawingContext::createSolidBrush     );
         cls.addFunc( _SC("selectBrush")            , &DrawingContext::selectBrush          );
         cls.addFunc( _SC("selectNewSolidBrush")    , &DrawingContext::selectNewSolidBrush  );
@@ -1521,20 +1615,22 @@ struct DrawingContext
         cls.addFunc( _SC("endPath")                , &DrawingContext::endPath              );
         cls.addFunc( _SC("closeFigure")            , &DrawingContext::closeFigure          );
         cls.addFunc( _SC("isPathStarted")          , &DrawingContext::isPathStarted        );
+        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo               );
+        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo               );
         cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo        );
         cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos     );
         cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos             );
         cls.addFunc( _SC("arcByAngleDeg")          , &DrawingContext::arcByAngleDeg        );
+        cls.addFunc( _SC("roundRectFigure")        , &DrawingContext::roundRectFigure      );
         cls.addFunc( _SC("roundRect")              , &DrawingContext::roundRect            );
         cls.addFunc( _SC("rect")                   , &DrawingContext::rect                 );
         cls.addFunc( _SC("fillRect")               , &DrawingContext::fillRect             );
         cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect     );
         cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect);
         cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle   );
+        cls.addFunc( _SC("textOut")                , &DrawingContext::textOut              );
+        cls.addFunc( _SC("textOutWithFontAndColor"), &DrawingContext::textOutWithFontAndColor);
         //cls.addFunc( _SC("")  , &DrawingContext::);
-        //cls.addFunc( _SC("")  , &DrawingContext::);
-        //cls.addFunc( _SC("")  , &DrawingContext::);
-
 
         return cls;
     }

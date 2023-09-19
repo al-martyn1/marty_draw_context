@@ -848,6 +848,94 @@ struct DrawingGradientParams
 
 
 //----------------------------------------------------------------------------
+struct DrawingDcResourcesState
+{
+    int             nPens      = 0;
+    int             penId      = 0;
+    int             nBrushes   = 0;
+    int             brushId    = 0;
+    int             nFonts     = 0;
+    int             fontId     = 0;
+    DrawingColor    textColor;
+    DrawingColor    bkColor  ;
+
+    DrawingDcResourcesState() = default;
+    DrawingDcResourcesState(const DrawingDcResourcesState &) = default;
+    DrawingDcResourcesState(const DcResourcesState &rcState)
+    : nPens    (rcState.nPens    )
+    , penId    (rcState.penId    )
+    , nBrushes (rcState.nBrushes )
+    , brushId  (rcState.brushId  )
+    , nFonts   (rcState.nFonts   )
+    , fontId   (rcState.fontId   )
+    , textColor(rcState.textColor)
+    , bkColor  (rcState.bkColor  )
+    {}
+
+    operator marty_draw_context::DcResourcesState() const
+    {
+        DcResourcesState rcState;
+
+        rcState.nPens     = nPens    ;
+        rcState.penId     = penId    ;
+        rcState.nBrushes  = nBrushes ;
+        rcState.brushId   = brushId  ;
+        rcState.nFonts    = nFonts   ;
+        rcState.fontId    = fontId   ;
+        rcState.textColor = textColor;
+        rcState.bkColor   = bkColor  ;
+
+        return rcState;
+    }
+
+    static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("DcResourcesState"))
+    {
+        auto cls = vm.addClass( className.c_str()
+                              , []() { return new DcResourcesState(); }
+                              , true /* release */
+                              );
+        return cls;
+    }
+
+}; // struct DrawingDcResourcesState
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+struct DrawingDcOffsetScale
+{
+    DrawingCoords    offset  ;
+    DrawingCoords    scale   ;
+    float            penScale;
+
+    DrawingDcOffsetScale() = default;
+    DrawingDcOffsetScale(const DrawingDcOffsetScale &) = default;
+    DrawingDcOffsetScale(const DcOffsetScale &os)
+    : offset  (os.offset  )
+    , scale   (os.scale   )
+    , penScale(floatToFloat(os.penScale))
+    {}
+
+    operator marty_draw_context::DcOffsetScale() const
+    {
+        DcOffsetScale os;
+
+        os.offset   = offset  ;
+        os.scale    = scale   ;
+        os.penScale = penScale;
+
+        return os;
+    }
+
+}; // struct DrawingDcOffsetScale
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
 struct DrawingPenParams
 {
     float         width  ;
@@ -926,6 +1014,42 @@ struct DrawingContext
         //auto retVal = pDc->getScaledSize( DrawCoord{ctxSizeX, ctxSizeY} );
         auto retVal = pDc->mapRawToLogicSize( DrawCoord{ctxSizeX, ctxSizeY} );
         return retVal;
+    }
+
+// }; // struct DrawingDcOffsetScale
+// }; // struct DrawingDcResourcesState
+
+
+    DrawingDcResourcesState getResourcesState() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingDcResourcesState();
+        return pDc->getResourcesState();
+    }
+
+    void restoreResourcesState(const DcResourcesState &rcState) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return;
+        pDc->restoreResourcesState(rcState);
+    }
+
+    DcOffsetScale getOffsetScale() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DcOffsetScale();
+        return pDc->getOffsetScale();
+    }
+
+    void restoreOffsetScale(const DcOffsetScale &dcOs) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return;
+        return pDc->restoreOffsetScale(dcOs);
     }
 
 
@@ -1053,6 +1177,23 @@ struct DrawingContext
             return -1;
         return (int)pDc->setBkMode((BkMode)mode);
     }
+
+    DrawingColor getBkColor() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingColor();
+        return pDc->getBkColor();
+    }
+
+    int getBkMode() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return (int)pDc->getBkMode();
+    }
+
 
     DrawingCoords getDialigBaseUnits() const
     {
@@ -1578,6 +1719,11 @@ struct DrawingContext
         cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize);
         cls.addFunc( _SC("getSize")                , &DrawingContext::getSize);
 
+        cls.addFunc( _SC("getResourcesState")      , &DrawingContext::getResourcesState    );
+        cls.addFunc( _SC("restoreResourcesState")  , &DrawingContext::restoreResourcesState);
+        cls.addFunc( _SC("getOffsetScale")         , &DrawingContext::getOffsetScale       );
+        cls.addFunc( _SC("restoreOffsetScale")     , &DrawingContext::restoreOffsetScale   );
+
         cls.addFunc( _SC("setCollectMarkers")      , &DrawingContext::setCollectMarkers    );
         cls.addFunc( _SC("getCollectMarkers")      , &DrawingContext::getCollectMarkers    );
         cls.addFunc( _SC("markerAdd")              , &DrawingContext::markerAdd            );
@@ -1593,9 +1739,9 @@ struct DrawingContext
         cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
         cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
         cls.addFunc( _SC("setBkColor")             , &DrawingContext::setBkColor           );
-        //TODO: !!! Надо реализовать getBkColor
+        cls.addFunc( _SC("getBkColor")             , &DrawingContext::getBkColor           );
         cls.addFunc( _SC("setBkMode")              , &DrawingContext::setBkMode            );
-        //TODO: !!! Надо реализовать getBkMode
+        cls.addFunc( _SC("getBkMode")              , &DrawingContext::getBkMode            );
         cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
         cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
         cls.addFunc( _SC("getDialigBaseUnits")     , &DrawingContext::getDialigBaseUnits   );

@@ -809,11 +809,37 @@ bool adjustRoundedCornerLinesLen( DrawCoord             &s1
 }
 
 
+struct DcResourcesState
+{
+    int         nPens      = 0;
+    int         penId      = 0;
+    int         nBrushes   = 0;
+    int         brushId    = 0;
+    int         nFonts     = 0;
+    int         fontId     = 0;
 
+    ColorRef    textColor;
+    ColorRef    bkColor  ;
+
+};
+
+
+struct DcOffsetScale
+{
+    DrawCoord              offset;
+    DrawCoord              scale ;
+
+    DrawCoord::value_type  penScale;
+};
 
 
 
 } // namespace marty_draw_context
+
+
+
+
+
 
 
 

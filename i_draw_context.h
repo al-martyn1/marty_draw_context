@@ -130,6 +130,9 @@ struct IDrawContext
     virtual DrawCoord::value_type markerSetDefSize( const DrawCoord::value_type &sz ) = 0;
     virtual DrawCoord::value_type markerGetDefSize( ) = 0;
 
+    virtual DcResourcesState getResourcesState() = 0;
+    virtual void restoreResourcesState(const DcResourcesState &rcState) = 0;
+
 
     virtual float_t getFitFontHeight(const DrawSize &boxSize) = 0;
     virtual float_t getAwgFontWidth(const FontParamsA &fp) = 0;
@@ -154,6 +157,10 @@ struct IDrawContext
 
     virtual float_t setPenScale( float_t scale ) = 0;
     virtual float_t getPenScale( ) = 0;
+
+    virtual DcOffsetScale getOffsetScale() = 0;
+    virtual void restoreOffsetScale(const DcOffsetScale &dcOs) = 0;
+
 
     virtual DrawCoord getCurPos( ) = 0;
 
@@ -249,9 +256,10 @@ struct IDrawContext
     virtual ColorRef setTextColor( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
     virtual ColorRef setBkColor( const ColorRef &rgb ) = 0;
     virtual ColorRef setBkColor( std::uint8_t r, std::uint8_t g, std::uint8_t b ) = 0;
+    virtual ColorRef getBkColor() = 0;
 
     virtual BkMode setBkMode( BkMode mode ) = 0;
-    //virtual BkMode getBkMode() = 0;
+    virtual BkMode getBkMode() = 0;
 
     virtual int setDefaultCosmeticPen( int penId ) = 0;
     virtual int getDefaultCosmeticPen( ) = 0;

@@ -14,12 +14,15 @@
 
 
 //----------------------------------------------------------------------------
-#ifndef IDC_ARG_USED
+#ifndef MARTY_IDC_ARG_USED
 
     //! Подавление варнинга о неиспользованном аргументе
-    #define IDC_ARG_USED(x)                   (void)(x)
+    #define MARTY_IDC_ARG_USED(x)                   (void)(x)
 
 #endif
+
+
+
 
 //----------------------------------------------------------------------------
 
@@ -119,6 +122,9 @@ struct IDrawContext
 
     virtual SmoothingMode setSmoothingMode( SmoothingMode m ) = 0;
     virtual SmoothingMode getSmoothingMode( ) = 0;
+
+    virtual DrawingPrecise setDrawingPrecise(DrawingPrecise p) = 0;
+    virtual DrawingPrecise getDrawingPrecise() = 0;
 
     virtual bool setCollectMarkers( bool cmMode ) = 0;
     virtual bool getCollectMarkers( ) = 0;
@@ -314,6 +320,10 @@ struct IDrawContext
                           , const DrawCoord             &leftTop
                           , const DrawCoord             &rightBottom
                           ) = 0;
+    virtual bool fillRoundRect( const DrawCoord::value_type &cornersR
+                          , const DrawCoord             &leftTop
+                          , const DrawCoord             &rightBottom
+                          ) = 0;
 
     virtual bool rect( const DrawCoord             &leftTop
                      , const DrawCoord             &rightBottom
@@ -377,44 +387,6 @@ struct IDrawContext
                                    , const GradientParams        &gradientParams
                                    , bool                        excludeFrame
                                    ) = 0;
-
-
-// struct GradientParams
-// {
-//     ColorRef                 colorBegin;
-//     ColorRef                 colorMid  ;
-//     ColorRef                 colorEnd  ;
-//  
-//     DrawCoord::value_type    midPoint  = (DrawCoord::value_type)0.5;
-//  
-// }; // struct GradientParams
-
-    // GradientType
-    // vertical  ,
-    // horizontal
-
-
-    #if 0
-    // Arc center is in the middle of the bounding rectangle (br)
-    virtual bool arcTo ( const DrawCoord &brLeftTop
-                       , const DrawCoord &brRightBottom
-                       , const DrawCoord &brRightBottom
-                       , const DrawCoord &centerPos ) = 0;
-
-    // left, top, right, bottom of bounding rectangle
-
-                    [in] int xr1,      // The x-coordinate, in logical units, of the endpoint of the radial defining the starting point of the arc.
-                    [in] int yr1,      // The y-coordinate, in logical units, of the endpoint of the radial defining the starting point of the arc.
-
-                    [in] int xr2,      // The x-coordinate, in logical units, of the endpoint of the radial defining the ending point of the arc.
-                    [in] int yr2       // The y-coordinate, in logical units, of the endpoint of the radial defining the ending point of the arc.
-
-    virtual bool arcTo ( const DrawCoord &to, const DrawCoord &centerPos ) = 0;
-    virtual bool arcTo ( const DrawCoord &to, const DrawCoord &centerPos ) = 0;
-    #endif
-
-
-    //bool drawPath()
 
 
     class BkModeSaver

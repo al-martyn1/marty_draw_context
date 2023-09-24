@@ -993,12 +993,15 @@ struct DrawingPenParams
 //----------------------------------------------------------------------------
 struct DrawingContext
 {
+    ssq::Object   sqVm; // (HSQUIRRELVM vm);
+
     IDrawContext *pDc = 0;
     int           ctxSizeX = 0;
     int           ctxSizeY = 0;
 
-    DrawingContext() {}
-    DrawingContext(IDrawContext *pDc_) : pDc(pDc_), ctxSizeX(0), ctxSizeY(0) {}
+    DrawingContext() : sqVm(0) {}
+    DrawingContext(HSQUIRRELVM vm_) : sqVm(vm_), pDc(0), ctxSizeX(0), ctxSizeY(0) {}
+    DrawingContext(HSQUIRRELVM vm_, IDrawContext *pDc_) : sqVm(vm_), pDc(pDc_), ctxSizeX(0), ctxSizeY(0) {}
 
     DrawingCoords getRawSize() const
     {
@@ -1016,9 +1019,21 @@ struct DrawingContext
         return retVal;
     }
 
-// }; // struct DrawingDcOffsetScale
-// }; // struct DrawingDcResourcesState
+    int setDrawingPrecise(int p)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return (int)pDc->setDrawingPrecise((DrawingPrecise)p);
+    }
 
+    int getDrawingPrecise()
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return -1;
+        return (int)pDc->getDrawingPrecise();
+    }
 
     DrawingDcResourcesState getResourcesState() const
     {
@@ -1480,6 +1495,20 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getStackInfos();
+            auto source = (si.source != nullptr ? si.source : _SC("null"));
+            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
+
+            throw ssq::RuntimeException("DrawContext.beginPath: path already started (endPath not called for previous beginPath)"
+                                       , ssq::ToUtf8(source).c_str()
+                                       , ssq::ToUtf8(funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
         return pDc->beginPath();
     }
 
@@ -1488,6 +1517,20 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getStackInfos();
+            auto source = (si.source != nullptr ? si.source : _SC("null"));
+            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
+
+            throw ssq::RuntimeException("DrawContext.beginPath: path already started (endPath not called for previous beginPath)"
+                                       , ssq::ToUtf8(source).c_str()
+                                       , ssq::ToUtf8(funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
         return pDc->beginPath(c);
     }
 
@@ -1496,6 +1539,35 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
+
+        if (!pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getStackInfos();
+            auto source = (si.source != nullptr ? si.source : _SC("null"));
+            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
+
+            throw ssq::RuntimeException("DrawContext.endPath: path not started (beginPath not called)"
+                                       , ssq::ToUtf8(source).c_str()
+                                       , ssq::ToUtf8(funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
+        // typedef struct tagSQStackInfos{
+        //     const SQChar* funcname;
+        //     const SQChar* source;
+        //     SQInteger line;
+        // }SQStackInfos;
+
+        //SQStackInfos getStackInfos() const
+
+        // RuntimeException(const char* msg):Exception(msg) {
+        //     message = std::string(msg);
+        // }
+        //  
+        // RuntimeException(const char* msg, const char* source, const char* func, int line):Exception(msg) {
+
+
         return pDc->endPath(bStroke, bFill);
     }
 
@@ -1641,7 +1713,43 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getStackInfos();
+            auto source = (si.source != nullptr ? si.source : _SC("null"));
+            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
+
+            throw ssq::RuntimeException("DrawContext.roundRect: function can't be used within the path"
+                                       , ssq::ToUtf8(source).c_str()
+                                       , ssq::ToUtf8(funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
         return pDc->roundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
+    }
+
+    bool fillRoundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getStackInfos();
+            auto source = (si.source != nullptr ? si.source : _SC("null"));
+            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
+
+            throw ssq::RuntimeException("DrawContext.fillRoundRect: function can't be used within the path"
+                                       , ssq::ToUtf8(source).c_str()
+                                       , ssq::ToUtf8(funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
+        return pDc->fillRoundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
     }
 
     bool rect(DrawingCoords leftTop, DrawingCoords rightBottom) const
@@ -1710,11 +1818,18 @@ struct DrawingContext
         return pDc->textOut(pos, fontId, rgb, text);
     }
 
+    // const HSQUIRRELVM& Object::getHandle() const {
+    //     return vm;
+    // }
+    // Object(HSQUIRRELVM vm);
 
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
     {
-        auto cls = vm.addClass( className.c_str(), []() { return new DrawingContext(); }, true /* release */ );
+        auto cls = vm.addClass( className.c_str(), [&]() { return new DrawingContext(vm.getHandle()); }, true /* release */ );
+
+        cls.addFunc( _SC("setDrawingPrecise")      , &DrawingContext::setDrawingPrecise);
+        cls.addFunc( _SC("getDrawingPrecise")      , &DrawingContext::getDrawingPrecise);
 
         cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize);
         cls.addFunc( _SC("getSize")                , &DrawingContext::getSize);
@@ -1791,6 +1906,7 @@ struct DrawingContext
         cls.addFunc( _SC("roundRectFigure")        , &DrawingContext::roundRectFigure      );
         cls.addFunc( _SC("roundRect")              , &DrawingContext::roundRect            );
         cls.addFunc( _SC("rect")                   , &DrawingContext::rect                 );
+        cls.addFunc( _SC("fillRoundRect")          , &DrawingContext::fillRoundRect        );
         cls.addFunc( _SC("fillRect")               , &DrawingContext::fillRect             );
         cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect     );
         cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect);
@@ -2070,6 +2186,12 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
+    scriptText.append(makeEnumScriptString( prefix, "DrawingPrecise"   , itemSep, enumSep, knownEnumNames
+                                          , DrawingPrecise::defPrecise, DrawingPrecise::pixelPrecise, DrawingPrecise::textPrecise, DrawingPrecise::smoothingPrecise
+                                          )
+                     );
+
+
 
     if (pKnownEnumNames)
     {
@@ -2284,6 +2406,36 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
 //TODO: !!! Надо попробовать сериализацию флагов через enum_serialize, а не через enum_serialize_flags - 
 // нам не нужно наборы флагов сериализовывать, а только отдельные флаги
 // Заодно, если установлено несколько флагов, то по идее, должна выскочить ошибка, надо проверить
+
+//----------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------
+template<typename TVM>
+ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns)
+{
+    ssq::sqstring preparedScriptText1 = marty_draw_context::simplesquirrel::prepareScriptEnums(scriptText, ns, true);
+    ssq::sqstring sqNs = utils::to_sqstring(ns);
+
+    // lout << encoding::toUtf8(preparedScriptText1);
+    // lout << "\n----------\n\n";
+
+    ssq::Table tDraw = 
+    vm.addTable(sqNs.c_str());
+    marty_draw_context::simplesquirrel::DrawingColor           ::expose(tDraw /*vm*/, _SC("Color"));
+    marty_draw_context::simplesquirrel::DrawingCoords          ::expose(tDraw /*vm*/, _SC("Coords"));
+    marty_draw_context::simplesquirrel::DrawingCoords          ::expose(tDraw /*vm*/, _SC("Scale"));
+    //marty_draw_context::simplesquirrel::DrawingCoords          ::expose(tDraw /*vm*/, _SC(""));
+    marty_draw_context::simplesquirrel::DrawingFontParams      ::expose(tDraw /*vm*/, _SC("FontParams"));
+    marty_draw_context::simplesquirrel::DrawingGradientParams  ::expose(tDraw /*vm*/, _SC("GradientParams"));
+    marty_draw_context::simplesquirrel::DrawingPenParams       ::expose(tDraw /*vm*/, _SC("PenParams"));
+    marty_draw_context::simplesquirrel::DrawingContext         ::expose(tDraw /*vm*/, _SC("Context"));
+
+    return preparedScriptText1;
+}
 
 //----------------------------------------------------------------------------
 

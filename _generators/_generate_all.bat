@@ -66,6 +66,9 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set SMOOTHINGMODE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
 @set SMOOTHINGMODE_DEF=invalid,unknown=-1;defMode=0;highSpeed,lowQuality=1;highQuality,lowSpeed=2;noSmoothing,none=3;antiAlias=4
 
+@set DRAWINGPRECISE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
+@set DRAWINGPRECISE_DEF=invalid,unknown=-1;defPrecise=0;pixelPrecise;textPrecise;smoothingPrecise
+
 
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %HORALIGN_GEN_FLAGS%                %UINT32% -E=HorAlign                         -F=%HORALIGN_DEF%               ^
@@ -80,5 +83,6 @@ umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %BKMODE_GEN_FLAGS%                  %UINT32% -E=BkMode                           -F=%BKMODE_DEF% ^
 %ARCDIRECTION_GEN_FLAGS%            %UINT32% -E=ArcDirectionEnum                 -F=%ARCDIRECTION_DEF% ^
 %SMOOTHINGMODE_GEN_FLAGS%           %UINT32% -E=SmoothingMode                    -F=%SMOOTHINGMODE_DEF% ^
+%DRAWINGPRECISE_GEN_FLAGS%          %UINT32% -E=DrawingPrecise                   -F=%DRAWINGPRECISE_DEF% ^
 ..\draw_context_enums.h
 

@@ -432,5 +432,34 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( SmoothingMode, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( SmoothingMode::noSmoothing   , "none"        );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( SmoothingMode, std::map, 1 )
 
+
+enum class DrawingPrecise : std::uint32_t
+{
+    invalid            = (std::uint32_t)(-1),
+    unknown            = (std::uint32_t)(-1),
+    defPrecise         = 0,
+    pixelPrecise       = 1,
+    textPrecise        = 2,
+    smoothingPrecise   = 3
+
+}; // enum class DrawingPrecise : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( DrawingPrecise, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::invalid            , "Invalid"          );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::defPrecise         , "DefPrecise"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::pixelPrecise       , "PixelPrecise"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::textPrecise        , "TextPrecise"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::smoothingPrecise   , "SmoothingPrecise" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( DrawingPrecise, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( DrawingPrecise, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::invalid            , "invalid"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::invalid            , "unknown"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::defPrecise         , "defprecise"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::pixelPrecise       , "pixelprecise"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::textPrecise        , "textprecise"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::smoothingPrecise   , "smoothingprecise" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( DrawingPrecise, std::map, 1 )
+
 } // namespace marty_draw_context
 

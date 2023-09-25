@@ -113,6 +113,8 @@ struct IDrawContext
 
     virtual ~IDrawContext() {}
 
+    virtual void flushBits() = 0;
+
     virtual void setStringEncoding(const std::string &encName) = 0;
     virtual std::string getStringEncoding() = 0;
 
@@ -323,15 +325,17 @@ struct IDrawContext
     virtual bool fillRoundRect( const DrawCoord::value_type &cornersR
                           , const DrawCoord             &leftTop
                           , const DrawCoord             &rightBottom
+                          , bool                         drawFrame
                           ) = 0;
 
     virtual bool rect( const DrawCoord             &leftTop
                      , const DrawCoord             &rightBottom
                      ) = 0;
 
-    virtual  bool fillRect( const DrawCoord             &leftTop
-                     , const DrawCoord             &rightBottom
-                     ) = 0;
+    virtual bool fillRect( const DrawCoord             &leftTop
+                         , const DrawCoord             &rightBottom
+                         , bool                         drawFrame
+                         ) = 0;
 
     virtual bool fillGradientRect( const DrawCoord             &leftTop
                                  , const DrawCoord             &rightBottom

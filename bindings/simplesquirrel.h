@@ -1019,6 +1019,14 @@ struct DrawingContext
         return retVal;
     }
 
+    void flushBits() 
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return;
+        pDc->flushBits();
+    }
+    
     int setDrawingPrecise(int p)
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
@@ -1730,7 +1738,7 @@ struct DrawingContext
         return pDc->roundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
     }
 
-    bool fillRoundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom) const
+    bool fillRoundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom, bool drawFrame) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
@@ -1749,7 +1757,7 @@ struct DrawingContext
                                        );
         }
 
-        return pDc->fillRoundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
+        return pDc->fillRoundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom, drawFrame);
     }
 
     bool rect(DrawingCoords leftTop, DrawingCoords rightBottom) const
@@ -1760,12 +1768,12 @@ struct DrawingContext
         return pDc->rect(leftTop, rightBottom);
     }
 
-    bool fillRect(DrawingCoords leftTop, DrawingCoords rightBottom) const
+    bool fillRect(DrawingCoords leftTop, DrawingCoords rightBottom, bool drawFrame) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->fillRect(leftTop, rightBottom);
+        return pDc->fillRect(leftTop, rightBottom, drawFrame);
     }
 
     bool fillGradientRect(DrawingCoords leftTop, DrawingCoords rightBottom, DrawingGradientParams gradientParams, int gradientType, bool excludeFrame) const
@@ -1828,91 +1836,93 @@ struct DrawingContext
     {
         auto cls = vm.addClass( className.c_str(), [&]() { return new DrawingContext(vm.getHandle()); }, true /* release */ );
 
-        cls.addFunc( _SC("setDrawingPrecise")      , &DrawingContext::setDrawingPrecise);
-        cls.addFunc( _SC("getDrawingPrecise")      , &DrawingContext::getDrawingPrecise);
+        cls.addFunc( _SC("flushBits")              , &DrawingContext::flushBits             );
 
-        cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize);
-        cls.addFunc( _SC("getSize")                , &DrawingContext::getSize);
+        cls.addFunc( _SC("setDrawingPrecise")      , &DrawingContext::setDrawingPrecise     );
+        cls.addFunc( _SC("getDrawingPrecise")      , &DrawingContext::getDrawingPrecise     );
 
-        cls.addFunc( _SC("getResourcesState")      , &DrawingContext::getResourcesState    );
-        cls.addFunc( _SC("restoreResourcesState")  , &DrawingContext::restoreResourcesState);
-        cls.addFunc( _SC("getOffsetScale")         , &DrawingContext::getOffsetScale       );
-        cls.addFunc( _SC("restoreOffsetScale")     , &DrawingContext::restoreOffsetScale   );
+        cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize            );
+        cls.addFunc( _SC("getSize")                , &DrawingContext::getSize               );
 
-        cls.addFunc( _SC("setCollectMarkers")      , &DrawingContext::setCollectMarkers    );
-        cls.addFunc( _SC("getCollectMarkers")      , &DrawingContext::getCollectMarkers    );
-        cls.addFunc( _SC("markerAdd")              , &DrawingContext::markerAdd            );
-        cls.addFunc( _SC("markerAddEx")            , &DrawingContext::markerAddEx          );
-        cls.addFunc( _SC("markersClear")           , &DrawingContext::markersClear         );
-        cls.addFunc( _SC("markersDraw")            , &DrawingContext::markersDraw          );
-        cls.addFunc( _SC("markersDrawEx")          , &DrawingContext::markersDrawEx        );
-        cls.addFunc( _SC("markerSetDefSize")       , &DrawingContext::markerSetDefSize     );
-        cls.addFunc( _SC("markerGetDefSize")       , &DrawingContext::markerGetDefSize     );
+        cls.addFunc( _SC("getResourcesState")      , &DrawingContext::getResourcesState     );
+        cls.addFunc( _SC("restoreResourcesState")  , &DrawingContext::restoreResourcesState );
+        cls.addFunc( _SC("getOffsetScale")         , &DrawingContext::getOffsetScale        );
+        cls.addFunc( _SC("restoreOffsetScale")     , &DrawingContext::restoreOffsetScale    );
 
-        cls.addFunc( _SC("setSmoothingMode")       , &DrawingContext::setSmoothingMode     );
-        cls.addFunc( _SC("getSmoothingMode")       , &DrawingContext::getSmoothingMode     );
-        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
-        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
-        cls.addFunc( _SC("setBkColor")             , &DrawingContext::setBkColor           );
-        cls.addFunc( _SC("getBkColor")             , &DrawingContext::getBkColor           );
-        cls.addFunc( _SC("setBkMode")              , &DrawingContext::setBkMode            );
-        cls.addFunc( _SC("getBkMode")              , &DrawingContext::getBkMode            );
-        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor         );
-        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor         );
-        cls.addFunc( _SC("getDialigBaseUnits")     , &DrawingContext::getDialigBaseUnits   );
-        cls.addFunc( _SC("mapRawToLogicPos")       , &DrawingContext::mapRawToLogicPos     );
-        cls.addFunc( _SC("mapRawToLogicSize")      , &DrawingContext::mapRawToLogicSize    );
-        cls.addFunc( _SC("getScaledPos")           , &DrawingContext::getScaledPos         );
-        cls.addFunc( _SC("getScaledSize")          , &DrawingContext::getScaledSize        );
-        cls.addFunc( _SC("setOffset")              , &DrawingContext::setOffset            );
-        cls.addFunc( _SC("getOffset")              , &DrawingContext::getOffset            );
-        cls.addFunc( _SC("setScale")               , &DrawingContext::setScale             );
-        cls.addFunc( _SC("getScale")               , &DrawingContext::getScale             );
-        cls.addFunc( _SC("setPenScale")            , &DrawingContext::setPenScale          );
-        cls.addFunc( _SC("getPenScale")            , &DrawingContext::getPenScale          );
-        cls.addFunc( _SC("createSolidPen")         , &DrawingContext::createSolidPen       );
-        cls.addFunc( _SC("selectPen")              , &DrawingContext::selectPen            );
-        cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen    );
-        cls.addFunc( _SC("getCurPen")              , &DrawingContext::getCurPen            );
-        cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor          );
-        cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen);
-        cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen);
-        cls.addFunc( _SC("createSolidBrush")       , &DrawingContext::createSolidBrush     );
-        cls.addFunc( _SC("selectBrush")            , &DrawingContext::selectBrush          );
-        cls.addFunc( _SC("selectNewSolidBrush")    , &DrawingContext::selectNewSolidBrush  );
-        cls.addFunc( _SC("getCurBrush")            , &DrawingContext::getCurBrush          );
-        cls.addFunc( _SC("createFont")             , &DrawingContext::createFont           );
-        cls.addFunc( _SC("createFontEx")           , &DrawingContext::createFontEx         );
-        cls.addFunc( _SC("createOrFindFont")       , &DrawingContext::createOrFindFont     );
-        cls.addFunc( _SC("createOrFindFontEx")     , &DrawingContext::createOrFindFontEx   );
-        cls.addFunc( _SC("createFontWithFace")        , &DrawingContext::createFontWithFace      );
-        cls.addFunc( _SC("createOrFindFontWithFace")  , &DrawingContext::createOrFindFontWithFace);
-        cls.addFunc( _SC("selectFont")             , &DrawingContext::selectFont           );
-        cls.addFunc( _SC("selectNewFont")          , &DrawingContext::selectNewFont        );
-        cls.addFunc( _SC("selectNewFontEx")        , &DrawingContext::selectNewFontEx      );
-        cls.addFunc( _SC("getCurFont")             , &DrawingContext::getCurFont           );
-        cls.addFunc( _SC("getFontParamsById")      , &DrawingContext::getFontParamsById    );
-        cls.addFunc( _SC("beginPath")              , &DrawingContext::beginPath            );
-        cls.addFunc( _SC("beginPathFrom")          , &DrawingContext::beginPathFrom        );
-        cls.addFunc( _SC("endPath")                , &DrawingContext::endPath              );
-        cls.addFunc( _SC("closeFigure")            , &DrawingContext::closeFigure          );
-        cls.addFunc( _SC("isPathStarted")          , &DrawingContext::isPathStarted        );
-        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo               );
-        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo               );
-        cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo        );
-        cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos     );
-        cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos             );
-        cls.addFunc( _SC("arcByAngleDeg")          , &DrawingContext::arcByAngleDeg        );
-        cls.addFunc( _SC("roundRectFigure")        , &DrawingContext::roundRectFigure      );
-        cls.addFunc( _SC("roundRect")              , &DrawingContext::roundRect            );
-        cls.addFunc( _SC("rect")                   , &DrawingContext::rect                 );
-        cls.addFunc( _SC("fillRoundRect")          , &DrawingContext::fillRoundRect        );
-        cls.addFunc( _SC("fillRect")               , &DrawingContext::fillRect             );
-        cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect     );
-        cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect);
-        cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle   );
-        cls.addFunc( _SC("textOut")                , &DrawingContext::textOut              );
-        cls.addFunc( _SC("textOutWithFontAndColor"), &DrawingContext::textOutWithFontAndColor);
+        cls.addFunc( _SC("setCollectMarkers")      , &DrawingContext::setCollectMarkers     );
+        cls.addFunc( _SC("getCollectMarkers")      , &DrawingContext::getCollectMarkers     );
+        cls.addFunc( _SC("markerAdd")              , &DrawingContext::markerAdd             );
+        cls.addFunc( _SC("markerAddEx")            , &DrawingContext::markerAddEx           );
+        cls.addFunc( _SC("markersClear")           , &DrawingContext::markersClear          );
+        cls.addFunc( _SC("markersDraw")            , &DrawingContext::markersDraw           );
+        cls.addFunc( _SC("markersDrawEx")          , &DrawingContext::markersDrawEx         );
+        cls.addFunc( _SC("markerSetDefSize")       , &DrawingContext::markerSetDefSize      );
+        cls.addFunc( _SC("markerGetDefSize")       , &DrawingContext::markerGetDefSize      );
+
+        cls.addFunc( _SC("setSmoothingMode")       , &DrawingContext::setSmoothingMode      );
+        cls.addFunc( _SC("getSmoothingMode")       , &DrawingContext::getSmoothingMode      );
+        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor          );
+        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor          );
+        cls.addFunc( _SC("setBkColor")             , &DrawingContext::setBkColor            );
+        cls.addFunc( _SC("getBkColor")             , &DrawingContext::getBkColor            );
+        cls.addFunc( _SC("setBkMode")              , &DrawingContext::setBkMode             );
+        cls.addFunc( _SC("getBkMode")              , &DrawingContext::getBkMode             );
+        cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor          );
+        cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor          );
+        cls.addFunc( _SC("getDialigBaseUnits")     , &DrawingContext::getDialigBaseUnits    );
+        cls.addFunc( _SC("mapRawToLogicPos")       , &DrawingContext::mapRawToLogicPos      );
+        cls.addFunc( _SC("mapRawToLogicSize")      , &DrawingContext::mapRawToLogicSize     );
+        cls.addFunc( _SC("getScaledPos")           , &DrawingContext::getScaledPos          );
+        cls.addFunc( _SC("getScaledSize")          , &DrawingContext::getScaledSize         );
+        cls.addFunc( _SC("setOffset")              , &DrawingContext::setOffset             );
+        cls.addFunc( _SC("getOffset")              , &DrawingContext::getOffset             );
+        cls.addFunc( _SC("setScale")               , &DrawingContext::setScale              );
+        cls.addFunc( _SC("getScale")               , &DrawingContext::getScale              );
+        cls.addFunc( _SC("setPenScale")            , &DrawingContext::setPenScale           );
+        cls.addFunc( _SC("getPenScale")            , &DrawingContext::getPenScale           );
+        cls.addFunc( _SC("createSolidPen")         , &DrawingContext::createSolidPen        );
+        cls.addFunc( _SC("selectPen")              , &DrawingContext::selectPen             );
+        cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen     );
+        cls.addFunc( _SC("getCurPen")              , &DrawingContext::getCurPen             );
+        cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor           );
+        cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen );
+        cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen );
+        cls.addFunc( _SC("createSolidBrush")       , &DrawingContext::createSolidBrush      );
+        cls.addFunc( _SC("selectBrush")            , &DrawingContext::selectBrush           );
+        cls.addFunc( _SC("selectNewSolidBrush")    , &DrawingContext::selectNewSolidBrush   );
+        cls.addFunc( _SC("getCurBrush")            , &DrawingContext::getCurBrush           );
+        cls.addFunc( _SC("createFont")             , &DrawingContext::createFont            );
+        cls.addFunc( _SC("createFontEx")           , &DrawingContext::createFontEx          );
+        cls.addFunc( _SC("createOrFindFont")       , &DrawingContext::createOrFindFont      );
+        cls.addFunc( _SC("createOrFindFontEx")     , &DrawingContext::createOrFindFontEx    );
+        cls.addFunc( _SC("createFontWithFace")      ,&DrawingContext::createFontWithFace      );
+        cls.addFunc( _SC("createOrFindFontWithFace"),&DrawingContext::createOrFindFontWithFace);
+        cls.addFunc( _SC("selectFont")             , &DrawingContext::selectFont              );
+        cls.addFunc( _SC("selectNewFont")          , &DrawingContext::selectNewFont           );
+        cls.addFunc( _SC("selectNewFontEx")        , &DrawingContext::selectNewFontEx         );
+        cls.addFunc( _SC("getCurFont")             , &DrawingContext::getCurFont              );
+        cls.addFunc( _SC("getFontParamsById")      , &DrawingContext::getFontParamsById       );
+        cls.addFunc( _SC("beginPath")              , &DrawingContext::beginPath               );
+        cls.addFunc( _SC("beginPathFrom")          , &DrawingContext::beginPathFrom           );
+        cls.addFunc( _SC("endPath")                , &DrawingContext::endPath                 );
+        cls.addFunc( _SC("closeFigure")            , &DrawingContext::closeFigure             );
+        cls.addFunc( _SC("isPathStarted")          , &DrawingContext::isPathStarted           );
+        cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo                  );
+        cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo                  );
+        cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo           );
+        cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos        );
+        cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos                );
+        cls.addFunc( _SC("arcByAngleDeg")          , &DrawingContext::arcByAngleDeg           );
+        cls.addFunc( _SC("roundRectFigure")        , &DrawingContext::roundRectFigure         );
+        cls.addFunc( _SC("roundRect")              , &DrawingContext::roundRect               );
+        cls.addFunc( _SC("rect")                   , &DrawingContext::rect                    );
+        cls.addFunc( _SC("fillRoundRect")          , &DrawingContext::fillRoundRect           );
+        cls.addFunc( _SC("fillRect")               , &DrawingContext::fillRect                );
+        cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect        );
+        cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect   );
+        cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle      );
+        cls.addFunc( _SC("textOut")                , &DrawingContext::textOut                 );
+        cls.addFunc( _SC("textOutWithFontAndColor"), &DrawingContext::textOutWithFontAndColor );
         //cls.addFunc( _SC("")  , &DrawingContext::);
 
         return cls;

@@ -277,6 +277,8 @@ public:
             return DrawingPrecise::invalid;
         }
 
+        getActiveDc()->flushBits();
+
         auto drawingPrecisePrev = m_drawingPrecise;
         m_drawingPrecise = p;
 
@@ -292,7 +294,7 @@ public:
         return m_drawingPrecise;
     }
 
-
+    void flushBits() override { return getActiveDc()->flushBits(); }
 
     void setStringEncoding(const std::string &encName) override { return delegateCallAll([&](I& i) { return i.setStringEncoding(encName); }); }
     std::string getStringEncoding() override                    { return getActiveDc()->getStringEncoding(); }
@@ -504,8 +506,9 @@ public:
     bool fillRoundRect( const DrawCoord::value_type &cornersR
                   , const DrawCoord             &leftTop
                   , const DrawCoord             &rightBottom
+                  , bool                         drawFrame
                   ) override
-                  { return getActiveDc()->fillRoundRect(cornersR, leftTop, rightBottom); }
+                  { return getActiveDc()->fillRoundRect(cornersR, leftTop, rightBottom, drawFrame); }
 
     bool rect( const DrawCoord             &leftTop
              , const DrawCoord             &rightBottom
@@ -514,8 +517,9 @@ public:
 
     bool fillRect( const DrawCoord             &leftTop
              , const DrawCoord             &rightBottom
+             , bool                         drawFrame
              ) override
-             { return getActiveDc()->rect(leftTop, rightBottom); }
+             { return getActiveDc()->fillRect(leftTop, rightBottom, drawFrame); }
 
     bool fillGradientRect( const DrawCoord             &leftTop
                          , const DrawCoord             &rightBottom

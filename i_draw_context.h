@@ -311,6 +311,9 @@ struct IDrawContext
     virtual bool arcTo(const DrawCoord &centerPos, const DrawCoord &endPos, bool directionCounterclockwise, DrawCoord *pResEndPos = 0 ) = 0;
     virtual bool arcTo(const DrawCoord &centerPos, const DrawCoord::value_type angleGradus, DrawCoord *pResEndPos = 0 ) = 0;
 
+    virtual bool circle    (const DrawCoord &centerPos, const DrawCoord::value_type &r) = 0;
+    virtual bool fillCircle(const DrawCoord &centerPos, const DrawCoord::value_type &r, bool drawFrame) = 0;
+
     //! Рисует набор горизонтальных и вертикальных линий, если две точки задают диагональную линию - это ошибка
     virtual bool roundRectFigure( const DrawCoord::value_type &cornersR
                                 , std::size_t numPoints

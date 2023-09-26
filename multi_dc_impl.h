@@ -489,6 +489,9 @@ public:
     bool arcTo(const DrawCoord &centerPos, const DrawCoord &endPos, bool directionCounterclockwise, DrawCoord *pResEndPos = 0 ) override { return getActiveDc()->arcTo(centerPos, endPos, directionCounterclockwise, pResEndPos); }
     bool arcTo(const DrawCoord &centerPos, const DrawCoord::value_type angleGradus, DrawCoord *pResEndPos = 0 ) override                 { return getActiveDc()->arcTo(centerPos, angleGradus, pResEndPos); }
     
+    bool circle    (const DrawCoord &centerPos, const DrawCoord::value_type &r) override                 { return getActiveDc()->circle(centerPos, r); }
+    bool fillCircle(const DrawCoord &centerPos, const DrawCoord::value_type &r, bool drawFrame) override { return getActiveDc()->fillCircle(centerPos, r, drawFrame); }
+
     //! Рисует набор горизонтальных и вертикальных линий, если две точки задают диагональную линию - это ошибка
     bool roundRectFigure( const DrawCoord::value_type &cornersR
                         , std::size_t numPoints

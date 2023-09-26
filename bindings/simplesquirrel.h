@@ -1506,13 +1506,10 @@ struct DrawingContext
 
         if (pDc->isPathStarted())
         {
-            SQStackInfos si = sqVm.getStackInfos();
-            auto source = (si.source != nullptr ? si.source : _SC("null"));
-            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
-
+            SQStackInfos si = sqVm.getSafeStackInfos();
             throw ssq::RuntimeException("DrawContext.beginPath: path already started (endPath not called for previous beginPath)"
-                                       , ssq::ToUtf8(source).c_str()
-                                       , ssq::ToUtf8(funcname).c_str()
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
                                        , (int)si.line
                                        );
         }
@@ -1528,13 +1525,10 @@ struct DrawingContext
 
         if (pDc->isPathStarted())
         {
-            SQStackInfos si = sqVm.getStackInfos();
-            auto source = (si.source != nullptr ? si.source : _SC("null"));
-            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
-
+            SQStackInfos si = sqVm.getSafeStackInfos();
             throw ssq::RuntimeException("DrawContext.beginPath: path already started (endPath not called for previous beginPath)"
-                                       , ssq::ToUtf8(source).c_str()
-                                       , ssq::ToUtf8(funcname).c_str()
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
                                        , (int)si.line
                                        );
         }
@@ -1550,13 +1544,10 @@ struct DrawingContext
 
         if (!pDc->isPathStarted())
         {
-            SQStackInfos si = sqVm.getStackInfos();
-            auto source = (si.source != nullptr ? si.source : _SC("null"));
-            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
-
+            SQStackInfos si = sqVm.getSafeStackInfos();
             throw ssq::RuntimeException("DrawContext.endPath: path not started (beginPath not called)"
-                                       , ssq::ToUtf8(source).c_str()
-                                       , ssq::ToUtf8(funcname).c_str()
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
                                        , (int)si.line
                                        );
         }
@@ -1711,10 +1702,44 @@ struct DrawingContext
 
     }
 
-    // virtual bool roundRectFigure( float cornersR
-    //                             , std::size_t numPoints
-    //                             , const DrawCoord             *pPoints
-    //                             ) = 0;
+
+    bool circle(DrawingCoords centerPos, ssq::Object r) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getSafeStackInfos();
+            throw ssq::RuntimeException("DrawContext.circle: function can't be used within the path"
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
+        return pDc->circle(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("R")));
+    }
+
+    bool fillCircle(DrawingCoords centerPos, ssq::Object r, bool drawFrame) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        if (pDc->isPathStarted())
+        {
+            SQStackInfos si = sqVm.getSafeStackInfos();
+            throw ssq::RuntimeException("DrawContext.fillCircle: function can't be used within the path"
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
+                                       , (int)si.line
+                                       );
+        }
+
+        return pDc->fillCircle(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("R")), drawFrame);
+    }
 
     bool roundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom) const
     {
@@ -1724,13 +1749,10 @@ struct DrawingContext
 
         if (pDc->isPathStarted())
         {
-            SQStackInfos si = sqVm.getStackInfos();
-            auto source = (si.source != nullptr ? si.source : _SC("null"));
-            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
-
+            SQStackInfos si = sqVm.getSafeStackInfos();
             throw ssq::RuntimeException("DrawContext.roundRect: function can't be used within the path"
-                                       , ssq::ToUtf8(source).c_str()
-                                       , ssq::ToUtf8(funcname).c_str()
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
                                        , (int)si.line
                                        );
         }
@@ -1746,13 +1768,10 @@ struct DrawingContext
 
         if (pDc->isPathStarted())
         {
-            SQStackInfos si = sqVm.getStackInfos();
-            auto source = (si.source != nullptr ? si.source : _SC("null"));
-            auto funcname = (si.funcname != nullptr ? si.funcname : _SC("unknown"));
-
+            SQStackInfos si = sqVm.getSafeStackInfos();
             throw ssq::RuntimeException("DrawContext.fillRoundRect: function can't be used within the path"
-                                       , ssq::ToUtf8(source).c_str()
-                                       , ssq::ToUtf8(funcname).c_str()
+                                       , ssq::ToUtf8(si.source).c_str()
+                                       , ssq::ToUtf8(si.funcname).c_str()
                                        , (int)si.line
                                        );
         }
@@ -1869,9 +1888,12 @@ struct DrawingContext
         cls.addFunc( _SC("getBkMode")              , &DrawingContext::getBkMode             );
         cls.addFunc( _SC("setTextColor")           , &DrawingContext::setTextColor          );
         cls.addFunc( _SC("getTextColor")           , &DrawingContext::getTextColor          );
+
         cls.addFunc( _SC("getDialigBaseUnits")     , &DrawingContext::getDialigBaseUnits    );
+
         cls.addFunc( _SC("mapRawToLogicPos")       , &DrawingContext::mapRawToLogicPos      );
         cls.addFunc( _SC("mapRawToLogicSize")      , &DrawingContext::mapRawToLogicSize     );
+
         cls.addFunc( _SC("getScaledPos")           , &DrawingContext::getScaledPos          );
         cls.addFunc( _SC("getScaledSize")          , &DrawingContext::getScaledSize         );
         cls.addFunc( _SC("setOffset")              , &DrawingContext::setOffset             );
@@ -1880,6 +1902,7 @@ struct DrawingContext
         cls.addFunc( _SC("getScale")               , &DrawingContext::getScale              );
         cls.addFunc( _SC("setPenScale")            , &DrawingContext::setPenScale           );
         cls.addFunc( _SC("getPenScale")            , &DrawingContext::getPenScale           );
+
         cls.addFunc( _SC("createSolidPen")         , &DrawingContext::createSolidPen        );
         cls.addFunc( _SC("selectPen")              , &DrawingContext::selectPen             );
         cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen     );
@@ -1887,10 +1910,12 @@ struct DrawingContext
         cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor           );
         cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen );
         cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen );
+
         cls.addFunc( _SC("createSolidBrush")       , &DrawingContext::createSolidBrush      );
         cls.addFunc( _SC("selectBrush")            , &DrawingContext::selectBrush           );
         cls.addFunc( _SC("selectNewSolidBrush")    , &DrawingContext::selectNewSolidBrush   );
         cls.addFunc( _SC("getCurBrush")            , &DrawingContext::getCurBrush           );
+
         cls.addFunc( _SC("createFont")             , &DrawingContext::createFont            );
         cls.addFunc( _SC("createFontEx")           , &DrawingContext::createFontEx          );
         cls.addFunc( _SC("createOrFindFont")       , &DrawingContext::createOrFindFont      );
@@ -1902,13 +1927,17 @@ struct DrawingContext
         cls.addFunc( _SC("selectNewFontEx")        , &DrawingContext::selectNewFontEx         );
         cls.addFunc( _SC("getCurFont")             , &DrawingContext::getCurFont              );
         cls.addFunc( _SC("getFontParamsById")      , &DrawingContext::getFontParamsById       );
+
         cls.addFunc( _SC("beginPath")              , &DrawingContext::beginPath               );
         cls.addFunc( _SC("beginPathFrom")          , &DrawingContext::beginPathFrom           );
         cls.addFunc( _SC("endPath")                , &DrawingContext::endPath                 );
         cls.addFunc( _SC("closeFigure")            , &DrawingContext::closeFigure             );
         cls.addFunc( _SC("isPathStarted")          , &DrawingContext::isPathStarted           );
+
         cls.addFunc( _SC("moveTo")                 , &DrawingContext::moveTo                  );
         cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo                  );
+        cls.addFunc( _SC("circle")                 , &DrawingContext::circle                  );
+        cls.addFunc( _SC("fillCircle")             , &DrawingContext::fillCircle              );
         cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo           );
         cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos        );
         cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos                );

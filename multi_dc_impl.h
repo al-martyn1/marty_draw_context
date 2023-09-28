@@ -488,6 +488,9 @@ public:
 
     bool arcTo(const DrawCoord &centerPos, const DrawCoord &endPos, bool directionCounterclockwise, DrawCoord *pResEndPos = 0 ) override { return getActiveDc()->arcTo(centerPos, endPos, directionCounterclockwise, pResEndPos); }
     bool arcTo(const DrawCoord &centerPos, const DrawCoord::value_type angleGradus, DrawCoord *pResEndPos = 0 ) override                 { return getActiveDc()->arcTo(centerPos, angleGradus, pResEndPos); }
+
+    bool ellipse    (const DrawCoord &leftTop, const DrawCoord &rightBottom) override                    { return getActiveDc()->ellipse(leftTop, rightBottom); }
+    bool fillEllipse(const DrawCoord &leftTop, const DrawCoord &rightBottom, bool drawFrame) override    { return getActiveDc()->fillEllipse(leftTop, rightBottom, drawFrame); }
     
     bool circle    (const DrawCoord &centerPos, const DrawCoord::value_type &r) override                 { return getActiveDc()->circle(centerPos, r); }
     bool fillCircle(const DrawCoord &centerPos, const DrawCoord::value_type &r, bool drawFrame) override { return getActiveDc()->fillCircle(centerPos, r, drawFrame); }

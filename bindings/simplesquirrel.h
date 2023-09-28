@@ -1603,6 +1603,21 @@ struct DrawingContext
         return pDc->lineTo(to);     
     }
 
+    bool ellipse    (DrawingCoords leftTop, DrawingCoords rightBottom) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->ellipse(leftTop, rightBottom);
+    }
+
+    bool fillEllipse(DrawingCoords leftTop, DrawingCoords rightBottom, bool drawFrame) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->fillEllipse(leftTop, rightBottom, drawFrame);
+    }
 
     bool ellipticArcTo( DrawingCoords leftTop
                       , DrawingCoords rightBottom
@@ -1938,6 +1953,8 @@ struct DrawingContext
         cls.addFunc( _SC("lineTo")                 , &DrawingContext::lineTo                  );
         cls.addFunc( _SC("circle")                 , &DrawingContext::circle                  );
         cls.addFunc( _SC("fillCircle")             , &DrawingContext::fillCircle              );
+        cls.addFunc( _SC("ellipse")                , &DrawingContext::ellipse                 );
+        cls.addFunc( _SC("fillEllipse")            , &DrawingContext::fillEllipse             );
         cls.addFunc( _SC("ellipticArcTo")          , &DrawingContext::ellipticArcTo           );
         cls.addFunc( _SC("getLastArcEndPos")       , &DrawingContext::getLastArcEndPos        );
         cls.addFunc( _SC("arcToPos")               , &DrawingContext::arcToPos                );

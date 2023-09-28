@@ -311,6 +311,9 @@ struct IDrawContext
     virtual bool arcTo(const DrawCoord &centerPos, const DrawCoord &endPos, bool directionCounterclockwise, DrawCoord *pResEndPos = 0 ) = 0;
     virtual bool arcTo(const DrawCoord &centerPos, const DrawCoord::value_type angleGradus, DrawCoord *pResEndPos = 0 ) = 0;
 
+    virtual bool ellipse    (const DrawCoord &leftTop, const DrawCoord &rightBottom) = 0;
+    virtual bool fillEllipse(const DrawCoord &leftTop, const DrawCoord &rightBottom, bool drawFrame) = 0;
+
     virtual bool circle    (const DrawCoord &centerPos, const DrawCoord::value_type &r) = 0;
     virtual bool fillCircle(const DrawCoord &centerPos, const DrawCoord::value_type &r, bool drawFrame) = 0;
 

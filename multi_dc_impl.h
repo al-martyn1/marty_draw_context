@@ -345,13 +345,51 @@ public:
 
     DrawCoord getCurPos( ) override                              { return getActiveDc()->getCurPos(); }
 
-    int createSolidBrush( const ColorRef &rgb ) override         { return delegateCallAll([&](I& i) { return i.createSolidBrush(rgb); }); }
-    int createSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) override { return delegateCallAll([&](I& i) { return i.createSolidBrush(r, g, b); }); }
-    int selectBrush( int brushId ) override                      { return delegateCallAll([&](I& i) { return i.selectBrush(brushId); }); }
+    int createSolidBrush( const ColorRef &rgb ) override
+    {
+        return delegateCallAll( [&](I& i) 
+                                {
+                                    return i.createSolidBrush(rgb);
+                                }
+                              );
+    }
+
+    int createSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) override
+    {
+        return delegateCallAll( [&](I& i)
+                                {
+                                    return i.createSolidBrush(r, g, b);
+                                }
+                              );
+    }
+
+    int selectBrush( int brushId ) override
+    {
+        return delegateCallAll( [&](I& i)
+                                {
+                                    return i.selectBrush(brushId);
+                                }
+                              );
+    }
 
     // returns new brushId, not prev
-    int selectNewSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) override { return delegateCallAll([&](I& i) { return i.selectNewSolidBrush(r, g, b); }); }
-    int selectNewSolidBrush( const ColorRef &rgb ) override                            { return delegateCallAll([&](I& i) { return i.selectNewSolidBrush(rgb); }); }
+    int selectNewSolidBrush( std::uint8_t r, std::uint8_t g, std::uint8_t b ) override
+    {
+        return delegateCallAll( [&](I& i)
+                                {
+                                    return i.selectNewSolidBrush(r, g, b);
+                                }
+                              );
+    }
+
+    int selectNewSolidBrush( const ColorRef &rgb ) override
+    {
+        return delegateCallAll( [&](I& i)
+                                {
+                                    return i.selectNewSolidBrush(rgb);
+                                }
+                              );
+    }
 
     int getCurBrush() override                                   { return getActiveDc()->getCurBrush(); }
 
@@ -466,7 +504,8 @@ public:
 
     int getCurPen() override                 { return getActiveDc()->getCurPen(); }
 
-    ColorRef getPenColor(int penId) override { return getActiveDc()->getPenColor(penId); }
+    ColorRef  getPenColor (int penId) override { return getActiveDc()->getPenColor(penId); }
+    PenParams getPenParams(int penId) override { return getActiveDc()->getPenParams(penId); }
 
 
     bool beginPath()                                override         { return getActiveDc()->beginPath(); }

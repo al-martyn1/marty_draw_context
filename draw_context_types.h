@@ -527,7 +527,7 @@ struct PenParams
     LineEndcapStyle            endcaps;
     LineJoinStyle              join   ;
 
-    PenParams() = default;
+    PenParams() : width((DrawCoord::value_type)1), endcaps(LineEndcapStyle::round), join(LineJoinStyle::bevel) {}
     PenParams( DrawCoord::value_type w, LineEndcapStyle ec, LineJoinStyle j ) : width(w), endcaps(ec), join(j) {}
     PenParams( const PenParams &) = default;
     PenParams( PenParams &&)      = default;
@@ -544,7 +544,7 @@ struct PenParamsWithColor
     LineJoinStyle              join;
     ColorRef                   color;
 
-    PenParamsWithColor() = default;
+    PenParamsWithColor() : width((DrawCoord::value_type)1), endcaps(LineEndcapStyle::round), join(LineJoinStyle::bevel), color() {}
     PenParamsWithColor( DrawCoord::value_type w, LineEndcapStyle ec, LineJoinStyle j, ColorRef c) : width(w), endcaps(ec), join(j), color(c) {}
     PenParamsWithColor( const PenParamsWithColor &) = default;
     PenParamsWithColor( PenParamsWithColor &&)      = default;

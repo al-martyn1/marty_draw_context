@@ -289,7 +289,8 @@ struct IDrawContext
 
     virtual int getCurPen() = 0;
 
-    virtual ColorRef getPenColor(int penId) = 0;
+    virtual ColorRef  getPenColor (int penId) = 0;
+    virtual PenParams getPenParams(int penId) = 0;
 
 
     virtual bool beginPath()                                = 0;

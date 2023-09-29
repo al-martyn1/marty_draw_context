@@ -1348,6 +1348,14 @@ struct DrawingContext
         return pDc->getPenColor(penId);     
     }
 
+    DrawingPenParams getPenParams(int penId) const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingPenParams();
+        return PenParams(pDc->getPenParams(penId));
+    }
+
     int setDefaultCosmeticPen( int penId ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
@@ -1923,6 +1931,8 @@ struct DrawingContext
         cls.addFunc( _SC("selectNewSolidPen")      , &DrawingContext::selectNewSolidPen     );
         cls.addFunc( _SC("getCurPen")              , &DrawingContext::getCurPen             );
         cls.addFunc( _SC("getPenColor")            , &DrawingContext::getPenColor           );
+        cls.addFunc( _SC("getPenParams")           , &DrawingContext::getPenParams          );
+        
         cls.addFunc( _SC("setDefaultCosmeticPen")  , &DrawingContext::setDefaultCosmeticPen );
         cls.addFunc( _SC("getDefaultCosmeticPen")  , &DrawingContext::getDefaultCosmeticPen );
 

@@ -21,6 +21,9 @@
 #include "../draw_context_types.h"
 #include "../i_draw_context.h"
 
+//
+#include "marty_simplesquirrel/simplesquirrel.h"
+
 
 //----------------------------------------------------------------------------
 
@@ -87,359 +90,6 @@ namespace simplesquirrel {
 
 
 
-//----------------------------------------------------------------------------
-namespace utils {
-
-//------------------------------
-inline
-std::string to_ascii(const char* str)
-{
-    return str ? std::string(str) : std::string();
-}
-
-//------------------------------
-inline
-std::string to_ascii(const std::string &str)
-{
-    return str;
-}
-
-//------------------------------
-inline
-std::string to_ascii(const std::wstring &str)
-{
-    std::string strRes; strRes.reserve(str.size());
-    for(auto ch : str)
-        strRes.append(1, (char)(unsigned char)ch);
-    return strRes;
-}
-
-//------------------------------
-inline
-std::string to_ascii(const wchar_t* str)
-{
-    return str ? to_ascii(std::wstring(str)) : std::string();
-}
-
-//------------------------------
-struct CToAscii
-{
-    std::string operator()(const char* str) const
-    {
-        return to_ascii(str);
-    }
-
-    std::string operator()(const std::string &str) const
-    {
-        return to_ascii(str);
-    }
-
-    std::string operator()(const std::wstring &str) const
-    {
-        return to_ascii(str);
-    }
-
-    std::string operator()(const wchar_t* str) const
-    {
-        return to_ascii(str);
-    }
-
-    std::string operator()() const
-    {
-    }
-
-}; // struct CToAscii
-
-//------------------------------
-
-
-
-//------------------------------
-inline
-std::wstring to_wide(const wchar_t* str)
-{
-    return str ? std::wstring(str) : std::wstring();
-}
-
-//------------------------------
-inline
-std::wstring to_wide(const std::wstring &str)
-{
-    return str;
-}
-
-//------------------------------
-inline
-std::wstring to_wide(const std::string &str)
-{
-    std::wstring strRes; strRes.reserve(str.size());
-    for(auto ch : str)
-        strRes.append(1, (wchar_t)ch);
-    return strRes;
-}
-
-//------------------------------
-inline
-std::wstring to_wide(const char* str)
-{
-    return str ? to_wide(std::string(str)) : std::wstring();
-}
-
-//------------------------------
-struct CToWide
-{
-    std::wstring operator()(const wchar_t* str) const
-    {
-        return to_wide(str);
-    }
-
-    std::wstring operator()(const std::wstring &str) const
-    {
-        return to_wide(str);
-    }
-
-    std::wstring operator()(const std::string &str) const
-    {
-        return to_wide(str);
-    }
-
-    std::wstring operator()(const char* str) const
-    {
-        return to_wide(str);
-    }
-
-}; // struct CToWide
-
-//------------------------------
-
-
-
-//------------------------------
-#if !defined(SQUNICODE)
-
-    template<typename CharType>
-    inline std::string to_sqstring(const CharType* pStr)
-    {
-        return to_ascii(pStr);
-    }
-
-    template<typename StringType>
-    inline std::string to_sqstring(const StringType &str)
-    {
-        return to_ascii(str);
-    }
-
-#else
-
-    template<typename CharType>
-    inline std::wstring to_sqstring(const CharType* pStr)
-    {
-        return to_wide(pStr);
-    }
-
-    template<typename StringType>
-    inline std::wstring to_sqstring(const StringType &str)
-    {
-        return to_wide(str);
-    }
-
-#endif
-
-//------------------------------
-
-
-
-
-} // namespace utils
-
-//----------------------------------------------------------------------------
-
-
-
-
-//----------------------------------------------------------------------------
-template<typename TargetType> inline
-TargetType fromObjectConvertHelper(ssq::Object &o, const SQChar *paramName)
-{
-    MARTY_DC_BIND_SQUIRREL_ASSERT_FAIL(); // not implemented for generic type
-}
-
-//----------------------------------------------------------------------------
-template<> inline
-float fromObjectConvertHelper<float>(ssq::Object &o, const SQChar *paramName)
-{
-    (void)paramName;
-
-    if (o.isNull() || o.isEmpty())
-    {
-        return 0.0;
-    }
-
-    ssq::Type t = o.getType();
-    switch(t)
-    {
-        case ssq::Type::INTEGER:
-            return (float)o.toInt();
-
-        case ssq::Type::FLOAT:
-            return o.toFloat();
-
-        case ssq::Type::STRING:
-            {
-                auto str = o.toString();
-                try
-                {
-                    return std::stof(str);
-                }
-                catch(const std::invalid_argument &)
-                {
-                    throw ssq::TypeException("invalid argument", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-                catch(const std::out_of_range &)
-                {
-                    throw ssq::TypeException("out of range", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-                catch(...)
-                {
-                    throw ssq::TypeException("unknown error", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-            }
-
-        case ssq::Type::BOOL:
-        case ssq::Type::NULLPTR:
-        case ssq::Type::TABLE:
-        case ssq::Type::ARRAY:
-        case ssq::Type::USERDATA:
-        case ssq::Type::CLOSURE:
-        case ssq::Type::NATIVECLOSURE:
-        case ssq::Type::GENERATOR:
-        case ssq::Type::USERPOINTER:
-        case ssq::Type::THREAD:
-        case ssq::Type::FUNCPROTO:
-        case ssq::Type::CLASS:
-        case ssq::Type::INSTANCE:
-        case ssq::Type::WEAKREF:
-        case ssq::Type::OUTER:
-            [[fallthrough]];		
-        default: {}
-    }
-
-    throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-
-}
-
-//----------------------------------------------------------------------------
-template<> inline
-int fromObjectConvertHelper<int>(ssq::Object &o, const SQChar *paramName)
-{
-    (void)paramName;
-
-    if (o.isNull() || o.isEmpty())
-    {
-        return 0;
-    }
-
-    ssq::Type t = o.getType();
-    switch(t)
-    {
-        case ssq::Type::INTEGER:
-            return (int)o.toInt();
-
-        case ssq::Type::FLOAT:
-            {
-                float f = o.toFloat();
-                return (int)(f+0.5);
-            }
-
-        case ssq::Type::STRING:
-            {
-                auto str = o.toString();
-                try
-                {
-                    return std::stoi(str);
-                }
-                catch(const std::invalid_argument &)
-                {
-                    throw ssq::TypeException("invalid argument", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-                catch(const std::out_of_range &)
-                {
-                    throw ssq::TypeException("out of range", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-                catch(...)
-                {
-                    throw ssq::TypeException("unknown error", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-                }
-            }
-
-        case ssq::Type::BOOL:
-        case ssq::Type::NULLPTR:
-        case ssq::Type::TABLE:
-        case ssq::Type::ARRAY:
-        case ssq::Type::USERDATA:
-        case ssq::Type::CLOSURE:
-        case ssq::Type::NATIVECLOSURE:
-        case ssq::Type::GENERATOR:
-        case ssq::Type::USERPOINTER:
-        case ssq::Type::THREAD:
-        case ssq::Type::FUNCPROTO:
-        case ssq::Type::CLASS:
-        case ssq::Type::INSTANCE:
-        case ssq::Type::WEAKREF:
-        case ssq::Type::OUTER:
-            [[fallthrough]];		
-        default: {}
-    }
-
-    throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-
-}
-
-//----------------------------------------------------------------------------
-template<> inline
-ssq::sqstring fromObjectConvertHelper<ssq::sqstring>(ssq::Object &o, const SQChar *paramName)
-{
-    (void)paramName;
-
-    if (o.isNull() || o.isEmpty())
-    {
-        return 0;
-    }
-
-    ssq::Type t = o.getType();
-    switch(t)
-    {
-        case ssq::Type::INTEGER:
-            return utils::to_sqstring(std::to_string(o.toInt()));
-
-        case ssq::Type::FLOAT:
-            return utils::to_sqstring(std::to_string(o.toFloat()));
-
-        case ssq::Type::STRING:
-            return o.toString();
-
-        case ssq::Type::BOOL:
-        case ssq::Type::NULLPTR:
-        case ssq::Type::TABLE:
-        case ssq::Type::ARRAY:
-        case ssq::Type::USERDATA:
-        case ssq::Type::CLOSURE:
-        case ssq::Type::NATIVECLOSURE:
-        case ssq::Type::GENERATOR:
-        case ssq::Type::USERPOINTER:
-        case ssq::Type::THREAD:
-        case ssq::Type::FUNCPROTO:
-        case ssq::Type::CLASS:
-        case ssq::Type::INSTANCE:
-        case ssq::Type::WEAKREF:
-        case ssq::Type::OUTER:
-            [[fallthrough]];		
-        default: {}
-    }
-
-    throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
-
-}
 
 
 
@@ -484,7 +134,7 @@ struct DrawingColor : public ColorRef
 
             #else
 
-                std::string colorNameAscii = utils::to_ascii(colorName);
+                std::string colorNameAscii = marty_simplesquirrel::to_ascii(colorName);
                 return (DrawingColor)ColorRef::deserialize(colorNameAscii);
 
             #endif
@@ -595,7 +245,7 @@ struct DrawingColor : public ColorRef
                    , [](DrawingColor* self) -> ssq::sqstring
                      {
                          MARTY_DC_BIND_SQUIRREL_ASSERT(self);
-                         return utils::to_sqstring(self->serialize());
+                         return marty_simplesquirrel::to_sqstring(self->serialize());
                      }
                    );
 
@@ -690,7 +340,7 @@ struct DrawingCoords
         auto cls = vm.addClass( className.c_str()
                               , []( ssq::Object ox, ssq::Object oy  /* float x, float y */  ) -> DrawingCoords*
                                 {
-                                    return new DrawingCoords{fromObjectConvertHelper<float>(ox, _SC("x")), fromObjectConvertHelper<float>(oy, _SC("y"))};
+                                    return new DrawingCoords{ marty_simplesquirrel::fromObjectConvertHelper<float>(ox, _SC("x")), marty_simplesquirrel::fromObjectConvertHelper<float>(oy, _SC("y"))};
                                 }
                               , true // release
                               );
@@ -769,12 +419,12 @@ struct DrawingFontParams
         auto cls = vm.addClass( className.c_str()
                               , []( ssq::Object h, ssq::Object w, ssq::Object style, ssq::Object face )
                                 {
-                                    float         height_         = fromObjectConvertHelper<float>(h, _SC("height"));
+                                    float         height_         = marty_simplesquirrel::fromObjectConvertHelper<float>(h, _SC("height"));
                                     // int           escapement     = 0;
                                     // int           orientation    = 0;
-                                    int           weight_         = fromObjectConvertHelper<int>(w, _SC("weight"));
-                                    int           fontStyleFlags_ = fromObjectConvertHelper<int>(style, _SC("style"));
-                                    ssq::sqstring fontFace_       = fromObjectConvertHelper<ssq::sqstring>(face , _SC("face"));
+                                    int           weight_         = marty_simplesquirrel::fromObjectConvertHelper<int>(w, _SC("weight"));
+                                    int           fontStyleFlags_ = marty_simplesquirrel::fromObjectConvertHelper<int>(style, _SC("style"));
+                                    ssq::sqstring fontFace_       = marty_simplesquirrel::fromObjectConvertHelper<ssq::sqstring>(face , _SC("face"));
 
                                     return new DrawingFontParams(height_, 0, 0, weight_, fontStyleFlags_, fontFace_);
                                 }
@@ -827,7 +477,7 @@ struct DrawingGradientParams
         auto cls = vm.addClass( className.c_str()
                               , [](DrawingColor b, DrawingColor m, DrawingColor e, ssq::Object mp)
                                 {
-                                    float mp_         = fromObjectConvertHelper<float>(mp, _SC("midPont"));
+                                    float mp_         = marty_simplesquirrel::fromObjectConvertHelper<float>(mp, _SC("midPont"));
                                     return new DrawingGradientParams{b, m, e, mp_};
                                 }
                               , true /* release */
@@ -963,9 +613,9 @@ struct DrawingPenParams
         auto cls = vm.addClass( className.c_str()
                               , []( ssq::Object w, ssq::Object ecaps, ssq::Object j )
                                 {
-                                    float         width_     = fromObjectConvertHelper<float>(w, _SC("width"));
-                                    int           endcaps_   = fromObjectConvertHelper<int>(ecaps, _SC("endcaps"));
-                                    int           join_      = fromObjectConvertHelper<int>(j, _SC("join"));
+                                    float         width_     = marty_simplesquirrel::fromObjectConvertHelper<float>(w, _SC("width"));
+                                    int           endcaps_   = marty_simplesquirrel::fromObjectConvertHelper<int>(ecaps, _SC("endcaps"));
+                                    int           join_      = marty_simplesquirrel::fromObjectConvertHelper<int>(j, _SC("join"));
 
                                     return new DrawingPenParams(width_, endcaps_, join_ );
                                 }
@@ -1105,7 +755,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->markerAdd(pos, (DrawCoord::value_type)fromObjectConvertHelper<float>(size, _SC("size")));
+        return pDc->markerAdd(pos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(size, _SC("size")));
     }
 
     bool markersClear() const
@@ -1140,7 +790,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return floatToFloat((pDc->markerSetDefSize((DrawCoord::value_type)fromObjectConvertHelper<float>(size, _SC("size")))));
+        return floatToFloat((pDc->markerSetDefSize((DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(size, _SC("size")))));
     }
 
     float markerGetDefSize( ) const
@@ -1295,7 +945,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return 0.0f;
-        auto fScale = fromObjectConvertHelper<float>(scale, _SC("scale"));
+        auto fScale = marty_simplesquirrel::fromObjectConvertHelper<float>(scale, _SC("scale"));
         return floatToFloat(pDc->setPenScale(fScale));
     }
 
@@ -1420,7 +1070,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = fromObjectConvertHelper<float>(height, _SC("height"));
+        dfp.height = marty_simplesquirrel::fromObjectConvertHelper<float>(height, _SC("height"));
         return pDc->createFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1437,7 +1087,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
+        dfp.height = marty_simplesquirrel::fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
         return pDc->makeFontByParams(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1462,7 +1112,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return -1;
-        dfp.height = fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
+        dfp.height = marty_simplesquirrel::fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
         return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
     }
 
@@ -1670,7 +1320,7 @@ struct DrawingContext
             return false;
 
         DrawCoord calculatedEndPos; // 
-        bool res = pDc->arcTo(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(angle, _SC("angle")), &calculatedEndPos);
+        bool res = pDc->arcTo(centerPos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(angle, _SC("angle")), &calculatedEndPos);
         if (res)
         {
             lastArcEndPos = calculatedEndPos;
@@ -1721,7 +1371,7 @@ struct DrawingContext
             return true;
         }
 
-        return pDc->roundRectFigure((DrawCoord::value_type)fromObjectConvertHelper<float>(cornersR, _SC("cornersR")), drawCoordPoints.size(), &drawCoordPoints[0]);
+        return pDc->roundRectFigure((DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(cornersR, _SC("cornersR")), drawCoordPoints.size(), &drawCoordPoints[0]);
 
     }
 
@@ -1742,7 +1392,7 @@ struct DrawingContext
                                        );
         }
 
-        return pDc->circle(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("R")));
+        return pDc->circle(centerPos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("R")));
     }
 
     bool fillCircle(DrawingCoords centerPos, ssq::Object r, bool drawFrame) const
@@ -1761,7 +1411,7 @@ struct DrawingContext
                                        );
         }
 
-        return pDc->fillCircle(centerPos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("R")), drawFrame);
+        return pDc->fillCircle(centerPos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("R")), drawFrame);
     }
 
     bool roundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom) const
@@ -1780,7 +1430,7 @@ struct DrawingContext
                                        );
         }
 
-        return pDc->roundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
+        return pDc->roundRect((DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom);
     }
 
     bool fillRoundRect(ssq::Object r, DrawingCoords leftTop, DrawingCoords rightBottom, bool drawFrame) const
@@ -1799,7 +1449,7 @@ struct DrawingContext
                                        );
         }
 
-        return pDc->fillRoundRect((DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom, drawFrame);
+        return pDc->fillRoundRect((DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("cornersR")), leftTop, rightBottom, drawFrame);
     }
 
     bool rect(DrawingCoords leftTop, DrawingCoords rightBottom) const
@@ -1834,10 +1484,10 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->fillGradientRoundRect( (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("cornersR"))
+        return pDc->fillGradientRoundRect( (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("cornersR"))
                                     , leftTop, rightBottom, gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
                                     , (DrawCoord::value_type)gradientParams.midPoint, (GradientType)gradientType, excludeFrame
-                                    , (DrawCoord::value_type)fromObjectConvertHelper<float>(fillBreakPos, _SC("fillBreakPos")), (GradientRoundRectFillFlags)fillFlags
+                                    , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(fillBreakPos, _SC("fillBreakPos")), (GradientRoundRectFillFlags)fillFlags
                                     );
     }
 
@@ -1846,7 +1496,7 @@ struct DrawingContext
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->fillGradientCircle( pos, (DrawCoord::value_type)fromObjectConvertHelper<float>(r, _SC("radius")), gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
+        return pDc->fillGradientCircle( pos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("radius")), gradientParams.colorBegin, gradientParams.colorMid, gradientParams.colorEnd
                                     , (DrawCoord::value_type)gradientParams.midPoint, excludeFrame
                                     );
     }
@@ -1992,140 +1642,6 @@ struct DrawingContext
 
 
 
-//----------------------------------------------------------------------------
-// https://learn.microsoft.com/ru-ru/cpp/cpp/ellipses-and-variadic-templates?view=msvc-170
-
-inline
-void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec)
-{
-    (void)vec;
-}
-
-template<typename EnumVal> inline
-void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, EnumVal val)
-{
-    auto strVal = enum_serialize(val);
-    if (strVal.empty() || strVal=="0")
-    {
-        strVal = "None";
-    }
-    vec.emplace_back(strVal, (int)val);
-}
-
-template<typename First, typename... EnumVal> inline
-void makeEnumValuesVectorHelper( std::vector< std::pair<std::string, int> > &vec, First first, EnumVal... vals)
-{
-    makeEnumValuesVectorHelper(vec, first);
-    makeEnumValuesVectorHelper(vec, vals...);
-}
-
-template<typename... EnumVal> inline
-std::vector< std::pair<std::string, int> > makeEnumValuesVector( EnumVal... vals )
-{
-    std::vector< std::pair<std::string, int> > vec;
-    makeEnumValuesVectorHelper(vec, vals...);
-    return vec;
-}
-
-template<typename First, typename... EnumVal> inline
-std::vector< std::pair<std::string, int> > makeEnumValuesVector( First first, EnumVal... vals )
-{
-    std::vector< std::pair<std::string, int> > vec;
-    makeEnumValuesVectorHelper(vec, first);
-    makeEnumValuesVectorHelper(vec, vals...);
-    return vec;
-}
-
-//----------------------------------------------------------------------------
-
-
-
-
-//----------------------------------------------------------------------------
-template<typename... EnumVal> inline
-ssq::sqstring makeEnumScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
-{
-    known.insert(utils::to_sqstring(enumNameOnly));
-
-    std::string enumName = enumPrefix+enumNameOnly;
-
-    std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
-
-    std::string res = "enum " + enumName + "{";
-
-    for(auto p: valNameVec)
-    {
-        res.append(p.first);
-        res.append("=");
-        res.append(std::to_string(p.second));
-        res.append(1, itemSep );
-    }
-
-    res.append("}");
-    res.append(1, enumSep );
-
-    return utils::to_sqstring(res);
-}
-
-//----------------------------------------------------------------------------
-template<typename... EnumVal> inline
-ssq::sqstring makeFlagScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
-{
-    known.insert(utils::to_sqstring(enumNameOnly));
-
-    std::string enumName = enumPrefix+enumNameOnly;
-
-    std::vector< std::pair<std::string, int> > valNameVec = makeFlagValuesVector(vals...);
-
-    std::string res = "enum " + enumName + "{";
-
-    for(auto p: valNameVec)
-    {
-        res.append(p.first);
-        res.append("=");
-        res.append(std::to_string(p.second));
-        res.append(1, itemSep );
-    }
-
-    res.append("}");
-    res.append(1, enumSep );
-
-    return utils::to_sqstring(res);
-}
-
-//----------------------------------------------------------------------------
-template<typename... EnumVal> inline
-ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
-{
-    //known.insert(utils::to_sqstring(enumNameOnly));
-    (void)known;
-
-    std::string enumName = enumPrefix+enumNameOnly;
-
-    std::vector< std::pair<std::string, int> > valNameVec = makeEnumValuesVector(vals...);
-
-    std::string res = "class " + enumName + "{";
-
-    for(auto p: valNameVec)
-    {
-        res.append("static ");
-        res.append(p.first);
-        //res.append("<-");
-        res.append("=");
-        res.append(itemTypeString);
-        res.append("(");
-        res.append(std::to_string(p.second));
-        res.append(")");
-        res.append(1, itemSep );
-    }
-
-    res.append("}");
-    res.append(1, enumSep );
-
-    return utils::to_sqstring(res);
-}
-
-//----------------------------------------------------------------------------
 
 
 
@@ -2140,10 +1656,12 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
 
     std::set<ssq::sqstring> knownEnumNames;
 
+    itemSep = enumSep;
+
     // ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
     ssq::sqstring scriptText = 
                       //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
-                      makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep, knownEnumNames
+                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep, knownEnumNames
                                           , EColorRawEnum::AliceBlue       , EColorRawEnum::AntiqueWhite   , EColorRawEnum::Aqua             , EColorRawEnum::Aquamarine          
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               
@@ -2183,17 +1701,17 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           , EColorRawEnum::YellowGreen         
                                           );
 
-    scriptText.append(makeEnumScriptString( prefix, "HorAlign"       , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , itemSep, enumSep, knownEnumNames
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           )
                       );
 
-    scriptText.append(makeEnumScriptString( prefix, "FontStyleFlags" , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", itemSep, enumSep, knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "GradientRoundRectFillFlags" , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", itemSep, enumSep, knownEnumNames
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
                                           , GradientRoundRectFillFlags::squareEnd
@@ -2202,57 +1720,63 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "FontWeight"     , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", itemSep, enumSep, knownEnumNames
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
                                           , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "GradientType"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", itemSep, enumSep, knownEnumNames
                                           , GradientType::vertical, GradientType::horizontal
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "LineType"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", itemSep, enumSep, knownEnumNames
                                           , LineType::diagonal, LineType::vertical, LineType::horizontal
                                           )
                      );
 
     // Автоматом в алиасы генератор не умеет, запилил руцами
-    scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
+    //scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
+    scriptText.append(_SC("class "));
+    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
+    scriptText.append(_SC(".LineDirection{static FromLeftToRight=0; static FromTopToBottom=0; static FromRightToLeft=1; static FromBottomToTop=1; };"));
     // scriptText.append(makeEnumScriptString( prefix, "LineDirection"   , itemSep, enumSep, knownEnumNames
     //                                       , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
     //                                       )
     //                  );
 
-    scriptText.append(makeEnumScriptString( prefix, "LineEndcapStyle"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", itemSep, enumSep, knownEnumNames
                                           , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "LineJoinStyle"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", itemSep, enumSep, knownEnumNames
                                           , LineJoinStyle::bevel, LineJoinStyle::mitter, LineJoinStyle::round
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "BkMode"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", itemSep, enumSep, knownEnumNames
                                           , BkMode::opaque, BkMode::transparent
                                           )
                      );
 
     // Автоматом в алиасы генератор не умеет, запилил руцами
-    scriptText.append(_SC("enum ArcDirection{Cw=0 Clockwise=0 Ccw=1 CounterClockwise=1};"));
+    //scriptText.append(_SC("enum ArcDirection{Cw=0 Clockwise=0 Ccw=1 CounterClockwise=1};"));
+    scriptText.append(_SC("class "));
+    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
+    scriptText.append(_SC(".ArcDirection{static Cw=0; static Clockwise=0; static Ccw=1; static CounterClockwise=1; };"));
     // scriptText.append(makeEnumScriptString( prefix, "ArcDirectionEnum"   , itemSep, enumSep, knownEnumNames
     //                                       , ArcDirectionEnum::Cw, ArcDirectionEnum::Cсw
     //                                       )
     //                  );
 
-    scriptText.append(makeEnumScriptString( prefix, "SmoothingMode"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", itemSep, enumSep, knownEnumNames
                                           , SmoothingMode::defMode, SmoothingMode::highSpeed, SmoothingMode::highQuality, SmoothingMode::noSmoothing, SmoothingMode::antiAlias
                                           )
                      );
 
-    scriptText.append(makeEnumScriptString( prefix, "DrawingPrecise"   , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", itemSep, enumSep, knownEnumNames
                                           , DrawingPrecise::defPrecise, DrawingPrecise::pixelPrecise, DrawingPrecise::textPrecise, DrawingPrecise::smoothingPrecise
                                           )
                      );
@@ -2369,7 +1893,7 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
     std::set<ssq::sqstring> knownEnumNames;
     ssq::sqstring scriptEnumsStr = enumsExposeMakeScript(' ', ';', &knownEnumNames, prefix);
 
-    ssq::sqstring sqPrefix = utils::to_sqstring(prefix);
+    ssq::sqstring sqPrefix = marty_simplesquirrel::to_sqstring(prefix);
 
     // first - индекс текст. фрагмента, second - найденное положение
     std::vector< std::pair<std::size_t, std::size_t> > allOccurencies;
@@ -2484,7 +2008,7 @@ template<typename TVM>
 ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns)
 {
     ssq::sqstring preparedScriptText1 = marty_draw_context::simplesquirrel::prepareScriptEnums(scriptText, ns, true);
-    ssq::sqstring sqNs = utils::to_sqstring(ns);
+    ssq::sqstring sqNs = marty_simplesquirrel::to_sqstring(ns);
 
     // lout << encoding::toUtf8(preparedScriptText1);
     // lout << "\n----------\n\n";

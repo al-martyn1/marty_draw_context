@@ -1661,7 +1661,7 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
     // ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
     ssq::sqstring scriptText = 
                       //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
-                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep, knownEnumNames
+                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep // , knownEnumNames
                                           , EColorRawEnum::AliceBlue       , EColorRawEnum::AntiqueWhite   , EColorRawEnum::Aqua             , EColorRawEnum::Aquamarine          
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               
@@ -1701,17 +1701,17 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           , EColorRawEnum::YellowGreen         
                                           );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , itemSep, enumSep // , knownEnumNames
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           )
                       );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", itemSep, enumSep // , knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", itemSep, enumSep // , knownEnumNames
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
                                           , GradientRoundRectFillFlags::squareEnd
@@ -1720,18 +1720,18 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", itemSep, enumSep // , knownEnumNames
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
                                           , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", itemSep, enumSep // , knownEnumNames
                                           , GradientType::vertical, GradientType::horizontal
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", itemSep, enumSep // , knownEnumNames
                                           , LineType::diagonal, LineType::vertical, LineType::horizontal
                                           )
                      );
@@ -1746,17 +1746,17 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
     //                                       )
     //                  );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", itemSep, enumSep // , knownEnumNames
                                           , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", itemSep, enumSep// , knownEnumNames
                                           , LineJoinStyle::bevel, LineJoinStyle::mitter, LineJoinStyle::round
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", itemSep, enumSep // , knownEnumNames
                                           , BkMode::opaque, BkMode::transparent
                                           )
                      );
@@ -1771,12 +1771,12 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
     //                                       )
     //                  );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", itemSep, enumSep // , knownEnumNames
                                           , SmoothingMode::defMode, SmoothingMode::highSpeed, SmoothingMode::highQuality, SmoothingMode::noSmoothing, SmoothingMode::antiAlias
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", itemSep, enumSep, knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", itemSep, enumSep // , knownEnumNames
                                           , DrawingPrecise::defPrecise, DrawingPrecise::pixelPrecise, DrawingPrecise::textPrecise, DrawingPrecise::smoothingPrecise
                                           )
                      );

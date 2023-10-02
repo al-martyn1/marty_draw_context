@@ -71,6 +71,8 @@ struct MultiDrawContext : public IDrawContext
     typedef DrawCoord::value_type                 float_t;
 
 
+    std::string                                   engineName;
+
     std::shared_ptr<IDrawContext>                 defDc       = 0;
     std::shared_ptr<IDrawContext>                 pixelDc     = 0;
     std::shared_ptr<IDrawContext>                 textDc      = 0;
@@ -263,6 +265,11 @@ protected:
     // { return doDelegate([&](I& i) { return i.getter(); }); }
 
 public:
+
+    std::string getEngineName() override
+    {
+        return engineName;
+    }
 
 
     DrawingPrecise setDrawingPrecise(DrawingPrecise p) override

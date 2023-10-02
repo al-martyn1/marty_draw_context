@@ -113,6 +113,8 @@ struct IDrawContext
 
     virtual ~IDrawContext() {}
 
+    virtual std::string getEngineName() = 0;
+
     virtual void flushBits() = 0;
 
     virtual void setStringEncoding(const std::string &encName) = 0;

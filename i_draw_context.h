@@ -22,6 +22,14 @@
 #endif
 
 
+#if defined(_MSC_VER)
+    // MSVC 2022+
+    #if _MSC_VER>=1930
+        #pragma warning(disable:5267) // warning C5267: definition of implicit copy constructor for 'i_base' is deprecated because it has a user-provided destructor
+    #endif
+#endif
+
+
 
 
 //----------------------------------------------------------------------------
@@ -794,6 +802,13 @@ typedef IDrawContext::DcResourceLiberator       DcResourceLiberator ;
 
 
 } // namespace marty_draw_context
+
+
+
+
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif
 
 
 

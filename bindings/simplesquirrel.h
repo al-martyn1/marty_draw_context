@@ -1901,7 +1901,7 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
     // переделываем в вектор, чтобы обращаться по индексу
     std::vector<ssq::sqstring> knownEnumNamesVec = std::vector<ssq::sqstring>(knownEnumNames.begin(), knownEnumNames.end());
     std::vector<ssq::sqstring> replaceToNamesVec; replaceToNamesVec.reserve(knownEnumNamesVec.size());
-    for(const auto n: knownEnumNamesVec)
+    for(const auto &n: knownEnumNamesVec)
     {
         replaceToNamesVec.emplace_back(sqPrefix+n);
     }

@@ -402,6 +402,34 @@ struct IDrawContext
                                    ) = 0;
 
 
+    class DrawingPreciseSaver
+    {
+        IDrawContext    *pDc;
+        DrawingPrecise  prev;
+
+        DrawingPreciseSaver();
+        DrawingPreciseSaver(const DrawingPreciseSaver&);
+        DrawingPreciseSaver(DrawingPreciseSaver&&);
+        DrawingPreciseSaver& operator=(const DrawingPreciseSaver&);
+        DrawingPreciseSaver& operator=(DrawingPreciseSaver&&);
+
+    public:
+
+        DrawingPreciseSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getDrawingPrecise())
+        {
+        }
+
+        DrawingPreciseSaver(IDrawContext *pDc_, DrawingPrecise newDrawingPrecise) : pDc(pDc_), prev(pDc_->setDrawingPrecise(newDrawingPrecise))
+        {
+        }
+
+        ~DrawingPreciseSaver()
+        {
+            pDc->setDrawingPrecise(prev);
+        }
+
+    };
+
     class BkModeSaver
     {
         IDrawContext  *pDc;
@@ -736,6 +764,18 @@ struct IDrawContext
 
 
 
+typedef IDrawContext::DrawingPreciseSaver       DrawingPreciseSaver ;
+typedef IDrawContext::BkModeSaver               BkModeSaver         ;
+typedef IDrawContext::TextColorSaver            TextColorSaver      ;
+typedef IDrawContext::FontSaver                 FontSaver           ;
+typedef IDrawContext::PenSaver                  PenSaver            ;
+typedef IDrawContext::BrushSaver                BrushSaver          ;
+typedef IDrawContext::ScaleSaver                ScaleSaver          ;
+typedef IDrawContext::OffsetSaver               OffsetSaver         ;
+typedef IDrawContext::PenScaleSaver             PenScaleSaver       ;
+typedef IDrawContext::OffsetScaleSaver          OffsetScaleSaver    ;
+typedef IDrawContext::DcObjectsSaver            DcObjectsSaver      ;
+typedef IDrawContext::DcResourceLiberator       DcResourceLiberator ;
 
 
     // virtual ColorRef getTextColor( ) override

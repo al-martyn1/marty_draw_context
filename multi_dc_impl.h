@@ -340,8 +340,8 @@ public:
 
     DrawSize getDialigBaseUnits() override                      { return getActiveDc()->getDialigBaseUnits(); }
 
-    DrawCoord mapRawToLogicPos( const DrawCoord &c  ) override  { return getActiveDc()->mapRawToLogicPos (c); }
-    DrawCoord mapRawToLogicSize( const DrawCoord &c ) override  { return getActiveDc()->mapRawToLogicSize(c); }
+    DrawCoord mapRawToLogicPos( const DrawCoord &c  ) const override  { return getActiveDc()->mapRawToLogicPos (c); }
+    DrawCoord mapRawToLogicSize( const DrawCoord &c ) const override  { return getActiveDc()->mapRawToLogicSize(c); }
 
     DrawCoord getScaledPos( const DrawCoord &c  ) const override { return getActiveDc()->getScaledPos (c); }
     DrawCoord getScaledSize( const DrawCoord &c ) const override { return getActiveDc()->getScaledSize(c); }

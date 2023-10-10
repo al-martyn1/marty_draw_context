@@ -197,6 +197,16 @@ struct IDrawContext
 
     virtual int getCurBrush() = 0;
 
+    virtual std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Длина символа в wchar_t'ах - поддержка сурогатных пар, возвращает 0/1/2, 0 - достигли конца строки
+    virtual std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Длина текста в символах с учетом суррогатных пар
+    virtual std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Возвращает Unicode символ, формируя его (возможно) из суррогатной пары
+    virtual bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) = 0;
+    //virtual bool getCharWidths(std::vector<float_t> &widths, const std::wstring &text, int fontId=-1 /* use current font */ ) = 0;
+
+    // Нужны ли нам тут в публичном интерфейсе версии с char/std::string?
+    //virtual bool getCharWidths(const char         *text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
+    //virtual bool getCharWidths(const std::string  &text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
+
 
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const char    *fontFace ) = 0;
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const wchar_t *fontFace ) = 0;

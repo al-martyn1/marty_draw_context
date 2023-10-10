@@ -321,6 +321,11 @@ public:
     DcResourcesState getResourcesState() override               { return getActiveDc()->getResourcesState(); }
     void restoreResourcesState(const DcResourcesState &rcState) override { return delegateCallAll([&](I& i) { return i.restoreResourcesState(rcState); }); }
 
+    std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) override { return getActiveDc()->getCharLen(text, textSize); }
+    std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) override { return getActiveDc()->getTextCharsLen(text, textSize); }
+    std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) override     { return getActiveDc()->getChar32(text, textSize); }
+    bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) override { return getActiveDc()->getCharWidths(widths, text, textSize, fontId); }
+
 
     float_t getFitFontHeight(const DrawSize &boxSize) override  { return getActiveDc()->getFitFontHeight(boxSize); }
     float_t getAwgFontWidth(const FontParamsA &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }

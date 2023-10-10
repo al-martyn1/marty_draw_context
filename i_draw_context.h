@@ -165,11 +165,15 @@ struct IDrawContext
 
     virtual DrawSize getDialigBaseUnits() = 0;
 
-    virtual DrawCoord mapRawToLogicPos( const DrawCoord &c  ) = 0;
-    virtual DrawCoord mapRawToLogicSize( const DrawCoord &c ) = 0;
+    virtual DrawCoord mapRawToLogicPos( const DrawCoord &c  ) const = 0;
+    virtual DrawCoord mapRawToLogicSize( const DrawCoord &c ) const = 0;
+    virtual DrawCoord::value_type mapRawToLogicSizeX( const DrawCoord::value_type &c ) const = 0;
+    virtual DrawCoord::value_type mapRawToLogicSizeY( const DrawCoord::value_type &c ) const = 0;
 
     virtual DrawCoord getScaledPos( const DrawCoord &c  ) const = 0;
     virtual DrawCoord getScaledSize( const DrawCoord &c ) const = 0;
+    virtual DrawCoord::value_type getScaledSizeX( const DrawCoord::value_type &c ) const = 0;
+    virtual DrawCoord::value_type getScaledSizeY( const DrawCoord::value_type &c ) const = 0;
 
 
     virtual DrawCoord setOffset( const DrawCoord &c ) = 0;
@@ -197,10 +201,11 @@ struct IDrawContext
 
     virtual int getCurBrush() = 0;
 
-    virtual std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Длина символа в wchar_t'ах - поддержка сурогатных пар, возвращает 0/1/2, 0 - достигли конца строки
-    virtual std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Длина текста в символах с учетом суррогатных пар
-    virtual std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) = 0; //!< Возвращает Unicode символ, формируя его (возможно) из суррогатной пары
-    virtual bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) = 0;
+    // Надо бы ещё замут с кернинг-парами сделать, но пока отложу. Функция GetKerningPairs - https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getkerningpairsa?redirectedfrom=MSDN
+    virtual std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина символа в wchar_t'ах - поддержка сурогатных пар, возвращает 0/1/2, 0 - достигли конца строки
+    virtual std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина текста в символах с учетом суррогатных пар
+    virtual std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Возвращает Unicode символ, формируя его (возможно) из суррогатной пары
+    virtual bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) const = 0;
     //virtual bool getCharWidths(std::vector<float_t> &widths, const std::wstring &text, int fontId=-1 /* use current font */ ) = 0;
 
     // Нужны ли нам тут в публичном интерфейсе версии с char/std::string?

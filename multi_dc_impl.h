@@ -321,10 +321,15 @@ public:
     DcResourcesState getResourcesState() override               { return getActiveDc()->getResourcesState(); }
     void restoreResourcesState(const DcResourcesState &rcState) override { return delegateCallAll([&](I& i) { return i.restoreResourcesState(rcState); }); }
 
-    std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) override { return getActiveDc()->getCharLen(text, textSize); }
-    std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) override { return getActiveDc()->getTextCharsLen(text, textSize); }
-    std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) override     { return getActiveDc()->getChar32(text, textSize); }
-    bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) override { return getActiveDc()->getCharWidths(widths, text, textSize, fontId); }
+    std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) const override { return getActiveDc()->getCharLen(text, textSize); }
+    std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const override { return getActiveDc()->getTextCharsLen(text, textSize); }
+    std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const override     { return getActiveDc()->getChar32(text, textSize); }
+    bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) const override { return getActiveDc()->getCharWidths(widths, text, textSize, fontId); }
+
+    DrawCoord::value_type mapRawToLogicSizeX( const DrawCoord::value_type &c ) const override { return getActiveDc()->mapRawToLogicSizeX(c); }
+    DrawCoord::value_type mapRawToLogicSizeY( const DrawCoord::value_type &c ) const override { return getActiveDc()->mapRawToLogicSizeY(c); }
+    DrawCoord::value_type getScaledSizeX( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeX(c); }
+    DrawCoord::value_type getScaledSizeY( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeY(c); }
 
 
     float_t getFitFontHeight(const DrawSize &boxSize) override  { return getActiveDc()->getFitFontHeight(boxSize); }

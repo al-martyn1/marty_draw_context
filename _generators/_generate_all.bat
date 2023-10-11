@@ -87,6 +87,6 @@ umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %ARCDIRECTION_GEN_FLAGS%            %UINT32% -E=ArcDirectionEnum                 -F=%ARCDIRECTION_DEF% ^
 %SMOOTHINGMODE_GEN_FLAGS%           %UINT32% -E=SmoothingMode                    -F=%SMOOTHINGMODE_DEF% ^
 %DRAWINGPRECISE_GEN_FLAGS%          %UINT32% -E=DrawingPrecise                   -F=%DRAWINGPRECISE_DEF% ^
-%DRAWTEXTFLAGS_GEN_FLAGS%           %UINT32% -E=DrawTextFlags                    -F=%DRAWTEXTFLAGS_DEF% ^
+%DRAWTEXTFLAGS_GEN_FLAGS%           %UINT32% -E=DrawTextFlags                    -F=@draw_text_flags.txt ^
 ..\draw_context_enums.h
 

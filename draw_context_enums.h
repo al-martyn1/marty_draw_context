@@ -467,14 +467,14 @@ enum class DrawTextFlags : std::uint32_t
     invalid                    = (std::uint32_t)(-1),
     unknown                    = (std::uint32_t)(-1),
     defMode                    = 0x00,
-    calcOnly                   = 0x01,
-    fitGlyphEntire             = 0x00,
-    fitGlyphDefault            = 0x00,
-    fitGlyphStartPos           = 0x02,
-    stopOnCr                   = 0x04,
-    stopOnLf                   = 0x08,
-    combiningAsSeparateGlyph   = 0x10,
-    combiningAsGlyph           = 0x10
+    calcOnly                   = 0x01 /*!< Don't draw, calc only */,
+    fitGlyphEntire             = 0x00 /*!< Entire glyph must fit taken width */,
+    fitGlyphDefault            = 0x00 /*!< Entire glyph must fit taken width */,
+    fitGlyphStartPos           = 0x02 /*!< Only start pos must fit taken width, entire glyph may go beyond boundary */,
+    stopOnCr                   = 0x04 /*!< Short replacement for for stopCharsStr with CR */,
+    stopOnLf                   = 0x08 /*!< Short replacement for for stopCharsStr with LF */,
+    combiningAsSeparateGlyph   = 0x10 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    combiningAsGlyph           = 0x10 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */
 
 }; // enum class DrawTextFlags : std::uint32_t
 

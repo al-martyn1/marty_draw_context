@@ -358,7 +358,10 @@ struct ColorRef
     static
     ColorRef fromWinColorRef(std::uint32_t crul)
     {
-        return ColorRef{ (std::uint8_t)((crul&0x0000FF)>>0), (std::uint8_t)((crul&0x00FF00)>>8), (std::uint8_t)((crul&0xFF0000)>>16) };
+        auto r = (std::uint8_t)((crul&0x0000FFu)>>0);
+        auto g = (std::uint8_t)((crul&0x00FF00u)>>8);
+        auto b = (std::uint8_t)((crul&0xFF0000u)>>16);
+        return ColorRef{ r, g, b };
     }
 
 
@@ -373,7 +376,10 @@ struct ColorRef
     static
     ColorRef fromUnsigned(std::uint32_t crul)
     {
-        return ColorRef{ (std::uint8_t)((crul&0xFF0000)>>16), (std::uint8_t)((crul&0x00FF00)>>8), (std::uint8_t)((crul&0x0000FF)>>0) };
+        auto r = (std::uint8_t)((crul&0xFF0000u)>>16);
+        auto g = (std::uint8_t)((crul&0x00FF00u)>>8);
+        auto b = (std::uint8_t)((crul&0x0000FFu)>>0);
+        return ColorRef{ r, g, b };
     }
 
     static

@@ -212,6 +212,20 @@ struct IDrawContext
     //virtual bool getCharWidths(const char         *text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
     //virtual bool getCharWidths(const std::string  &text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
 
+    virtual bool drawTextColored( const DrawCoord               &startPos
+                                , const DrawCoord::value_type   &xPosMax
+                                , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
+                                , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
+                                , DrawTextFlags                 flags
+                                , const wchar_t                 *text
+                                , std::size_t                   textSize=(std::size_t)-1
+                                , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
+                                , const std::uint32_t           *pColors=0
+                                , std::size_t                   nColors=0
+                                , std::size_t                   *pSymbolsDrawn=0
+                                , const wchar_t                 *stopChars=0
+                                , int                           fontId=-1
+                                ) = 0;
 
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const char    *fontFace ) = 0;
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const wchar_t *fontFace ) = 0;
@@ -233,10 +247,14 @@ struct IDrawContext
 
     virtual int  getCurFont() = 0;
 
+    virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
+
     virtual std::wstring decodeString( const std::string &str ) = 0;
-    virtual bool textOut( const DrawCoord &pos, const std::string &text ) = 0;
+    virtual bool textOut( const DrawCoord &pos, const char    *text, std::size_t textSize=(std::size_t)-1 ) = 0;
+    virtual bool textOut( const DrawCoord &pos, const wchar_t *text, std::size_t textSize=(std::size_t)-1 ) = 0;
+    virtual bool textOut( const DrawCoord &pos, const std::string  &text ) = 0;
     virtual bool textOut( const DrawCoord &pos, const std::wstring &text ) = 0;
-    virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string &text ) = 0;
+    virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string  &text ) = 0;
     virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) = 0;
 
 
@@ -430,6 +448,9 @@ struct IDrawContext
                                    ) = 0;
 
 
+
+public:
+
     class DrawingPreciseSaver
     {
         IDrawContext    *pDc;
@@ -437,11 +458,12 @@ struct IDrawContext
 
         DrawingPreciseSaver();
         DrawingPreciseSaver(const DrawingPreciseSaver&);
-        DrawingPreciseSaver(DrawingPreciseSaver&&);
         DrawingPreciseSaver& operator=(const DrawingPreciseSaver&);
         DrawingPreciseSaver& operator=(DrawingPreciseSaver&&);
 
     public:
+
+        DrawingPreciseSaver(DrawingPreciseSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         DrawingPreciseSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getDrawingPrecise())
         {
@@ -453,6 +475,9 @@ struct IDrawContext
 
         ~DrawingPreciseSaver()
         {
+            if (pDc)
+            {
+            }
             pDc->setDrawingPrecise(prev);
         }
 
@@ -465,11 +490,12 @@ struct IDrawContext
 
         BkModeSaver();
         BkModeSaver(const BkModeSaver&);
-        BkModeSaver(BkModeSaver&&);
         BkModeSaver& operator=(const BkModeSaver&);
         BkModeSaver& operator=(BkModeSaver&&);
 
     public:
+
+        BkModeSaver(BkModeSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         BkModeSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->setBkMode(BkMode::transparent))
         {
@@ -482,7 +508,10 @@ struct IDrawContext
 
         ~BkModeSaver()
         {
-            pDc->setBkMode(prev);
+            if (pDc)
+            {
+                pDc->setBkMode(prev);
+            }
         }
 
     };
@@ -495,11 +524,12 @@ struct IDrawContext
 
         TextColorSaver();
         TextColorSaver(const TextColorSaver&);
-        TextColorSaver(TextColorSaver&&);
         TextColorSaver& operator=(const TextColorSaver&);
         TextColorSaver& operator=(TextColorSaver&&);
 
     public:
+
+        TextColorSaver(TextColorSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         TextColorSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getTextColor())
         {
@@ -511,7 +541,10 @@ struct IDrawContext
 
         ~TextColorSaver()
         {
-            pDc->setTextColor(prev);
+            if (pDc)
+            {
+                pDc->setTextColor(prev);
+            }
         }
 
     };
@@ -524,11 +557,12 @@ struct IDrawContext
 
         FontSaver();
         FontSaver(const FontSaver&);
-        FontSaver(FontSaver&&);
         FontSaver& operator=(const FontSaver&);
         FontSaver& operator=(FontSaver&&);
 
     public:
+
+        FontSaver(FontSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         FontSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getCurFont())
         {
@@ -540,7 +574,10 @@ struct IDrawContext
 
         ~FontSaver()
         {
-            pDc->selectFont(prev);
+            if (pDc)
+            {
+                pDc->selectFont(prev);
+            }
         }
 
     };
@@ -553,11 +590,12 @@ struct IDrawContext
 
         PenSaver();
         PenSaver(const PenSaver&);
-        PenSaver(PenSaver&&);
         PenSaver& operator=(const PenSaver&);
         PenSaver& operator=(PenSaver&&);
 
     public:
+
+        PenSaver(PenSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         PenSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getCurPen())
         {
@@ -569,7 +607,10 @@ struct IDrawContext
 
         ~PenSaver()
         {
-            pDc->selectPen(prev);
+            if (pDc)
+            {
+                pDc->selectPen(prev);
+            }
         }
 
     };
@@ -582,11 +623,12 @@ struct IDrawContext
 
         BrushSaver();
         BrushSaver(const BrushSaver&);
-        BrushSaver(BrushSaver&&);
         BrushSaver& operator=(const BrushSaver&);
         BrushSaver& operator=(BrushSaver&&);
 
     public:
+
+        BrushSaver(BrushSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         BrushSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getCurBrush())
         {
@@ -598,7 +640,10 @@ struct IDrawContext
 
         ~BrushSaver()
         {
-            pDc->selectBrush(prev);
+            if (pDc)
+            {
+                pDc->selectBrush(prev);
+            }
         }
 
     };
@@ -611,11 +656,12 @@ struct IDrawContext
 
         ScaleSaver();
         ScaleSaver(const ScaleSaver&);
-        ScaleSaver(ScaleSaver&&);
         ScaleSaver& operator=(const ScaleSaver&);
         ScaleSaver& operator=(ScaleSaver&&);
 
     public:
+
+        ScaleSaver(ScaleSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         ScaleSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getScale())
         {
@@ -627,7 +673,10 @@ struct IDrawContext
 
         ~ScaleSaver()
         {
-            pDc->setScale(prev);
+            if (pDc)
+            {
+                pDc->setScale(prev);
+            }
         }
 
     };
@@ -641,11 +690,12 @@ struct IDrawContext
 
         OffsetSaver();
         OffsetSaver(const OffsetSaver&);
-        OffsetSaver(OffsetSaver&&);
         OffsetSaver& operator=(const OffsetSaver&);
         OffsetSaver& operator=(OffsetSaver&&);
 
     public:
+
+        OffsetSaver(OffsetSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         OffsetSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getOffset())
         {
@@ -657,7 +707,10 @@ struct IDrawContext
 
         ~OffsetSaver()
         {
-            pDc->setOffset(prev);
+            if (pDc)
+            {
+                pDc->setOffset(prev);
+            }
         }
 
     };
@@ -670,11 +723,12 @@ struct IDrawContext
 
         PenScaleSaver();
         PenScaleSaver(const PenScaleSaver&);
-        PenScaleSaver(PenScaleSaver&&);
         PenScaleSaver& operator=(const PenScaleSaver&);
         PenScaleSaver& operator=(PenScaleSaver&&);
 
     public:
+
+        PenScaleSaver(PenScaleSaver&& o) : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
 
         PenScaleSaver(IDrawContext *pDc_) : pDc(pDc_), prev(pDc_->getPenScale())
         {
@@ -686,7 +740,10 @@ struct IDrawContext
 
         ~PenScaleSaver()
         {
-            pDc->setPenScale(prev);
+            if (pDc)
+            {
+                pDc->setPenScale(prev);
+            }
         }
 
     };
@@ -701,11 +758,12 @@ struct IDrawContext
 
         OffsetScaleSaver();
         OffsetScaleSaver(const OffsetScaleSaver&);
-        OffsetScaleSaver(OffsetScaleSaver&&);
+        OffsetScaleSaver(OffsetScaleSaver&& o); // : pDc(std::move(o.pDc)), prev(std::move(o.prev)) { o.pDc = 0; }
         OffsetScaleSaver& operator=(const OffsetScaleSaver&);
         OffsetScaleSaver& operator=(OffsetScaleSaver&&);
 
     public:
+
 
         OffsetScaleSaver(IDrawContext *pDc_)
         : offsetSaver(pDc_), scaleSaver(pDc_), penScaleSaver(pDc_)
@@ -740,11 +798,13 @@ struct IDrawContext
 
         DcObjectsSaver();
         DcObjectsSaver(const DcObjectsSaver&);
-        DcObjectsSaver(DcObjectsSaver&&);
+        DcObjectsSaver(DcObjectsSaver&& o); // = default;
         DcObjectsSaver& operator=(const DcObjectsSaver&);
         DcObjectsSaver& operator=(DcObjectsSaver&&);
 
     public:
+
+        
 
         DcObjectsSaver(IDrawContext *pDc_)
         : fontSaver       (pDc_)
@@ -768,11 +828,12 @@ struct IDrawContext
 
         DcResourceLiberator();
         DcResourceLiberator(const DcResourceLiberator&);
-        DcResourceLiberator(DcResourceLiberator&&);
         DcResourceLiberator& operator=(const DcResourceLiberator&);
         DcResourceLiberator& operator=(DcResourceLiberator&&);
 
     public:
+
+        DcResourceLiberator(DcResourceLiberator&& o) : pDc(std::move(o.pDc)) { o.pDc = 0; }
 
         DcResourceLiberator(IDrawContext *pDc_) : pDc(pDc_)
         {
@@ -780,7 +841,10 @@ struct IDrawContext
 
         ~DcResourceLiberator()
         {
-            pDc->freeAllocatedRc();
+            if (pDc)
+            {
+                pDc->freeAllocatedRc();
+            }
         }
 
     };

@@ -29,6 +29,8 @@ enum class EColorRawEnum : std::uint32_t
     BurlyWood              = 0xDEB887,
     CadetBlue              = 0x5F9EA0,
     Chartreuse             = 0x7FFF00,
+    Cyan                   = 0x00FFFF,
+    MediumCyan             = 0x00B7EB,
     Chocolate              = 0xD2691E,
     Coral                  = 0xFF7F50,
     CornflowerBlue         = 0x6495ED,
@@ -190,6 +192,8 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::GhostWhite            , "GhostWhite"           );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::PeachPuff             , "PeachPuff"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Chartreuse            , "Chartreuse"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::MediumCyan            , "MediumCyan"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "DarkSlateGray"        );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Chocolate             , "Chocolate"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkKhaki             , "DarkKhaki"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Coral                 , "Coral"                );
@@ -210,12 +214,10 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkOrange            , "DarkOrange"           );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Green                 , "Green"                );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkRed               , "DarkRed"              );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "LightGoldenRodYellow" );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkSalmon            , "DarkSalmon"           );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightPink             , "LightPink"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkSeaGreen          , "DarkSeaGreen"         );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkSlateBlue         , "DarkSlateBlue"        );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "DarkSlateGray"        );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DarkViolet            , "DarkViolet"           );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DeepSkyBlue           , "DeepSkyBlue"          );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::DimGray               , "DimGray"              );
@@ -239,6 +241,7 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Lavender              , "Lavender"             );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LavenderBlush         , "LavenderBlush"        );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightCoral            , "LightCoral"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "LightGoldenRodYellow" );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Lime                  , "Lime"                 );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightGray             , "LightGray"            );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::LightGreen            , "LightGreen"           );
@@ -329,6 +332,7 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::SlateGray             , "slate_grey"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::SlateGray             , "slategrey"               );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Aqua                  , "aqua"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Aqua                  , "cyan"                    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Azure                 , "azure"                   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkOrchid            , "dark-orchid"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkOrchid            , "dark_orchid"             );
@@ -369,6 +373,15 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::PeachPuff             , "peach_puff"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::PeachPuff             , "peachpuff"               );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Chartreuse            , "chartreuse"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::MediumCyan            , "medium-cyan"             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::MediumCyan            , "medium_cyan"             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::MediumCyan            , "mediumcyan"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark_slate_grey"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark-slate-gray"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark-slate-grey"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark_slate_gray"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "darkslategray"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "darkslategrey"           );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Chocolate             , "chocolate"               );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkKhaki             , "dark-khaki"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkKhaki             , "dark_khaki"              );
@@ -412,9 +425,6 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkRed               , "dark-red"                );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkRed               , "dark_red"                );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkRed               , "darkred"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "light-golden-rod-yellow" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "light_golden_rod_yellow" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "lightgoldenrodyellow"    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSalmon            , "dark-salmon"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSalmon            , "dark_salmon"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSalmon            , "darksalmon"              );
@@ -427,12 +437,6 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateBlue         , "dark-slate-blue"         );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateBlue         , "dark_slate_blue"         );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateBlue         , "darkslateblue"           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark_slate_grey"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark-slate-gray"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark-slate-grey"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "dark_slate_gray"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "darkslategray"           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkSlateGray         , "darkslategrey"           );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkViolet            , "dark-violet"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkViolet            , "dark_violet"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::DarkViolet            , "darkviolet"              );
@@ -495,6 +499,9 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightCoral            , "light-coral"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightCoral            , "light_coral"             );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightCoral            , "lightcoral"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "light-golden-rod-yellow" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "light_golden_rod_yellow" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGoldenRodYellow  , "lightgoldenrodyellow"    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::Lime                  , "lime"                    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGray             , "light-gray"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( EColorRawEnum::LightGray             , "light_gray"              );

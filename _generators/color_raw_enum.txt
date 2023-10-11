@@ -18,6 +18,9 @@ BurlyWood            =  0xDEB887;
 CadetBlue            =  0x5F9EA0;
 Chartreuse           =  0x7FFF00;
 
+Cyan                 =  0x00FFFF;
+MediumCyan           =  0x00B7EB;
+
 Chocolate            =  0xD2691E;
 Coral                =  0xFF7F50;
 CornflowerBlue       =  0x6495ED;

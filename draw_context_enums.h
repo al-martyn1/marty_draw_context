@@ -461,5 +461,52 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( DrawingPrecise, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( DrawingPrecise::smoothingPrecise   , "smoothingprecise" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( DrawingPrecise, std::map, 1 )
 
+
+enum class DrawTextFlags : std::uint32_t
+{
+    invalid                    = (std::uint32_t)(-1),
+    unknown                    = (std::uint32_t)(-1),
+    defMode                    = 0x00,
+    calcOnly                   = 0x01,
+    fitGlyphEntire             = 0x00,
+    fitGlyphDefault            = 0x00,
+    fitGlyphStartPos           = 0x02,
+    stopOnCr                   = 0x04,
+    stopOnLf                   = 0x08,
+    combiningAsSeparateGlyph   = 0x10,
+    combiningAsGlyph           = 0x10
+
+}; // enum class DrawTextFlags : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_FLAGS(DrawTextFlags)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "FitGlyphStartPos"         );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::invalid                    , "Invalid"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::defMode                    , "DefMode"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "StopOnLf"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "CalcOnly"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "StopOnCr"                 );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "fitglyphstartpos"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "invalid"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "unknown"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphdefault"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphentire"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "defmode"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasseparateglyph" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "stoponlf"                 );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "calconly"                 );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "stoponcr"                 );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(DrawTextFlags, std::set)
+
 } // namespace marty_draw_context
 

@@ -332,6 +332,7 @@ public:
     DrawCoord::value_type getScaledSizeY( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeY(c); }
 
 
+    bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
     float_t getFitFontHeight(const DrawSize &boxSize) override  { return getActiveDc()->getFitFontHeight(boxSize); }
     float_t getAwgFontWidth(const FontParamsA &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }
     float_t getAwgFontWidth(const FontParamsW &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }
@@ -434,11 +435,30 @@ public:
     virtual int  getCurFont() override                           { return getActiveDc()->getCurFont(); }
 
     std::wstring decodeString( const std::string &str ) override { return getActiveDc()->decodeString(str); }
+    bool textOut( const DrawCoord &pos, const wchar_t *text, size_t textSize) override  { return getActiveDc()->textOut(pos, text, textSize); }
+    bool textOut( const DrawCoord &pos, const char    *text, size_t textSize) override  { return getActiveDc()->textOut(pos, text, textSize); }
     bool textOut( const DrawCoord &pos, const std::string &text ) override  { return getActiveDc()->textOut(pos, text); }
     bool textOut( const DrawCoord &pos, const std::wstring &text ) override { return getActiveDc()->textOut(pos, text); }
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string &text ) override  { return getActiveDc()->textOut(pos, fontId, rgb, text); }
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) override { return getActiveDc()->textOut(pos, fontId, rgb, text); }
 
+    bool drawTextColored( const DrawCoord               &startPos
+                        , const DrawCoord::value_type   &xPosMax
+                        , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
+                        , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
+                        , DrawTextFlags                 flags
+                        , const wchar_t                 *text
+                        , std::size_t                   textSize=(std::size_t)-1
+                        , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
+                        , const std::uint32_t           *pColors=0
+                        , std::size_t                   nColors=0
+                        , std::size_t                   *pSymbolsDrawn=0
+                        , const wchar_t                 *stopChars=0
+                        , int                           fontId=-1
+                        ) override
+    {
+        return getActiveDc()->drawTextColored(startPos, xPosMax, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
+    }
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) override
 

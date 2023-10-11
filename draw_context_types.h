@@ -497,6 +497,14 @@ typedef FontParamsT<std::string >   FontParamsA;
 typedef FontParamsT<std::wstring>   FontParamsW;
 
 
+struct SimpleFontMetrics
+{
+    DrawCoord::value_type      height  ; //!< The height (ascent + descent) of characters.
+    DrawCoord::value_type      ascent  ; //!< The ascent (units above the base line) of characters.
+    DrawCoord::value_type      descent ; //!< The descent (units below the base line) of characters.
+    DrawCoord::value_type      overhang; //!< The extra width per string that may be added to some synthesized fonts.
+};
+
 
 
 // enum class SmoothingMode

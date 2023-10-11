@@ -443,22 +443,22 @@ public:
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string &text ) override  { return getActiveDc()->textOut(pos, fontId, rgb, text); }
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) override { return getActiveDc()->textOut(pos, fontId, rgb, text); }
 
-    bool drawTextColored( const DrawCoord               &startPos
-                        , const DrawCoord::value_type   &xPosMax
-                        , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
-                        , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
-                        , DrawTextFlags                 flags
-                        , const wchar_t                 *text
-                        , std::size_t                   textSize=(std::size_t)-1
-                        , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
-                        , const std::uint32_t           *pColors=0
-                        , std::size_t                   nColors=0
-                        , std::size_t                   *pSymbolsDrawn=0
-                        , const wchar_t                 *stopChars=0
-                        , int                           fontId=-1
-                        ) override
+    bool drawTextColoredEx( const DrawCoord               &startPos
+                          , const DrawCoord::value_type   &widthLim
+                          , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
+                          , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
+                          , DrawTextFlags                 flags
+                          , const wchar_t                 *text
+                          , std::size_t                   textSize=(std::size_t)-1
+                          , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
+                          , const std::uint32_t           *pColors=0
+                          , std::size_t                   nColors=0
+                          , std::size_t                   *pSymbolsDrawn=0
+                          , const wchar_t                 *stopChars=0
+                          , int                           fontId=-1
+                          ) override
     {
-        return getActiveDc()->drawTextColored(startPos, xPosMax, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
+        return getActiveDc()->drawTextColoredEx(startPos, widthLim, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
     }
 
     // bool drawTextColored( const DrawCoord               &startPos
@@ -478,6 +478,21 @@ public:
     // {
     //     return getActiveDc()->drawTextColored(startPos, xPosMax, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
     // }
+
+    bool drawTextColored  ( const DrawCoord               &startPos
+                          , const DrawCoord::value_type   &widthLim
+                          , DrawTextFlags                 flags
+                          , const wchar_t                 *text
+                          , std::size_t                   textSize=(std::size_t)-1
+                          , const std::uint32_t           *pColors=0
+                          , std::size_t                   nColors=0
+                          , const wchar_t                 *stopChars=0
+                          , int                           fontId=-1
+                          ) override
+    {
+        return getActiveDc()->drawTextColored(startPos, widthLim, flags, text, textSize, pColors, nColors, stopChars, fontId);
+    }
+
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) override
 

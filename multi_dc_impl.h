@@ -333,7 +333,6 @@ public:
     DrawCoord::value_type getScaledSizeY( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeY(c); }
 
 
-    bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
     float_t getFitFontHeight(const DrawSize &boxSize) override  { return getActiveDc()->getFitFontHeight(boxSize); }
     float_t getAwgFontWidth(const FontParamsA &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }
     float_t getAwgFontWidth(const FontParamsW &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }
@@ -492,6 +491,9 @@ public:
     {
         return getActiveDc()->drawTextColored(startPos, widthLim, flags, text, textSize, pColors, nColors, stopChars, fontId);
     }
+
+    bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
+    bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const override { return getActiveDc()->getKerningPairs(pairs, fontId); }
 
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) override

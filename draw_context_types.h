@@ -842,6 +842,27 @@ struct DcOffsetScale
 
 
 
+struct KerningPair
+{
+    std::uint32_t            chFirst   ;
+    std::uint32_t            chSecond  ;
+    DrawCoord::value_type    kernAmount;
+
+    bool operator==( const KerningPair &kp ) const
+    {
+        return chFirst==kp.chFirst && chSecond==kp.chSecond;
+    }
+
+    bool operator!=( const KerningPair &kp ) const
+    {
+        return chFirst!=kp.chFirst || chSecond!=kp.chSecond;
+    }
+
+};
+
+
+
+
 } // namespace marty_draw_context
 
 
@@ -885,6 +906,17 @@ struct hash<marty_draw_context::PenParamsWithColor>
         seed = marty_draw_context::hash_combine( seed, pp.endcaps );
         seed = marty_draw_context::hash_combine( seed, pp.join );
         return marty_draw_context::hash_combine( seed, pp.color );
+    }
+};
+
+
+template <>
+struct hash<marty_draw_context::KerningPair>
+{
+    std::size_t operator()(const marty_draw_context::KerningPair& kp) const
+    {
+        std::size_t seed = marty_draw_context::hash_combine(0,kp.chFirst);
+        return marty_draw_context::hash_combine(seed,kp.chSecond);
     }
 };
 

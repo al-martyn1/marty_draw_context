@@ -25,7 +25,9 @@ enum class HorAlign : std::uint32_t
     center         = 0x01,
     alignCenter    = 0x01,
     right          = 0x02,
-    alignRight     = 0x02
+    alignRight     = 0x02,
+    width          = 0x03,
+    alignWidth     = 0x03
 
 }; // enum class HorAlign : std::uint32_t
 
@@ -34,6 +36,7 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( HorAlign, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::invalid   , "Invalid" );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::center    , "Center"  );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::right     , "Right"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::width     , "Width"   );
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( HorAlign, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
@@ -53,6 +56,10 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align-right"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align_right"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "alignright"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "width"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "align-width"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "align_width"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "alignwidth"    );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( HorAlign, std::map, 1 )
 
 
@@ -471,10 +478,13 @@ enum class DrawTextFlags : std::uint32_t
     fitGlyphEntire             = 0x00 /*!< Entire glyph must fit taken width */,
     fitGlyphDefault            = 0x00 /*!< Entire glyph must fit taken width */,
     fitGlyphStartPos           = 0x02 /*!< Only start pos must fit taken width, entire glyph may go beyond boundary */,
-    stopOnCr                   = 0x04 /*!< Short replacement for for stopCharsStr with CR */,
-    stopOnLf                   = 0x08 /*!< Short replacement for for stopCharsStr with LF */,
-    combiningAsSeparateGlyph   = 0x10 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
-    combiningAsGlyph           = 0x10 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */
+    fitWidthDisable            = 0x04 /*!< Disable fit to width limit */,
+    kerningDisable             = 0x08 /*!< Disable kerning */,
+    stopOnCr                   = 0x10 /*!< Short replacement for for stopCharsStr with CR */,
+    stopOnLf                   = 0x20 /*!< Short replacement for for stopCharsStr with LF */,
+    stopOnTab                  = 0x40 /*!< Short replacement for for stopCharsStr with Tab */,
+    combiningAsSeparateGlyph   = 0x100 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    combiningAsGlyph           = 0x100 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */
 
 }; // enum class DrawTextFlags : std::uint32_t
 
@@ -483,17 +493,21 @@ MARTY_CPP_MAKE_ENUM_FLAGS(DrawTextFlags)
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "FitGlyphStartPos"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::invalid                    , "Invalid"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTab                  , "StopOnTab"                );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::defMode                    , "DefMode"                  );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "StopOnLf"                 );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "CalcOnly"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "FitWidthDisable"          );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "StopOnCr"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "KerningDisable"           );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "fitglyphstartpos"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "invalid"                  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "unknown"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnTab                  , "stopontab"                );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphdefault"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphentire"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "defmode"                  );
@@ -501,7 +515,9 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "stoponlf"                 );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "calconly"                 );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "fitwidthdisable"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "stoponcr"                 );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "kerningdisable"           );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)

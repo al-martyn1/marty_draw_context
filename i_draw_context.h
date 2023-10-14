@@ -259,8 +259,6 @@ struct IDrawContext
 
     virtual int  getCurFont() = 0;
 
-    virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
-
     virtual std::wstring decodeString( const std::string &str ) = 0;
     virtual bool textOut( const DrawCoord &pos, const char    *text, std::size_t textSize=(std::size_t)-1 ) = 0;
     virtual bool textOut( const DrawCoord &pos, const wchar_t *text, std::size_t textSize=(std::size_t)-1 ) = 0;
@@ -268,6 +266,10 @@ struct IDrawContext
     virtual bool textOut( const DrawCoord &pos, const std::wstring &text ) = 0;
     virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string  &text ) = 0;
     virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) = 0;
+
+
+    virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
+    virtual bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const = 0;
 
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) = 0;

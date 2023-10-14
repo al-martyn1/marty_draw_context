@@ -1,8 +1,17 @@
 invalid,unknown=-1
 defMode=0
+
 calcOnly=0x0001 // Don't draw, calc only
+
+
 fitGlyphEntire,fitGlyphDefault=0x0000 // Entire glyph must fit taken width
 fitGlyphStartPos=0x0002 // Only start pos must fit taken width, entire glyph may go beyond boundary
-stopOnCr=0x0004 // Short replacement for for stopCharsStr with CR
-stopOnLf=0x0008 // Short replacement for for stopCharsStr with LF
-combiningAsSeparateGlyph,combiningAsGlyph=0x0010 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
+fitWidthDisable=0x0004 // Disable fit to width limit
+
+kerningDisable=0x0008 // Disable kerning
+
+stopOnCr =0x0010 // Short replacement for for stopCharsStr with CR
+stopOnLf =0x0020 // Short replacement for for stopCharsStr with LF
+stopOnTab=0x0040 // Short replacement for for stopCharsStr with Tab
+
+combiningAsSeparateGlyph,combiningAsGlyph=0x0100 // Combining symbol calulated as standalone symbol into pSymbolsDrawn

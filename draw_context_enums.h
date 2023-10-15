@@ -485,6 +485,7 @@ enum class DrawTextFlags : std::uint32_t
     kerningDisable             = 0x00000200 /*!< Disable kerning */,
     combiningAsSeparateGlyph   = 0x00000400 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
     combiningAsGlyph           = 0x00000400 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    forceSpacesColoring        = 0x00000800,
     stopOnLineBreaks           = 0x00001000 /*!< Stop on any linebreak sequence */,
     stopOnTabs                 = 0x00002000 /*!< Stop on any hor tab symbols */
 
@@ -503,6 +504,7 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "EndEllipsis"              );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "KerningDisable"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "ForceSpacesColoring"      );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "StopOnLineBreaks"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "StopOnTabs"               );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
@@ -522,6 +524,7 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "kerningdisable"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasseparateglyph" );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "forcespacescoloring"      );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "stoponlinebreaks"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "stopontabs"               );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )

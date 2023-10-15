@@ -5,16 +5,17 @@ calcOnly         =0x000001 // Don't draw, calc only
 
 
 fitGlyphEntire,fitGlyphDefault=0x000000 // Entire glyph must fit taken width
-fitGlyphStartPos =0x000002 // Only start pos must fit taken width, entire glyph may go beyond boundary
-fitWidthDisable  =0x000004 // Disable fit to width limit, not used for para's drawing
-fitHeightStartPos=0x000010 // Line Y start pos must fit taken height, entire line may go beyond boundary
-fitHeightDisable =0x000020 // Disable fit to height limit, not used for para's drawing
+fitGlyphStartPos   =0x000002 // Only start pos must fit taken width, entire glyph may go beyond boundary
+fitWidthDisable    =0x000004 // Disable fit to width limit, not used for para's drawing
+fitHeightStartPos  =0x000010 // Line Y start pos must fit taken height, entire line may go beyond boundary
+fitHeightDisable   =0x000020 // Disable fit to height limit, not used for para's drawing
 
-endEllipsis      =0x000100 // Draw ellipsis if text not entire fit to limit
+endEllipsis        =0x000100 // Draw ellipsis if text not entire fit to limit
 
-kerningDisable   =0x000200 // Disable kerning
+kerningDisable     =0x000200 // Disable kerning
 combiningAsSeparateGlyph,combiningAsGlyph=0x000400 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
+forceSpacesColoring=0x000800
 
-stopOnLineBreaks =0x001000 // Stop on any linebreak sequence
-stopOnTabs       =0x002000 // Stop on any hor tab symbols
+stopOnLineBreaks   =0x001000 // Stop on any linebreak sequence
+stopOnTabs         =0x002000 // Stop on any hor tab symbols
 

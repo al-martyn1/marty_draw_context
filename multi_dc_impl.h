@@ -495,6 +495,10 @@ public:
     bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
     bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const override { return getActiveDc()->getKerningPairs(pairs, fontId); }
 
+    bool getCharWidth (std::uint32_t ch, float_t &w) const override                        { return getActiveDc()->getCharWidth(ch, w); }
+    bool getCharWidth (std::uint32_t ch, float_t &w, int fontId /* =-1 */ ) const override { return getActiveDc()->getCharWidth(ch, w, fontId); }
+
+
     bool isAnySpaceChar(std::uint32_t ch) const override             { return getActiveDc()->isAnySpaceChar(ch); }
     bool isAnyNonBreakingSpaceChar(std::uint32_t ch) const override  { return getActiveDc()->isAnyNonBreakingSpaceChar(ch); }
     bool isAnyTabChar(std::uint32_t ch) const override               { return getActiveDc()->isAnyTabChar(ch); }
@@ -502,7 +506,6 @@ public:
     bool isAnyWhiteSpaceChar(std::uint32_t ch) const override        { return getActiveDc()->isAnyWhiteSpaceChar(ch); }
     bool isLineBreak(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const override            { return getActiveDc()->isLineBreak(text, textSize); }
     std::size_t getLineBreakLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const override { return getActiveDc()->getLineBreakLen(text, textSize); }
-
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) override
 

@@ -205,6 +205,8 @@ struct IDrawContext
     virtual std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина текста в символах с учетом суррогатных пар
     virtual std::size_t getTextCharsLenEx(DrawTextFlags flags, const wchar_t *text, std::size_t textSize=(std::size_t)-1, const wchar_t *skipChars=0) const = 0; //!< Длина текста в символах с учетом суррогатных пар и с учетом (или нет) комбайнинг символов
     virtual std::uint32_t getChar32(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Возвращает Unicode символ, формируя его (возможно) из суррогатной пары
+    virtual bool getCharWidth (std::uint32_t charCode, float_t &w) const = 0;
+    virtual bool getCharWidth (std::uint32_t charCode, float_t &w, int fontId /* =-1 */ ) const = 0;
     virtual bool getCharWidths(std::vector<float_t> &widths, const wchar_t *text, std::size_t textSize=(std::size_t)-1, int fontId=-1 /* use current font */ ) const = 0;
     //virtual bool getCharWidths(std::vector<float_t> &widths, const std::wstring &text, int fontId=-1 /* use current font */ ) = 0;
 

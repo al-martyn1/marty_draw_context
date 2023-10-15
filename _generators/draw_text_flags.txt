@@ -8,10 +8,12 @@ fitGlyphEntire,fitGlyphDefault=0x0000 // Entire glyph must fit taken width
 fitGlyphStartPos=0x0002 // Only start pos must fit taken width, entire glyph may go beyond boundary
 fitWidthDisable=0x0004 // Disable fit to width limit
 
-kerningDisable=0x0008 // Disable kerning
+endEllipsis=0x0008 // Draw ellipsis if text not entire fit to limit
 
-stopOnCr =0x0010 // Short replacement for for stopCharsStr with CR
-stopOnLf =0x0020 // Short replacement for for stopCharsStr with LF
-stopOnTab=0x0040 // Short replacement for for stopCharsStr with Tab
+kerningDisable=0x0010 // Disable kerning
+combiningAsSeparateGlyph,combiningAsGlyph=0x0020 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
 
-combiningAsSeparateGlyph,combiningAsGlyph=0x0100 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
+stopOnCr =0x0100 // Short replacement for for stopCharsStr with CR
+stopOnLf =0x0200 // Short replacement for for stopCharsStr with LF
+stopOnTab=0x0400 // Short replacement for for stopCharsStr with Tab
+

@@ -473,18 +473,19 @@ enum class DrawTextFlags : std::uint32_t
 {
     invalid                    = (std::uint32_t)(-1),
     unknown                    = (std::uint32_t)(-1),
-    defMode                    = 0x00,
-    calcOnly                   = 0x01 /*!< Don't draw, calc only */,
-    fitGlyphEntire             = 0x00 /*!< Entire glyph must fit taken width */,
-    fitGlyphDefault            = 0x00 /*!< Entire glyph must fit taken width */,
-    fitGlyphStartPos           = 0x02 /*!< Only start pos must fit taken width, entire glyph may go beyond boundary */,
-    fitWidthDisable            = 0x04 /*!< Disable fit to width limit */,
-    kerningDisable             = 0x08 /*!< Disable kerning */,
-    stopOnCr                   = 0x10 /*!< Short replacement for for stopCharsStr with CR */,
-    stopOnLf                   = 0x20 /*!< Short replacement for for stopCharsStr with LF */,
-    stopOnTab                  = 0x40 /*!< Short replacement for for stopCharsStr with Tab */,
-    combiningAsSeparateGlyph   = 0x100 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
-    combiningAsGlyph           = 0x100 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */
+    defMode                    = 0x00000000,
+    calcOnly                   = 0x00000001 /*!< Don't draw, calc only */,
+    fitGlyphEntire             = 0x00000000 /*!< Entire glyph must fit taken width */,
+    fitGlyphDefault            = 0x00000000 /*!< Entire glyph must fit taken width */,
+    fitGlyphStartPos           = 0x00000002 /*!< Only start pos must fit taken width, entire glyph may go beyond boundary */,
+    fitWidthDisable            = 0x00000004 /*!< Disable fit to width limit */,
+    endEllipsis                = 0x00000008 /*!< Draw ellipsis if text not entire fit to limit */,
+    kerningDisable             = 0x00000010 /*!< Disable kerning */,
+    combiningAsSeparateGlyph   = 0x00000020 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    combiningAsGlyph           = 0x00000020 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    stopOnCr                   = 0x00000100 /*!< Short replacement for for stopCharsStr with CR */,
+    stopOnLf                   = 0x00000200 /*!< Short replacement for for stopCharsStr with LF */,
+    stopOnTab                  = 0x00000400 /*!< Short replacement for for stopCharsStr with Tab */
 
 }; // enum class DrawTextFlags : std::uint32_t
 
@@ -495,12 +496,13 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::invalid                    , "Invalid"                  );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTab                  , "StopOnTab"                );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::defMode                    , "DefMode"                  );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "StopOnLf"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "CalcOnly"                 );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "FitWidthDisable"          );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "StopOnCr"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "EndEllipsis"              );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "KerningDisable"           );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "StopOnCr"                 );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
@@ -511,13 +513,14 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphdefault"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphentire"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "defmode"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "stoponlf"                 );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasseparateglyph" );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLf                   , "stoponlf"                 );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "calconly"                 );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "fitwidthdisable"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "stoponcr"                 );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "endellipsis"              );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "kerningdisable"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnCr                   , "stoponcr"                 );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)

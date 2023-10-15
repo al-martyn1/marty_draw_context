@@ -15,7 +15,6 @@ endEllipsis      =0x000100 // Draw ellipsis if text not entire fit to limit
 kerningDisable   =0x000200 // Disable kerning
 combiningAsSeparateGlyph,combiningAsGlyph=0x000400 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
 
-stopOnCr         =0x001000 // Short replacement for for stopCharsStr with CR
-stopOnLf         =0x002000 // Short replacement for for stopCharsStr with LF
-stopOnTab        =0x004000 // Short replacement for for stopCharsStr with Tab
+stopOnLineBreaks =0x001000 // Stop on any linebreak sequence
+stopOnTabs       =0x002000 // Stop on any hor tab symbols
 

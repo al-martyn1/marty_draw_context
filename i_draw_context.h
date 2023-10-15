@@ -201,7 +201,6 @@ struct IDrawContext
 
     virtual int getCurBrush() = 0;
 
-    // Надо бы ещё замут с кернинг-парами сделать, но пока отложу. Функция GetKerningPairs - https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getkerningpairsa?redirectedfrom=MSDN
     virtual std::size_t getCharLen     (const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина символа в wchar_t'ах - поддержка сурогатных пар, возвращает 0/1/2, 0 - достигли конца строки
     virtual std::size_t getTextCharsLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина текста в символах с учетом суррогатных пар
     virtual std::size_t getTextCharsLenEx(DrawTextFlags flags, const wchar_t *text, std::size_t textSize=(std::size_t)-1, const wchar_t *skipChars=0) const = 0; //!< Длина текста в символах с учетом суррогатных пар и с учетом (или нет) комбайнинг символов
@@ -212,6 +211,17 @@ struct IDrawContext
     // Нужны ли нам тут в публичном интерфейсе версии с char/std::string?
     //virtual bool getCharWidths(const char         *text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
     //virtual bool getCharWidths(const std::string  &text, std::vector<float_t> &widths, int fontId=-1 /* use current font */ ) = 0;
+
+    virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
+    virtual bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const = 0;
+
+    virtual bool isAnySpaceChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyNonBreakingSpaceChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyTabChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyLineBreakChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyWhiteSpaceChar(std::uint32_t ch) const = 0;
+    virtual bool isLineBreak(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0;
+    virtual std::size_t getLineBreakLen(const wchar_t *text, std::size_t textSize=(std::size_t)-1) const = 0; //!< Длина символа LineBreak в wchar_t'ах, 0 - достигли конца строки или символ не LineBreak
 
     virtual bool drawTextColoredEx( const DrawCoord               &startPos
                                   , const DrawCoord::value_type   &widthLim
@@ -267,9 +277,6 @@ struct IDrawContext
     virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string  &text ) = 0;
     virtual bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) = 0;
 
-
-    virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
-    virtual bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const = 0;
 
 
     // virtual DrawCoord::value_type getFonSizeFitHeigh( const FontParamsA &fp, const DrawCoord &rectPos, const DrawCoord &rectSize, const std::string  &text /* , const std::string  &fontFace="Courier New"  */ , HorAlign a = HorAlign::left, float_t xMarginScale = 0, DrawCoord *pTextPos = 0, DrawCoord *pTextSize = 0 ) = 0;

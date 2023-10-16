@@ -219,6 +219,7 @@ struct IDrawContext
 
     virtual bool isAnySpaceChar(std::uint32_t ch) const = 0;
     virtual bool isAnyNonBreakingSpaceChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyBreakingSpaceChar(std::uint32_t ch) const = 0;
     virtual bool isAnyTabChar(std::uint32_t ch) const = 0;
     virtual bool isAnyLineBreakChar(std::uint32_t ch) const = 0;
     virtual bool isAnyWhiteSpaceChar(std::uint32_t ch) const = 0;
@@ -250,6 +251,26 @@ struct IDrawContext
                                   , const wchar_t                 *stopChars=0
                                   , int                           fontId=-1
                                   ) = 0;
+
+    virtual bool drawParaColoredEx( const DrawCoord                       &startPos
+                                  , const DrawCoord                       &limits       //!< Limits, vertical and horizontal, relative to start pos
+                                  , DrawCoord::value_type                 *pNextPosY    //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                                  , const DrawCoord::value_type           &lineSpacing  //!< Extra space between lines of text
+                                  , const DrawCoord::value_type           &paraIndent   //!< Indent on the first line
+                                  , const DrawCoord::value_type           &tabSize      //!< Size used for tabs if tabStops are over
+                                  , DrawTextFlags                         flags
+                                  , HorAlign                              horAlign
+                                  , VertAlign                             vertAlign
+                                  , const wchar_t                         *text
+                                  , std::size_t                           textSize=(std::size_t)-1
+                                  , std::size_t                           *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
+                                  , const std::uint32_t                   *pColors=0
+                                  , std::size_t                           nColors=0
+                                  , DrawCoord::value_type                 *pTabStopPositions=0        //!< Relative to start pos X coord
+                                  , std::size_t                           nTabStopPositions=0
+                                  , int                                   fontId=-1
+                                  ) = 0;
+
 
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const char    *fontFace ) = 0;
     virtual int  createFont( float_t height, int escapement, int orientation, FontWeight weight, FontStyleFlags fontStyleFlags, const wchar_t *fontFace ) = 0;

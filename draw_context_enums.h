@@ -63,6 +63,46 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( HorAlign, std::map, 1 )
 
 
+enum class VertAlign : std::uint32_t
+{
+    invalid        = (std::uint32_t)(-1),
+    alignInvalid   = (std::uint32_t)(-1),
+    top            = 0x00,
+    alignTop       = 0x00,
+    center         = 0x01,
+    alignCenter    = 0x01,
+    bottom         = 0x02,
+    alignBottom    = 0x02
+
+}; // enum class VertAlign : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( VertAlign, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( VertAlign::invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( VertAlign::center    , "Center"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( VertAlign::top       , "Top"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( VertAlign::bottom    , "Bottom"  );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( VertAlign, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( VertAlign, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "invalid"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "align-invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "align_invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "aligninvalid"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "center"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "align-center"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "align_center"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "aligncenter"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "top"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "align-top"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "align_top"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "aligntop"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "bottom"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "align-bottom"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "align_bottom"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "alignbottom"   );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( VertAlign, std::map, 1 )
+
+
 enum class FontStyleFlags : std::uint32_t
 {
     invalid      = (std::uint32_t)(-1),

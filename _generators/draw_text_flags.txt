@@ -1,5 +1,5 @@
-invalid,unknown=-1
-defMode=0
+invalid,unknown    =-1
+none,defMode       =0
 
 calcOnly           =0x000001 // Don't draw, calc only
 

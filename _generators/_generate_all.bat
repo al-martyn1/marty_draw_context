@@ -73,7 +73,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set DRAWINGPRECISE_DEF=invalid,unknown=-1;defPrecise=0;pixelPrecise;textPrecise;smoothingPrecise
 
 @set DRAWTEXTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA% %HEX8%
-@set DRAWTEXTFLAGS_DEF=invalid,unknown=-1;defMode=0;calcOnly=0x0001;fitGlyphEntire,fitGlyphDefault=0x0000;fitGlyphStartPos=0x0002;stopOnCr=0x0004;stopOnLf=0x0008;combiningAsSeparateGlyph,combiningAsGlyph=0x0010
+@rem set DRAWTEXTFLAGS_DEF=invalid,unknown=-1;defMode=0;calcOnly=0x0001;fitGlyphEntire,fitGlyphDefault=0x0000;fitGlyphStartPos=0x0002;stopOnCr=0x0004;stopOnLf=0x0008;combiningAsSeparateGlyph,combiningAsGlyph=0x0010
 
 
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^

@@ -216,10 +216,17 @@ struct IDrawContext
 
     virtual bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const = 0;
     virtual bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const = 0;
+    virtual float_t getKerningValue( const std::unordered_set<KerningPair> &pairs, std::uint32_t chFirst, std::uint32_t chSecond) const = 0;
 
+    // Про категории символов юникода - https://learn.microsoft.com/ru-ru/dotnet/api/system.globalization.unicodecategory?view=net-7.0
+    virtual bool isArabicDigitChar(std::uint32_t ch) const = 0;
+    virtual bool isLatinLetterChar(std::uint32_t ch) const = 0;
     virtual bool isAnySpaceChar(std::uint32_t ch) const = 0;
     virtual bool isAnyNonBreakingSpaceChar(std::uint32_t ch) const = 0;
     virtual bool isAnyBreakingSpaceChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyNonBreakingDashChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyBreakingDashChar(std::uint32_t ch) const = 0;
+    virtual bool isAnyDashChar(std::uint32_t ch) const = 0;
     virtual bool isAnyTabChar(std::uint32_t ch) const = 0;
     virtual bool isAnyLineBreakChar(std::uint32_t ch) const = 0;
     virtual bool isAnyWhiteSpaceChar(std::uint32_t ch) const = 0;
@@ -233,6 +240,7 @@ struct IDrawContext
                                   , DrawTextFlags                 flags
                                   , const wchar_t                 *text
                                   , std::size_t                   textSize=(std::size_t)-1
+                                  , std::uint32_t                 *pLastCharProcessed = 0 //!< IN/OUT last drawn char, for kerning calculation
                                   , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
                                   , const std::uint32_t           *pColors=0
                                   , std::size_t                   nColors=0

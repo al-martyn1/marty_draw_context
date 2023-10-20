@@ -449,6 +449,7 @@ public:
                           , DrawTextFlags                 flags
                           , const wchar_t                 *text
                           , std::size_t                   textSize=(std::size_t)-1
+                          , std::uint32_t                 *pLastCharProcessed = 0 //!< IN/OUT last drawn char, for kerning calculation
                           , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
                           , const std::uint32_t           *pColors=0
                           , std::size_t                   nColors=0
@@ -457,7 +458,7 @@ public:
                           , int                           fontId=-1
                           ) override
     {
-        return getActiveDc()->drawTextColoredEx(startPos, widthLim, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
+        return getActiveDc()->drawTextColoredEx(startPos, widthLim, pNextPosX, pOverhang, flags, text, textSize, pLastCharProcessed, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
     }
 
     // bool drawTextColored( const DrawCoord               &startPos
@@ -492,15 +493,48 @@ public:
         return getActiveDc()->drawTextColored(startPos, widthLim, flags, text, textSize, pColors, nColors, stopChars, fontId);
     }
 
+    bool drawParaColoredEx( const DrawCoord                       &startPos
+                          , const DrawCoord                       &limits       //!< Limits, vertical and horizontal, relative to start pos
+                          , DrawCoord::value_type                 *pNextPosY    //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                          , const DrawCoord::value_type           &lineSpacing  //!< Extra space between lines of text
+                          , const DrawCoord::value_type           &paraIndent   //!< Indent on the first line
+                          , const DrawCoord::value_type           &tabSize      //!< Size used for tabs if tabStops are over
+                          , DrawTextFlags                         flags
+                          , HorAlign                              horAlign
+                          , VertAlign                             vertAlign
+                          , const wchar_t                         *text
+                          , std::size_t                           textSize=(std::size_t)-1
+                          , std::size_t                           *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
+                          , const std::uint32_t                   *pColors=0
+                          , std::size_t                           nColors=0
+                          , DrawCoord::value_type                 *pTabStopPositions=0        //!< Relative to start pos X coord
+                          , std::size_t                           nTabStopPositions=0
+                          , int                                   fontId=-1
+                          ) override
+    {
+        return getActiveDc()->drawParaColoredEx( startPos, limits, pNextPosY, lineSpacing, paraIndent, tabSize, flags
+                                               , horAlign, vertAlign, text, textSize, pCharsProcessed
+                                               , pColors, nColors, pTabStopPositions, nTabStopPositions
+                                               , fontId
+                                               );
+    }
+
     bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
     bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const override { return getActiveDc()->getKerningPairs(pairs, fontId); }
+    float_t getKerningValue( const std::unordered_set<KerningPair> &pairs, std::uint32_t chFirst, std::uint32_t chSecond) const override { return getActiveDc()->getKerningValue(pairs, chFirst, chSecond); }
 
     bool getCharWidth (std::uint32_t ch, float_t &w) const override                        { return getActiveDc()->getCharWidth(ch, w); }
     bool getCharWidth (std::uint32_t ch, float_t &w, int fontId /* =-1 */ ) const override { return getActiveDc()->getCharWidth(ch, w, fontId); }
 
 
+    bool isArabicDigitChar(std::uint32_t ch) const override          { return getActiveDc()->isArabicDigitChar(ch); }
+    bool isLatinLetterChar(std::uint32_t ch) const override          { return getActiveDc()->isLatinLetterChar(ch); }
     bool isAnySpaceChar(std::uint32_t ch) const override             { return getActiveDc()->isAnySpaceChar(ch); }
     bool isAnyNonBreakingSpaceChar(std::uint32_t ch) const override  { return getActiveDc()->isAnyNonBreakingSpaceChar(ch); }
+    bool isAnyBreakingSpaceChar(std::uint32_t ch) const override     { return getActiveDc()->isAnyBreakingSpaceChar(ch); }
+    bool isAnyNonBreakingDashChar(std::uint32_t ch) const override   { return getActiveDc()->isAnyNonBreakingDashChar(ch); }
+    bool isAnyBreakingDashChar(std::uint32_t ch) const override      { return getActiveDc()->isAnyBreakingDashChar(ch); }
+    bool isAnyDashChar(std::uint32_t ch) const override              { return getActiveDc()->isAnyDashChar(ch); }
     bool isAnyTabChar(std::uint32_t ch) const override               { return getActiveDc()->isAnyTabChar(ch); }
     bool isAnyLineBreakChar(std::uint32_t ch) const override         { return getActiveDc()->isAnyLineBreakChar(ch); }
     bool isAnyWhiteSpaceChar(std::uint32_t ch) const override        { return getActiveDc()->isAnyWhiteSpaceChar(ch); }

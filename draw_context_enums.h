@@ -520,14 +520,16 @@ enum class DrawTextFlags : std::uint32_t
     fitGlyphStartPos           = 0x00000002 /*!< Only start pos must fit taken width, entire glyph may go beyond boundary */,
     fitWidthDisable            = 0x00000004 /*!< Disable fit to width limit, not used for para's drawing */,
     fitHeightStartPos          = 0x00000010 /*!< Line Y start pos must fit taken height, entire line may go beyond boundary */,
-    fitHeightDisable           = 0x00000020 /*!< Disable fit to height limit, not used for para's drawing */,
+    fitHeightDisable           = 0x00000020 /*!< Disable fit to height limit */,
     endEllipsis                = 0x00000100 /*!< Draw ellipsis if text not entire fit to limit */,
-    kerningDisable             = 0x00000200 /*!< Disable kerning */,
-    combiningAsSeparateGlyph   = 0x00000400 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
-    combiningAsGlyph           = 0x00000400 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
-    forceSpacesColoring        = 0x00000800,
-    stopOnLineBreaks           = 0x00001000 /*!< Stop on any linebreak sequence */,
-    stopOnTabs                 = 0x00002000 /*!< Stop on any hor tab symbols */
+    dontExpandTabs             = 0x00000200 /*!< If not tab stop positions taken, or if they are over, in normal case tabs will be expanded with taken tabSize. This flags disables such behavior, and forces to threat tabs as spaces */,
+    kerningDisable             = 0x00001000 /*!< Disable kerning */,
+    combiningAsSeparateGlyph   = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    combiningAsGlyph           = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
+    forceSpacesColoring        = 0x00004000 /*!< Force increment color index while drawing space chars */,
+    stopOnLineBreaks           = 0x00010000 /*!< Stop on any linebreak sequence */,
+    stopOnTabs                 = 0x00020000 /*!< Stop on any hor tab symbols */,
+    keepLtSpaces               = 0x00040000 /*!< Keep leading and trailing spaces while drawing paras */
 
 }; // enum class DrawTextFlags : std::uint32_t
 
@@ -542,11 +544,13 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "FitHeightDisable"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitHeightStartPos          , "FitHeightStartPos"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "EndEllipsis"              );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::dontExpandTabs             , "DontExpandTabs"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "KerningDisable"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "ForceSpacesColoring"      );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "StopOnLineBreaks"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "StopOnTabs"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "KeepLtSpaces"             );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
@@ -561,12 +565,14 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "fitheightdisable"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitHeightStartPos          , "fitheightstartpos"        );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "endellipsis"              );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::dontExpandTabs             , "dontexpandtabs"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "kerningdisable"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasseparateglyph" );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "forcespacescoloring"      );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "stoponlinebreaks"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "stopontabs"               );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "keepltspaces"             );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)

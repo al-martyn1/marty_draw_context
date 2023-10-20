@@ -15,8 +15,9 @@ dontExpandTabs     =0x000200 // If not tab stop positions taken, or if they are 
 
 kerningDisable     =0x001000 // Disable kerning
 combiningAsSeparateGlyph,combiningAsGlyph=0x002000 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
-forceSpacesColoring=0x004000
+forceSpacesColoring=0x004000 // Force increment color index while drawing space chars
 
 stopOnLineBreaks   =0x010000 // Stop on any linebreak sequence
 stopOnTabs         =0x020000 // Stop on any hor tab symbols
 
+keepLtSpaces       =0x040000 // Keep leading and trailing spaces while drawing paras

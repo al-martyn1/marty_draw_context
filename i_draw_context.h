@@ -170,6 +170,10 @@ struct IDrawContext
     virtual DrawCoord::value_type mapRawToLogicSizeX( const DrawCoord::value_type &c ) const = 0;
     virtual DrawCoord::value_type mapRawToLogicSizeY( const DrawCoord::value_type &c ) const = 0;
 
+    virtual DrawCoord             getPixelSize()  const = 0;
+    virtual DrawCoord::value_type getPixelSizeX() const = 0;
+    virtual DrawCoord::value_type getPixelSizeY() const = 0;
+
     virtual DrawCoord getScaledPos( const DrawCoord &c  ) const = 0;
     virtual DrawCoord getScaledSize( const DrawCoord &c ) const = 0;
     virtual DrawCoord::value_type getScaledSizeX( const DrawCoord::value_type &c ) const = 0;

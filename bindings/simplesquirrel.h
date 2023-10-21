@@ -892,6 +892,18 @@ struct DrawingContext
         return pDc->mapRawToLogicSize(c);
     }
 
+    DrawingCoords getPixelSize() const
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords();
+        return pDc->getPixelSize();
+    }
+
+    // virtual DrawCoord::value_type getPixelSizeX() const = 0;
+    // virtual DrawCoord::value_type getPixelSizeY() const = 0;
+
+
     DrawingCoords getScaledPos ( DrawingCoords c ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
@@ -1566,6 +1578,7 @@ struct DrawingContext
 
         cls.addFunc( _SC("mapRawToLogicPos")       , &DrawingContext::mapRawToLogicPos      );
         cls.addFunc( _SC("mapRawToLogicSize")      , &DrawingContext::mapRawToLogicSize     );
+        cls.addFunc( _SC("getPixelSize")           , &DrawingContext::getPixelSize          );
 
         cls.addFunc( _SC("getScaledPos")           , &DrawingContext::getScaledPos          );
         cls.addFunc( _SC("getScaledSize")          , &DrawingContext::getScaledSize         );

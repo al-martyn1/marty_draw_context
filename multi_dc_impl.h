@@ -332,6 +332,10 @@ public:
     DrawCoord::value_type getScaledSizeX( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeX(c); }
     DrawCoord::value_type getScaledSizeY( const DrawCoord::value_type &c ) const override     { return getActiveDc()->getScaledSizeY(c); }
 
+    DrawCoord             getPixelSize () const override     { return getActiveDc()->getPixelSize (); }
+    DrawCoord::value_type getPixelSizeX() const override     { return getActiveDc()->getPixelSizeX(); }
+    DrawCoord::value_type getPixelSizeY() const override     { return getActiveDc()->getPixelSizeY(); }
+
 
     float_t getFitFontHeight(const DrawSize &boxSize) override  { return getActiveDc()->getFitFontHeight(boxSize); }
     float_t getAwgFontWidth(const FontParamsA &fp) override     { return getActiveDc()->getAwgFontWidth(fp); }

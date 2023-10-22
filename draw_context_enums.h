@@ -513,6 +513,7 @@ enum class DrawTextFlags : std::uint32_t
 {
     invalid                    = (std::uint32_t)(-1),
     unknown                    = (std::uint32_t)(-1),
+    none                       = 0x00000000,
     defMode                    = 0x00000000,
     calcOnly                   = 0x00000001 /*!< Don't draw, calc only */,
     fitGlyphEntire             = 0x00000000 /*!< Entire glyph must fit taken width */,
@@ -538,7 +539,7 @@ MARTY_CPP_MAKE_ENUM_FLAGS(DrawTextFlags)
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "FitGlyphStartPos"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::invalid                    , "Invalid"                  );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::defMode                    , "DefMode"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::none                       , "None"                     );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "CalcOnly"                 );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "FitWidthDisable"          );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "FitHeightDisable"         );
@@ -557,9 +558,10 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitGlyphStartPos           , "fitglyphstartpos"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "invalid"                  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::invalid                    , "unknown"                  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphdefault"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "fitglyphentire"           );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::defMode                    , "defmode"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::none                       , "none"                     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::none                       , "fitglyphdefault"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::none                       , "fitglyphentire"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::none                       , "defmode"                  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::calcOnly                   , "calconly"                 );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitWidthDisable            , "fitwidthdisable"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "fitheightdisable"         );
@@ -578,6 +580,84 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(DrawTextFlags, std::set)
+
+
+enum class WindowSizingEventEdge : std::uint32_t
+{
+    invalid       = (std::uint32_t)(-1),
+    unknown       = (std::uint32_t)(-1),
+    none          = 0,
+    left          = 1,
+    right         = 2,
+    top           = 3,
+    topLeft       = 4,
+    topRigh       = 5,
+    bottom        = 6,
+    bottomLeft    = 7,
+    bottomRight   = 8
+
+}; // enum class WindowSizingEventEdge : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( WindowSizingEventEdge, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::left          , "Left"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::invalid       , "Invalid"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::none          , "None"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::topLeft       , "TopLeft"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::right         , "Right"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::top           , "Top"         );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::topRigh       , "TopRigh"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::bottom        , "Bottom"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::bottomLeft    , "BottomLeft"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::bottomRight   , "BottomRight" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( WindowSizingEventEdge, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( WindowSizingEventEdge, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::left          , "left"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::invalid       , "invalid"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::invalid       , "unknown"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::none          , "none"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::topLeft       , "topleft"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::right         , "right"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::top           , "top"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::topRigh       , "toprigh"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::bottom        , "bottom"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::bottomLeft    , "bottomleft"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizingEventEdge::bottomRight   , "bottomright" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( WindowSizingEventEdge, std::map, 1 )
+
+
+enum class WindowSizeRequestType : std::uint32_t
+{
+    invalid     = (std::uint32_t)(-1),
+    unknown     = (std::uint32_t)(-1),
+    restored    = 0,
+    none        = 0,
+    minimized   = 1,
+    maximized   = 2,
+    maxShow     = 3,
+    maxHide     = 4
+
+}; // enum class WindowSizeRequestType : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( WindowSizeRequestType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::maxShow     , "MaxShow"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::invalid     , "Invalid"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::restored    , "Restored"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::minimized   , "Minimized" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::maxHide     , "MaxHide"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::maximized   , "Maximized" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( WindowSizeRequestType, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( WindowSizeRequestType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::maxShow     , "maxshow"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::invalid     , "invalid"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::invalid     , "unknown"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::restored    , "restored"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::restored    , "none"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::minimized   , "minimized" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::maxHide     , "maxhide"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::maximized   , "maximized" );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( WindowSizeRequestType, std::map, 1 )
 
 } // namespace marty_draw_context
 

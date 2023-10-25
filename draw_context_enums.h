@@ -522,8 +522,10 @@ enum class DrawTextFlags : std::uint32_t
     fitWidthDisable            = 0x00000004 /*!< Disable fit to width limit, not used for para's drawing */,
     fitHeightStartPos          = 0x00000010 /*!< Line Y start pos must fit taken height, entire line may go beyond boundary */,
     fitHeightDisable           = 0x00000020 /*!< Disable fit to height limit */,
-    endEllipsis                = 0x00000100 /*!< Draw ellipsis if text not entire fit to limit */,
-    dontExpandTabs             = 0x00000200 /*!< If not tab stop positions taken, or if they are over, in normal case tabs will be expanded with taken tabSize. This flags disables such behavior, and forces to threat tabs as spaces */,
+    endEllipsis                = 0x00000100 /*!< Draw ellipsis at end if text not entire fit to limit */,
+    pathEllipsis               = 0x00000200 /*!< Draw ellipsis in the middle of space if text not entire fit to limit, text interpreted as path separated by '\' or '/' */,
+    wordEllipsis               = 0x00000400 /*!< Draw ellipsis in the middle of space if text not entire fit to limit, like pathEllipsis, but text is separated by spaces */,
+    dontExpandTabs             = 0x00000800 /*!< If not tab stop positions taken, or if they are over, in normal case tabs will be expanded with taken tabSize. This flags disables such behavior, and forces to threat tabs as spaces */,
     kerningDisable             = 0x00001000 /*!< Disable kerning */,
     combiningAsSeparateGlyph   = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
     combiningAsGlyph           = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
@@ -545,6 +547,8 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "FitHeightDisable"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::fitHeightStartPos          , "FitHeightStartPos"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "EndEllipsis"              );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::pathEllipsis               , "PathEllipsis"             );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::wordEllipsis               , "WordEllipsis"             );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::dontExpandTabs             , "DontExpandTabs"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "KerningDisable"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
@@ -567,6 +571,8 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitHeightDisable           , "fitheightdisable"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::fitHeightStartPos          , "fitheightstartpos"        );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::endEllipsis                , "endellipsis"              );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::pathEllipsis               , "pathellipsis"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::wordEllipsis               , "wordellipsis"             );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::dontExpandTabs             , "dontexpandtabs"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::kerningDisable             , "kerningdisable"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasseparateglyph" );

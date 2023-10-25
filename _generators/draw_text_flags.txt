@@ -10,8 +10,10 @@ fitWidthDisable    =0x000004 // Disable fit to width limit, not used for para's 
 fitHeightStartPos  =0x000010 // Line Y start pos must fit taken height, entire line may go beyond boundary
 fitHeightDisable   =0x000020 // Disable fit to height limit
 
-endEllipsis        =0x000100 // Draw ellipsis if text not entire fit to limit
-dontExpandTabs     =0x000200 // If not tab stop positions taken, or if they are over, in normal case tabs will be expanded with taken tabSize. This flags disables such behavior, and forces to threat tabs as spaces
+endEllipsis        =0x000100 // Draw ellipsis at end if text not entire fit to limit
+pathEllipsis       =0x000200 // Draw ellipsis in the middle of space if text not entire fit to limit, text interpreted as path separated by '\' or '/'
+wordEllipsis       =0x000400 // Draw ellipsis in the middle of space if text not entire fit to limit, like pathEllipsis, but text is separated by spaces
+dontExpandTabs     =0x000800 // If not tab stop positions taken, or if they are over, in normal case tabs will be expanded with taken tabSize. This flags disables such behavior, and forces to threat tabs as spaces
 
 kerningDisable     =0x001000 // Disable kerning
 combiningAsSeparateGlyph,combiningAsGlyph=0x002000 // Combining symbol calulated as standalone symbol into pSymbolsDrawn

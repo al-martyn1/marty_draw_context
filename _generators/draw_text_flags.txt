@@ -23,3 +23,4 @@ stopOnLineBreaks   =0x010000 // Stop on any linebreak sequence
 stopOnTabs         =0x020000 // Stop on any hor tab symbols
 
 keepLtSpaces       =0x040000 // Keep leading and trailing spaces while drawing paras
+noLastLineSpacing  =0x080000 // Disable adding line spacing to last para line

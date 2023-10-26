@@ -532,7 +532,8 @@ enum class DrawTextFlags : std::uint32_t
     forceSpacesColoring        = 0x00004000 /*!< Force increment color index while drawing space chars */,
     stopOnLineBreaks           = 0x00010000 /*!< Stop on any linebreak sequence */,
     stopOnTabs                 = 0x00020000 /*!< Stop on any hor tab symbols */,
-    keepLtSpaces               = 0x00040000 /*!< Keep leading and trailing spaces while drawing paras */
+    keepLtSpaces               = 0x00040000 /*!< Keep leading and trailing spaces while drawing paras */,
+    noLastLineSpacing          = 0x00080000 /*!< Disable adding line spacing to last para line */
 
 }; // enum class DrawTextFlags : std::uint32_t
 
@@ -556,6 +557,7 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "StopOnLineBreaks"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "StopOnTabs"               );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "KeepLtSpaces"             );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::noLastLineSpacing          , "NoLastLineSpacing"        );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
@@ -581,6 +583,7 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "stoponlinebreaks"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "stopontabs"               );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "keepltspaces"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::noLastLineSpacing          , "nolastlinespacing"        );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)

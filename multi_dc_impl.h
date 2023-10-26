@@ -511,7 +511,7 @@ public:
                           , std::size_t                           *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
                           , const std::uint32_t                   *pColors=0
                           , std::size_t                           nColors=0
-                          , DrawCoord::value_type                 *pTabStopPositions=0        //!< Relative to start pos X coord
+                          , const DrawCoord::value_type           *pTabStopPositions=0        //!< Relative to start pos X coord
                           , std::size_t                           nTabStopPositions=0
                           , int                                   fontId=-1
                           ) override

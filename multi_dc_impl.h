@@ -500,6 +500,7 @@ public:
     bool drawParaColoredEx( const DrawCoord                       &startPos
                           , const DrawCoord                       &limits       //!< Limits, vertical and horizontal, relative to start pos
                           , DrawCoord::value_type                 *pNextPosY    //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                          bool                                    *pVerticalDone
                           , const DrawCoord::value_type           &lineSpacing  //!< Extra space between lines of text
                           , const DrawCoord::value_type           &paraIndent   //!< Indent on the first line
                           , const DrawCoord::value_type           &tabSize      //!< Size used for tabs if tabStops are over
@@ -516,7 +517,7 @@ public:
                           , int                                   fontId=-1
                           ) override
     {
-        return getActiveDc()->drawParaColoredEx( startPos, limits, pNextPosY, lineSpacing, paraIndent, tabSize, flags
+        return getActiveDc()->drawParaColoredEx( startPos, limits, pNextPosY, pVerticalDone, lineSpacing, paraIndent, tabSize, flags
                                                , horAlign, vertAlign, text, textSize, pCharsProcessed
                                                , pColors, nColors, pTabStopPositions, nTabStopPositions
                                                , fontId

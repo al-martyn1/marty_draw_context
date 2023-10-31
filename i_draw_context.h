@@ -267,6 +267,7 @@ struct IDrawContext
     virtual bool drawParaColoredEx( const DrawCoord                       &startPos
                                   , const DrawCoord                       &limits       //!< Limits, vertical and horizontal, relative to start pos
                                   , DrawCoord::value_type                 *pNextPosY    //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                                  , bool                                  *pVerticalDone //!< OUT All/not all lines drawn, 
                                   , const DrawCoord::value_type           &lineSpacing  //!< Extra space between lines of text
                                   , const DrawCoord::value_type           &paraIndent   //!< Indent on the first line
                                   , const DrawCoord::value_type           &tabSize      //!< Size used for tabs if tabStops are over

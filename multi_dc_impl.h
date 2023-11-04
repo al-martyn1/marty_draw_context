@@ -446,82 +446,116 @@ public:
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::string &text ) override  { return getActiveDc()->textOut(pos, fontId, rgb, text); }
     bool textOut( const DrawCoord &pos, int fontId, const ColorRef &rgb, const std::wstring &text ) override { return getActiveDc()->textOut(pos, fontId, rgb, text); }
 
-    bool drawTextColoredEx( const DrawCoord               &startPos
-                          , const DrawCoord::value_type   &widthLim
-                          , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
-                          , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
-                          , DrawTextFlags                 flags
-                          , const wchar_t                 *text
-                          , std::size_t                   textSize=(std::size_t)-1
-                          , std::uint32_t                 *pLastCharProcessed = 0 //!< IN/OUT last drawn char, for kerning calculation
-                          , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
-                          , const std::uint32_t           *pColors=0
-                          , std::size_t                   nColors=0
-                          , std::size_t                   *pSymbolsDrawn=0
-                          , const wchar_t                 *stopChars=0
-                          , int                           fontId=-1
-                          ) override
+    bool drawTextColored( const DrawCoord                  &startPos
+                        , const DrawCoord::value_type      &widthLim
+                        , DrawTextFlags                    flags
+                        , const wchar_t                    *text
+                        , std::size_t                      textSize=(std::size_t)-1
+                        , const wchar_t                    *stopChars=0
+                        , const std::uint32_t              *pColors=0
+                        , std::size_t                      nColors=0
+                        , const std::uint32_t              *pBackColors=0
+                        , std::size_t                      nBackColors=0
+                        , int                              fontId=-1
+                        , DrawCoord::value_type            *pNextPosX=0          //!< OUT, Положение вывода для символа, следующего за последним выведенным
+                        , DrawCoord::value_type            *pOverhang=0          //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
+                        , std::uint32_t                    *pLastCharProcessed=0 //!< IN/OUT last drawn char, for kerning calculation
+                        , std::size_t                      *pCharsProcessed=0    //!< OUT Num chars, not symbols/glyphs
+                        , std::size_t                      *pSymbolsDrawn=0
+                        ) override
     {
-        return getActiveDc()->drawTextColoredEx(startPos, widthLim, pNextPosX, pOverhang, flags, text, textSize, pLastCharProcessed, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
+        return getActiveDc()->drawTextColored( startPos, widthLim
+                                             , flags
+                                             , text, textSize
+                                             , stopChars
+                                             , pColors, nColors, pBackColors, nBackColors
+                                             , fontId
+                                             , pNextPosX, pOverhang
+                                             , pLastCharProcessed, pCharsProcessed
+                                             , pSymbolsDrawn
+                                             );
     }
 
-    // bool drawTextColored( const DrawCoord               &startPos
-    //                     , const DrawCoord::value_type   &xPosMax
-    //                     , DrawCoord::value_type         *pNextPosX //!< OUT, Положение вывода для символа, следующего за последним выведенным
-    //                     , DrawCoord::value_type         *pOverhang //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
-    //                     , DrawTextFlags                 flags
-    //                     , const char                    *text
-    //                     , std::size_t                   textSize=(std::size_t)-1
-    //                     , std::size_t                   *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
-    //                     , const std::uint32_t           *pColors=0
-    //                     , std::size_t                   nColors=0
-    //                     , std::size_t                   *pSymbolsDrawn=0
-    //                     , const char                    *stopChars=0
-    //                     , int                           fontId=-1
-    //                     ) override
-    // {
-    //     return getActiveDc()->drawTextColored(startPos, xPosMax, pNextPosX, pOverhang, flags, text, textSize, pCharsProcessed, pColors, nColors, pSymbolsDrawn, stopChars, fontId);
-    // }
-
-    bool drawTextColored  ( const DrawCoord               &startPos
-                          , const DrawCoord::value_type   &widthLim
-                          , DrawTextFlags                 flags
-                          , const wchar_t                 *text
-                          , std::size_t                   textSize=(std::size_t)-1
-                          , const std::uint32_t           *pColors=0
-                          , std::size_t                   nColors=0
-                          , const wchar_t                 *stopChars=0
-                          , int                           fontId=-1
-                          ) override
+    bool drawTextColored( const DrawCoord                  &startPos
+                        , const DrawCoord::value_type      &widthLim
+                        , DrawTextFlags                    flags
+                        , const std::wstring               &text
+                        , const std::wstring               &stopChars
+                        , const std::vector<std::uint32_t> &colors
+                        , const std::vector<std::uint32_t> &bkColors
+                        , int                              fontId=-1
+                        , DrawCoord::value_type            *pNextPosX=0          //!< OUT, Положение вывода для символа, следующего за последним выведенным
+                        , DrawCoord::value_type            *pOverhang=0          //!< OUT, Вынос элементов символа за пределы NextPosX - актуально, как минимум, для iatalic стиля шрифта
+                        , std::uint32_t                    *pLastCharProcessed=0 //!< IN/OUT last drawn char, for kerning calculation
+                        , std::size_t                      *pCharsProcessed=0    //!< OUT Num chars, not symbols/glyphs
+                        , std::size_t                      *pSymbolsDrawn=0
+                        ) override
     {
-        return getActiveDc()->drawTextColored(startPos, widthLim, flags, text, textSize, pColors, nColors, stopChars, fontId);
+        return getActiveDc()->drawTextColored( startPos, widthLim, flags, text.c_str(), text.size(), stopChars.c_str()
+                                             , colors.empty()   ? (const std::uint32_t*)0 : &colors[0], colors.size()
+                                             , bkColors.empty() ? (const std::uint32_t*)0 : &bkColors[0], bkColors.size()
+                                             , fontId
+                                             , pNextPosX, pOverhang, pLastCharProcessed, pCharsProcessed, pSymbolsDrawn
+                                             );
     }
 
-    bool drawParaColoredEx( const DrawCoord                       &startPos
-                          , const DrawCoord                       &limits       //!< Limits, vertical and horizontal, relative to start pos
-                          , DrawCoord::value_type                 *pNextPosY    //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
-                          , bool                                  *pVerticalDone
-                          , const DrawCoord::value_type           &lineSpacing  //!< Extra space between lines of text
-                          , const DrawCoord::value_type           &paraIndent   //!< Indent on the first line
-                          , const DrawCoord::value_type           &tabSize      //!< Size used for tabs if tabStops are over
-                          , DrawTextFlags                         flags
-                          , HorAlign                              horAlign
-                          , VertAlign                             vertAlign
-                          , const wchar_t                         *text
-                          , std::size_t                           textSize=(std::size_t)-1
-                          , std::size_t                           *pCharsProcessed=0 //!< OUT Num chars, not symbols/glyphs
-                          , const std::uint32_t                   *pColors=0
-                          , std::size_t                           nColors=0
-                          , const DrawCoord::value_type           *pTabStopPositions=0        //!< Relative to start pos X coord
-                          , std::size_t                           nTabStopPositions=0
-                          , int                                   fontId=-1
-                          ) override
+    bool drawParaColored( const DrawCoord                  &startPos
+                        , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                        , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                        , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                        , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                        , DrawTextFlags                    flags
+                        , HorAlign                         horAlign
+                        , VertAlign                        vertAlign
+                        , const wchar_t                    *text
+                        , std::size_t                      textSize=(std::size_t)-1
+                        , const std::uint32_t              *pColors=0
+                        , std::size_t                      nColors=0
+                        , const std::uint32_t              *pBackColors=0
+                        , std::size_t                      nBackColors=0
+                        , const DrawCoord::value_type      *pTabStopPositions=0        //!< Relative to start pos X coord
+                        , std::size_t                      nTabStopPositions=0
+                        , int                              fontId=-1
+                        , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                        , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
+                        , std::size_t                      *pCharsProcessed=0   //!< OUT Num chars, not symbols/glyphs
+                        ) override
     {
-        return getActiveDc()->drawParaColoredEx( startPos, limits, pNextPosY, pVerticalDone, lineSpacing, paraIndent, tabSize, flags
-                                               , horAlign, vertAlign, text, textSize, pCharsProcessed
-                                               , pColors, nColors, pTabStopPositions, nTabStopPositions
-                                               , fontId
-                                               );
+        return getActiveDc()->drawParaColored( startPos, limits
+                                             , lineSpacing, paraIndent, tabSize, flags
+                                             , horAlign, vertAlign, text, textSize
+                                             , pColors, nColors, pBackColors, nBackColors, pTabStopPositions, nTabStopPositions
+                                             , fontId
+                                             , pNextPosY, pVerticalDone
+                                             , pCharsProcessed
+                                             );
+    }
+
+    virtual bool drawParaColored( const DrawCoord                  &startPos
+                                , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                                , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                                , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                                , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                                , DrawTextFlags                    flags
+                                , HorAlign                         horAlign
+                                , VertAlign                        vertAlign
+                                , const std::wstring               &text
+                                , const std::vector<std::uint32_t> &colors
+                                , const std::vector<std::uint32_t> &bkColors
+                                , const std::vector<DrawCoord::value_type> &tabStopPositions
+                                , int                              fontId=-1
+                                , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                                , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
+                                , std::size_t                      *pCharsProcessed=0   //!< OUT Num chars, not symbols/glyphs
+                                ) override
+    {
+        return getActiveDc()->drawParaColored( startPos, limits, lineSpacing, paraIndent, tabSize, flags, horAlign, vertAlign, text.c_str(), text.size()
+                                             , colors.empty()           ? (const std::uint32_t*)0 : &colors[0], colors.size()
+                                             , bkColors.empty()         ? (const std::uint32_t*)0 : &bkColors[0], bkColors.size()
+                                             , tabStopPositions.empty() ? (DrawCoord::value_type*)0 : &tabStopPositions[0], tabStopPositions.size()
+                                             , fontId
+                                             , pNextPosY, pVerticalDone, pCharsProcessed
+                                             );
     }
 
     bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }

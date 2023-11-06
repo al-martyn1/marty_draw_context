@@ -336,6 +336,26 @@ struct IDrawContext
                                 , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
                                 ) = 0;
 
+    virtual bool drawMultiParasColored( const DrawCoord            &startPos
+                                , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                                , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                                , const DrawCoord::value_type      &paraSpacing  //!< Extra space between paras
+                                , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                                , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                                , DrawTextFlags                    flags
+                                , HorAlign                         horAlign
+                                , VertAlign                        vertAlign
+                                , const std::wstring               &text
+                                , const std::vector<std::uint32_t> &colors
+                                , const std::vector<std::uint32_t> &bkColors
+                                , const std::vector<DrawCoord::value_type> &tabStopPositions
+                                , const std::vector<std::uint32_t> &paraColors
+                                , const std::vector<std::uint32_t> &paraBkColors
+                                , int                              fontId=-1
+                                , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                                , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
+                                ) = 0;
+
     #if 0
     virtual bool drawParaColoredEx( const DrawCoord                  &startPos
                                   , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos

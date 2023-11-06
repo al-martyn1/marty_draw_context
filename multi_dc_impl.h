@@ -558,6 +558,78 @@ public:
                                              );
     }
 
+    bool drawMultiParasColored( const DrawCoord            &startPos
+                              , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                              , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                              , const DrawCoord::value_type      &paraSpacing  //!< Extra space between paras
+                              , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                              , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                              , DrawTextFlags                    flags
+                              , HorAlign                         horAlign
+                              , VertAlign                        vertAlign
+                              , const wchar_t                    *text
+                              , std::size_t                      textSize=(std::size_t)-1
+                              , const std::uint32_t              *pColors=0
+                              , std::size_t                      nColors=0
+                              , const std::uint32_t              *pBackColors=0
+                              , std::size_t                      nBackColors=0
+                              , const DrawCoord::value_type      *pTabStopPositions=0        //!< Relative to start pos X coord
+                              , std::size_t                      nTabStopPositions=0
+                              , const std::uint32_t              *pParaColors=0
+                              , std::size_t                      nParaColors=0
+                              , const std::uint32_t              *pParaBackColors=0
+                              , std::size_t                      nParaBackColors=0
+                              , int                              fontId=-1
+                              , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                              , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
+                              ) override
+    {
+        return getActiveDc()->drawMultiParasColored( startPos, limits, lineSpacing, paraSpacing, paraIndent, tabSize, flags, horAlign, vertAlign
+                                                   , text, textSize
+                                                   , pColors, nColors
+                                                   , pBackColors, nBackColors
+                                                   , pTabStopPositions, nTabStopPositions
+                                                   , pParaColors, nParaColors
+                                                   , pParaBackColors, nParaBackColors
+                                                   , fontId
+                                                   , pNextPosY
+                                                   , pVerticalDone
+                                                   );
+    }
+
+    bool drawMultiParasColored( const DrawCoord            &startPos
+                              , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                              , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                              , const DrawCoord::value_type      &paraSpacing  //!< Extra space between paras
+                              , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                              , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                              , DrawTextFlags                    flags
+                              , HorAlign                         horAlign
+                              , VertAlign                        vertAlign
+                              , const std::wstring               &text
+                              , const std::vector<std::uint32_t> &colors
+                              , const std::vector<std::uint32_t> &bkColors
+                              , const std::vector<DrawCoord::value_type> &tabStopPositions
+                              , const std::vector<std::uint32_t> &paraColors
+                              , const std::vector<std::uint32_t> &paraBkColors
+                              , int                              fontId=-1
+                              , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                              , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
+                              ) override
+    {
+        return getActiveDc()->drawMultiParasColored( startPos, limits, lineSpacing, paraSpacing, paraIndent, tabSize, flags, horAlign, vertAlign
+                                                   , text.c_str(), text.size()
+                                                   , colors.empty()           ? (const std::uint32_t*)0 : &colors[0], colors.size()
+                                                   , bkColors.empty()         ? (const std::uint32_t*)0 : &bkColors[0], bkColors.size()
+                                                   , tabStopPositions.empty() ? (DrawCoord::value_type*)0 : &tabStopPositions[0], tabStopPositions.size()
+                                                   , paraColors.empty()       ? (const std::uint32_t*)0 : &paraColors[0], paraColors.size()
+                                                   , paraBkColors.empty()     ? (const std::uint32_t*)0 : &paraBkColors[0], paraBkColors.size()
+                                                   , fontId
+                                                   , pNextPosY
+                                                   , pVerticalDone
+                                                   );
+    }
+
     bool getSimpleFontMetrics(SimpleFontMetrics &m, int fontId=-1) const override { return getActiveDc()->getSimpleFontMetrics(m, fontId); }
     bool getKerningPairs(std::vector<KerningPair> &pairs, int fontId=-1) const override { return getActiveDc()->getKerningPairs(pairs, fontId); }
     float_t getKerningValue( const std::unordered_set<KerningPair> &pairs, std::uint32_t chFirst, std::uint32_t chSecond) const override { return getActiveDc()->getKerningValue(pairs, chFirst, chSecond); }

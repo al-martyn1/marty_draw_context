@@ -289,7 +289,7 @@ struct IDrawContext
                                 , int                              fontId=-1
                                 , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
                                 , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
-                                , std::size_t                      *pCharsProcessed=0   //!< OUT Num chars, not symbols/glyphs
+                                , std::size_t                      *pSymbolsDrawn=0     //!< OUT For Next para Y start calculation
                                 ) = 0;
 
     virtual bool drawParaColored( const DrawCoord                  &startPos
@@ -307,7 +307,33 @@ struct IDrawContext
                                 , int                              fontId=-1
                                 , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
                                 , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
-                                , std::size_t                      *pCharsProcessed=0   //!< OUT Num chars, not symbols/glyphs
+                                , std::size_t                      *pSymbolsDrawn=0     //!< OUT For Next para Y start calculation
+                                ) = 0;
+
+    virtual bool drawMultiParasColored( const DrawCoord            &startPos
+                                , const DrawCoord                  &limits       //!< Limits, vertical and horizontal, relative to start pos
+                                , const DrawCoord::value_type      &lineSpacing  //!< Extra space between lines of text
+                                , const DrawCoord::value_type      &paraSpacing  //!< Extra space between paras
+                                , const DrawCoord::value_type      &paraIndent   //!< Indent on the first line
+                                , const DrawCoord::value_type      &tabSize      //!< Size used for tabs if tabStops are over
+                                , DrawTextFlags                    flags
+                                , HorAlign                         horAlign
+                                , VertAlign                        vertAlign
+                                , const wchar_t                    *text
+                                , std::size_t                      textSize=(std::size_t)-1
+                                , const std::uint32_t              *pColors=0
+                                , std::size_t                      nColors=0
+                                , const std::uint32_t              *pBackColors=0
+                                , std::size_t                      nBackColors=0
+                                , const DrawCoord::value_type      *pTabStopPositions=0        //!< Relative to start pos X coord
+                                , std::size_t                      nTabStopPositions=0
+                                , const std::uint32_t              *pParaColors=0
+                                , std::size_t                      nParaColors=0
+                                , const std::uint32_t              *pParaBackColors=0
+                                , std::size_t                      nParaBackColors=0
+                                , int                              fontId=-1
+                                , DrawCoord::value_type            *pNextPosY=0         //!< OUT No line spacing added cause spacing between paras can be other then lineSpacing value
+                                , bool                             *pVerticalDone=0     //!< OUT All/not all lines drawn, 
                                 ) = 0;
 
     #if 0

@@ -530,6 +530,7 @@ enum class DrawTextFlags : std::uint32_t
     combiningAsSeparateGlyph   = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
     combiningAsGlyph           = 0x00002000 /*!< Combining symbol calulated as standalone symbol into pSymbolsDrawn */,
     forceSpacesColoring        = 0x00004000 /*!< Force increment color index while drawing space chars */,
+    skipEmptyParas             = 0x00008000 /*!< Skip empty paras while drawing multiple paras */,
     stopOnLineBreaks           = 0x00010000 /*!< Stop on any linebreak sequence */,
     stopOnTabs                 = 0x00020000 /*!< Stop on any hor tab symbols */,
     keepLtSpaces               = 0x00040000 /*!< Keep leading and trailing spaces while drawing paras */,
@@ -558,6 +559,7 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "CombiningAsSeparateGlyph" );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "ForceSpacesColoring"      );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "StopOnLineBreaks"         );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::skipEmptyParas             , "SkipEmptyParas"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::coloringResetOnPara        , "ColoringResetOnPara"      );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "StopOnTabs"               );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "KeepLtSpaces"             );
@@ -587,6 +589,7 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::combiningAsSeparateGlyph   , "combiningasglyph"         );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::forceSpacesColoring        , "forcespacescoloring"      );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnLineBreaks           , "stoponlinebreaks"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::skipEmptyParas             , "skipemptyparas"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::coloringResetOnPara        , "coloringresetonpara"      );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::stopOnTabs                 , "stopontabs"               );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "keepltspaces"             );

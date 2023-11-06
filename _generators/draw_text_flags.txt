@@ -19,6 +19,8 @@ kerningDisable          =0x00001000 // Disable kerning
 combiningAsSeparateGlyph,combiningAsGlyph=0x00002000 // Combining symbol calulated as standalone symbol into pSymbolsDrawn
 forceSpacesColoring     =0x00004000 // Force increment color index while drawing space chars
 
+skipEmptyParas          =0x00008000 // Skip empty paras while drawing multiple paras
+
 stopOnLineBreaks        =0x00010000 // Stop on any linebreak sequence
 stopOnTabs              =0x00020000 // Stop on any hor tab symbols
 

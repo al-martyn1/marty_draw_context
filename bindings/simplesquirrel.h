@@ -1530,10 +1530,237 @@ struct DrawingContext
         return pDc->textOut(pos, fontId, rgb, text);
     }
 
-    // const HSQUIRRELVM& Object::getHandle() const {
-    //     return vm;
+    // bool textOut(DrawingCoords pos, ssq::sqstring text) const
+    // {
+    //     MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+    //     if (!pDc)
+    //         return false;
+    //     return pDc->textOut(pos, text);
     // }
-    // Object(HSQUIRRELVM vm);
+    // return pDc->circle(centerPos, (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(r, _SC("R")));
+    // DrawingCoords
+    // int selectNewFontEx(DrawingFontParams dfp, ssq::Object height) const
+    // {
+    //     MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+    //     if (!pDc)
+    //         return -1;
+    //     dfp.height = marty_simplesquirrel::fromObjectConvertHelper<float>(height, _SC("height")); // ssq::Object
+    //     return pDc->selectNewFont(static_cast< FontParamsT<ssq::sqstring> >(dfp) );
+    // }
+    //  
+    // //---
+    // int createFontWithFace(DrawingFontParams dfp, ssq::sqstring face) const
+
+
+    std::vector<std::uint32_t> toUnsignedColorsVector(ssq::Object &o, const SQChar *paramName, bool allowSingleVal=false) const
+    {
+        std::vector<std::uint32_t>  resVec;
+
+        if (o.isNull() || o.isEmpty())
+        {
+            return resVec;
+        }
+
+        ssq::Type t = o.getType();
+        switch(t)
+        {
+            case ssq::Type::INTEGER:
+            case ssq::Type::FLOAT:
+            case ssq::Type::STRING:
+            case ssq::Type::BOOL:
+                if (allowSingleVal)
+                {
+                    resVec.emplace_back((std::uint32_t)marty_simplesquirrel::fromObjectConvertHelper<unsigned>(o, paramName));
+                    return resVec;
+                }
+                break;
+
+            case ssq::Type::ARRAY:
+            {
+                ssq::Array a     = o.toArray();
+                std::size_t size = a.size();
+        
+                for(std::size_t i=0; i!=size; ++i)
+                {
+                    // DrawingCoords drawingCoords = a.get<DrawingCoords>(i);
+    
+                    auto clr = a.get<DrawingColor>(i);
+                    resVec.emplace_back(clr.toUnsigned());
+                }
+    
+                return resVec;
+            }
+    
+            case ssq::Type::NULLPTR:
+            case ssq::Type::TABLE:
+            case ssq::Type::USERDATA:
+            case ssq::Type::CLOSURE:
+            case ssq::Type::NATIVECLOSURE:
+            case ssq::Type::GENERATOR:
+            case ssq::Type::USERPOINTER:
+            case ssq::Type::THREAD:
+            case ssq::Type::FUNCPROTO:
+            case ssq::Type::CLASS:
+            case ssq::Type::INSTANCE:
+            case ssq::Type::WEAKREF:
+            case ssq::Type::OUTER:
+                [[fallthrough]];		
+            default: {}
+        }
+    
+        throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::INTEGER), ssq::typeToStr(t));
+    }
+    
+    std::vector<DrawCoord::value_type> toDrawCoordValueTypeVector(ssq::Object &o, const SQChar *paramName) const
+    {
+        (void)paramName;
+
+        std::vector<DrawCoord::value_type>  resVec;
+
+        if (o.isNull() || o.isEmpty())
+        {
+            return resVec;
+        }
+
+        ssq::Type t = o.getType();
+        switch(t)
+        {
+            case ssq::Type::ARRAY:
+            {
+                ssq::Array a     = o.toArray();
+                std::size_t size = a.size();
+        
+                for(std::size_t i=0; i!=size; ++i)
+                {
+                    auto obj = a.get<ssq::Object>(i);
+                    resVec.emplace_back(marty_simplesquirrel::fromObjectConvertHelper<float>(obj, paramName));
+                    //resVec.emplace_back((DrawCoord::value_type)a.get<float>(i));
+                }
+    
+                return resVec;
+            }
+    
+            case ssq::Type::INTEGER:
+            case ssq::Type::FLOAT:
+            case ssq::Type::STRING:
+            case ssq::Type::BOOL:
+            case ssq::Type::NULLPTR:
+            case ssq::Type::TABLE:
+            case ssq::Type::USERDATA:
+            case ssq::Type::CLOSURE:
+            case ssq::Type::NATIVECLOSURE:
+            case ssq::Type::GENERATOR:
+            case ssq::Type::USERPOINTER:
+            case ssq::Type::THREAD:
+            case ssq::Type::FUNCPROTO:
+            case ssq::Type::CLASS:
+            case ssq::Type::INSTANCE:
+            case ssq::Type::WEAKREF:
+            case ssq::Type::OUTER:
+                [[fallthrough]];		
+            default: {}
+        }
+    
+        throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
+    }
+
+    bool drawTextColored( DrawingCoords    startPos
+                        , ssq::Object      widthLim
+                        , int              flags
+                        , ssq::sqstring    text
+                        , ssq::sqstring    stopChars
+                        , ssq::Object      colors
+                        , ssq::Object      bkColors
+                        , int              fontId
+                        )
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->drawTextColored( (DrawCoord)startPos
+                                   , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(widthLim, _SC("widthLim"))
+                                   , (DrawTextFlags)flags
+                                   , text, stopChars
+                                   , toUnsignedColorsVector(colors  , _SC("colors"  ), true /* allowSingleVal */ )
+                                   , toUnsignedColorsVector(bkColors, _SC("bkColors"), true /* allowSingleVal */ )
+                                   , fontId
+                                   );
+    }
+
+
+    bool drawParaColored( DrawingCoords    startPos
+                        , DrawingCoords    limits
+                        , ssq::Object      lineSpacing
+                        , ssq::Object      paraIndent
+                        , ssq::Object      tabSize
+                        , int              flags
+                        , int              horAlign
+                        , int              vertAlign
+                        , ssq::sqstring    text
+                        , ssq::Object      colors
+                        , ssq::Object      bkColors
+                        , ssq::Object      tabStopPositions
+                        , int              fontId
+                        )
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->drawParaColored( (DrawCoord)startPos
+                                   , (DrawCoord)limits
+                                   , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(lineSpacing, _SC("lineSpacing"))
+                                   , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(paraIndent , _SC("paraIndent" ))
+                                   , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(tabSize    , _SC("tabSize"    ))
+                                   , (DrawTextFlags)flags
+                                   , (HorAlign) horAlign 
+                                   , (VertAlign)vertAlign
+                                   , text
+                                   , toUnsignedColorsVector(colors  , _SC("colors"  ), true /* allowSingleVal */ )
+                                   , toUnsignedColorsVector(bkColors, _SC("bkColors"), true /* allowSingleVal */ )
+                                   , toDrawCoordValueTypeVector(tabStopPositions, _SC("tabStopPositions"))
+                                   , fontId
+                                   );
+    }
+
+    bool drawMultiParasColored( DrawingCoords    startPos
+                              , DrawingCoords    limits
+                              , ssq::Object      lineSpacing
+                              , ssq::Object      paraSpacing
+                              , ssq::Object      paraIndent
+                              , ssq::Object      tabSize
+                              , int              flags
+                              , int              horAlign
+                              , int              vertAlign
+                              , ssq::sqstring    text
+                              , ssq::Object      colors
+                              , ssq::Object      bkColors
+                              , ssq::Object      tabStopPositions
+                              , ssq::Object      paraColors
+                              , ssq::Object      paraBkColors
+                              , int              fontId
+                              )
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+        return pDc->drawMultiParasColored( (DrawCoord)startPos
+                                         , (DrawCoord)limits
+                                         , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(lineSpacing, _SC("lineSpacing"))
+                                         , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(paraSpacing, _SC("paraSpacing"))
+                                         , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(paraIndent , _SC("paraIndent" ))
+                                         , (DrawCoord::value_type)marty_simplesquirrel::fromObjectConvertHelper<float>(tabSize    , _SC("tabSize"    ))
+                                         , (DrawTextFlags)flags
+                                         , (HorAlign) horAlign 
+                                         , (VertAlign)vertAlign
+                                         , text
+                                         , toUnsignedColorsVector(colors      , _SC("colors"      ), true /* allowSingleVal */ )
+                                         , toUnsignedColorsVector(bkColors    , _SC("bkColors"    ), true /* allowSingleVal */ )
+                                         , toDrawCoordValueTypeVector(tabStopPositions, _SC("tabStopPositions"))
+                                         , toUnsignedColorsVector(paraColors  , _SC("paraColors"  ), true /* allowSingleVal */ )
+                                         , toUnsignedColorsVector(paraBkColors, _SC("paraBkColors"), true /* allowSingleVal */ )
+                                         , fontId
+                                         );
+    }
 
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
@@ -1640,8 +1867,14 @@ struct DrawingContext
         cls.addFunc( _SC("fillGradientRect")       , &DrawingContext::fillGradientRect        );
         cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect   );
         cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle      );
+
+
         cls.addFunc( _SC("textOut")                , &DrawingContext::textOut                 );
         cls.addFunc( _SC("textOutWithFontAndColor"), &DrawingContext::textOutWithFontAndColor );
+        cls.addFunc( _SC("drawTextColored")        , &DrawingContext::drawTextColored         );
+        cls.addFunc( _SC("drawParaColored")        , &DrawingContext::drawParaColored         );
+        cls.addFunc( _SC("drawMultiParasColored")  , &DrawingContext::drawMultiParasColored   );
+        //cls.addFunc( _SC("")  , &DrawingContext::);
         //cls.addFunc( _SC("")  , &DrawingContext::);
 
         return cls;
@@ -1692,6 +1925,11 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "VertAlign", ""       , itemSep, enumSep // , knownEnumNames
+                                          , VertAlign::top, VertAlign::center, VertAlign::bottom
+                                          )
+                     );
+
     scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", itemSep, enumSep // , knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
@@ -1721,6 +1959,18 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           , LineType::diagonal, LineType::vertical, LineType::horizontal
                                           )
                      );
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawTextFlags" , "", itemSep, enumSep // , knownEnumNames
+                                          , DrawTextFlags::none                     , DrawTextFlags::calcOnly                 , DrawTextFlags::fitGlyphStartPos
+                                          , DrawTextFlags::fitWidthDisable          , DrawTextFlags::fitHeightStartPos        , DrawTextFlags::fitHeightDisable
+                                          , DrawTextFlags::endEllipsis              , DrawTextFlags::pathEllipsis             , DrawTextFlags::wordEllipsis
+                                          , DrawTextFlags::dontExpandTabs           , DrawTextFlags::kerningDisable           , DrawTextFlags::combiningAsSeparateGlyph
+                                          , DrawTextFlags::forceSpacesColoring      , DrawTextFlags::skipEmptyParas           , DrawTextFlags::stopOnLineBreaks
+                                          , DrawTextFlags::stopOnTabs               , DrawTextFlags::keepLtSpaces             , DrawTextFlags::noLastLineSpacing
+                                          , DrawTextFlags::coloringResetOnPara      , DrawTextFlags::coloringWords
+                                          )
+                     );
+
 
     // Автоматом в алиасы генератор не умеет, запилил руцами
     //scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
@@ -1773,6 +2023,7 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               
                                           , EColorRawEnum::BurlyWood       , EColorRawEnum::CadetBlue      , EColorRawEnum::Chartreuse       , EColorRawEnum::Chocolate           
+                                          , EColorRawEnum::Cyan            , EColorRawEnum::MediumCyan
                                           , EColorRawEnum::Coral           , EColorRawEnum::CornflowerBlue , EColorRawEnum::Cornsilk         , EColorRawEnum::DarkCyan            
                                           , EColorRawEnum::DarkGoldenRod   , EColorRawEnum::DarkGray       , EColorRawEnum::DarkGrey         , EColorRawEnum::DarkGreen           
                                           , EColorRawEnum::DarkKhaki       , EColorRawEnum::DarkMagenta    , EColorRawEnum::DarkOliveGreen   , EColorRawEnum::DarkOrange          

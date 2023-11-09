@@ -536,8 +536,7 @@ enum class DrawTextFlags : std::uint32_t
     keepLtSpaces               = 0x00040000 /*!< Keep leading and trailing spaces while drawing paras */,
     noLastLineSpacing          = 0x00080000 /*!< Disable adding line spacing to last para line */,
     coloringResetOnPara        = 0x00100000 /*!< Start each para coloring from colors begin */,
-    coloringWords              = 0x00200000 /*!< Coloring whole words insted of each letter coloring */,
-    coloringParas              = 0x00400000 /*!< Coloring whole paras insted of each letter/word coloring */
+    coloringWords              = 0x00200000 /*!< Coloring whole words insted of each letter coloring */
 
 }; // enum class DrawTextFlags : std::uint32_t
 
@@ -565,7 +564,6 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "KeepLtSpaces"             );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::noLastLineSpacing          , "NoLastLineSpacing"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::coloringWords              , "ColoringWords"            );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( DrawTextFlags::coloringParas              , "ColoringParas"            );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
@@ -595,7 +593,6 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( DrawTextFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::keepLtSpaces               , "keepltspaces"             );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::noLastLineSpacing          , "nolastlinespacing"        );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::coloringWords              , "coloringwords"            );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( DrawTextFlags::coloringParas              , "coloringparas"            );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( DrawTextFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(DrawTextFlags, std::set)

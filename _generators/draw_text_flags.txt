@@ -29,4 +29,4 @@ noLastLineSpacing       =0x00080000 // Disable adding line spacing to last para 
 
 coloringResetOnPara     =0x00100000 // Start each para coloring from colors begin
 coloringWords           =0x00200000 // Coloring whole words insted of each letter coloring
-coloringParas           =0x00400000 // Coloring whole paras insted of each letter/word coloring
+# coloringParas           =0x00400000 // Coloring whole paras insted of each letter/word coloring

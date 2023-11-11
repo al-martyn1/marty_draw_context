@@ -16,6 +16,33 @@
 
 namespace marty_draw_context{
 
+enum class Endianness : std::uint32_t
+{
+    invalid        = (std::uint32_t)(-1),
+    unknown        = (std::uint32_t)(-1),
+    littleEndian   = 0x00,
+    bigEndian      = 0x01
+
+}; // enum class Endianness : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Endianness, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Endianness::invalid        , "Invalid"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Endianness::bigEndian      , "BigEndian"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Endianness::littleEndian   , "LittleEndian" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Endianness, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Endianness, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "invalid"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "unknown"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "big-endian"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "big_endian"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "bigendian"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "little-endian" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "little_endian" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "littleendian"  );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Endianness, std::map, 1 )
+
+
 enum class HorAlign : std::uint32_t
 {
     invalid        = (std::uint32_t)(-1),

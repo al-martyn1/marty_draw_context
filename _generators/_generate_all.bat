@@ -30,6 +30,11 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set GEN_OPTS=--enum-values-style=CamelStyle
 
 @rem flags,
+
+@set ENDIANNESS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set ENDIANNESS_DEF=invalid,unknown=-1;littleEndian=0;bigEndian=1
+
+
 @set HORALIGN_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
 @set HORALIGN_DEF=invalid,alignInvalid=-1;left,alignLeft=0;center,alignCenter;right,alignRight;width,alignWidth;
 
@@ -85,6 +90,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 
 
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
+%ENDIANNESS_GEN_FLAGS%              %UINT32% -E=Endianness                        -F=%ENDIANNESS_DEF%               ^
 %HORALIGN_GEN_FLAGS%                %UINT32% -E=HorAlign                         -F=%HORALIGN_DEF%               ^
 %VERTALIGN_GEN_FLAGS%               %UINT32% -E=VertAlign                        -F=%VERTALIGN_DEF%              ^
 %FONTSTYLEFLAGS_GEN_FLAGS%          %UINT32% -E=FontStyleFlags                   -F=%FONTSTYLEFLAGS_DEF%         ^
@@ -103,4 +109,12 @@ umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %WINDOWSIZINGEVENTEDGE_GEN_FLAGS%   %UINT32% -E=WindowSizingEventEdge            -F=%WINDOWSIZINGEVENTEDGE_DEF% ^
 %WINDOWSIZEREQUESTTYPE_GEN_FLAGS%   %UINT32% -E=WindowSizeRequestType            -F=%WINDOWSIZEREQUESTTYPE_DEF% ^
 ..\draw_context_enums.h
+
+
+@rem https://ru.wikipedia.org/wiki/Windows_Metafile
+@rem PDF/DOCX - https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/91c257d7-c39d-4a36-9b1f-63e3f73d30ca
+@set NS_EMF=--namespace=marty_draw_context/emf
+@set EMFRECORDTYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+
+umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_EMF% %EMFRECORDTYPE_GEN_FLAGS% -E=RecordType -F=@emf_record_type.txt ..\emf_enums.h
 

@@ -3,7 +3,40 @@
 
 //#include <stdint>
 
+#if !defined(MARTY_IDC_ARCH_LITTLE_ENDIAN) && !defined(MARTY_IDC_ARCH_BIG_ENDIAN)
+
+    #if defined(UMBA_ARCH_LITTLE_ENDIAN)
+
+        #define MARTY_IDC_ARCH_LITTLE_ENDIAN
+
+    #elif defined(UMBA_ARCH_BIG_ENDIAN)
+
+        #define MARTY_IDC_ARCH_BIG_ENDIAN
+
+    #endif
+
+#endif
+
+#if !defined(MARTY_IDC_ARCH_LITTLE_ENDIAN) && !defined(MARTY_IDC_ARCH_BIG_ENDIAN)
+
+    #define MARTY_IDC_ARCH_LITTLE_ENDIAN
+
+#endif
+
+#if defined(MARTY_IDC_ARCH_LITTLE_ENDIAN) && defined(MARTY_IDC_ARCH_BIG_ENDIAN)
+
+    #error "MARTY_IDC_ARCH_LITTLE_ENDIAN macro conficts with MARTY_IDC_ARCH_BIG_ENDIAN macro"
+
+#endif
+
+
+
+
+#include <exception>
+#include <stdexcept>
 #include <cstddef>
+#include <cstring>
+#include <memory>
 #include <utility>
 
 #include "marty_decimal/marty_decimal.h"
@@ -126,12 +159,24 @@ struct IDrawContext
 
     virtual ~IDrawContext() {}
 
+    // Utility methods
     virtual std::string getEngineName() = 0;
 
-    virtual void flushBits() = 0;
+    virtual std::uint8_t* swapByteOrder(std::uint8_t *pData, std::size_t dataSize) const = 0;
 
+    virtual Endianness    getHostEndianness() const = 0;
+    virtual std::uint8_t* convertEndiannessToHost  (std::uint8_t *pData, std::size_t dataSize, Endianness srcEndianness) const = 0;
+    virtual std::uint8_t* convertEndiannessFromHost(std::uint8_t *pData, std::size_t dataSize, Endianness dstEndianness) const = 0;
+
+
+    // char strings encoding
     virtual void setStringEncoding(const std::string &encName) = 0;
     virtual std::string getStringEncoding() = 0;
+    virtual std::wstring decodeString( const std::string &str ) = 0;
+
+    // 
+
+    virtual void flushBits() = 0;
 
     virtual void logFontsInfo() = 0;
 
@@ -474,7 +519,6 @@ struct IDrawContext
 
     virtual int  getCurFont() = 0;
 
-    virtual std::wstring decodeString( const std::string &str ) = 0;
     virtual bool textOut( const DrawCoord &pos, const char    *text, std::size_t textSize=(std::size_t)-1 ) = 0;
     virtual bool textOut( const DrawCoord &pos, const wchar_t *text, std::size_t textSize=(std::size_t)-1 ) = 0;
     virtual bool textOut( const DrawCoord &pos, const std::string  &text ) = 0;
@@ -1143,7 +1187,45 @@ typedef IDrawContext::DcResourceLiberator       DcResourceLiberator ;
 
 
 
+template<typename T>
+std::enable_if_t<!std::is_integral<T>::value, void> convertEndiannessToDc(const IDrawContext *pDc, T &t, Endianness srcEndianness)
+{
+    pDc->convertEndiannessToHost  ((std::uint8_t*)&t, sizeof(T), srcEndianness);
+}
 
+template<typename T>
+std::enable_if_t<!std::is_integral<T>::value, void> convertEndiannessFromDc(const IDrawContext *pDc, T &t, Endianness dstEndianness)
+{
+    pDc->convertEndiannessFromHost((std::uint8_t*)&t, sizeof(T), dstEndianness);
+}
+
+template<typename T>
+const std::uint8_t* copyFromRawBytesEx( T &t, const std::uint8_t* pRawData, std::size_t &rawDataRestSize)
+{
+    const auto sizeofT = sizeof(T);
+
+    if (rawDataRestSize<sizeofT)
+    {
+        throw std::runtime_error("marty_draw_context::copyFromRawBytesEx: Not enough raw data to copy from");
+    }
+
+    std::memcpy( (void* dest)&t, (const void*)pRawData, sizeofT );
+
+    rawDataRestSize -= sizeofT;
+    pRawData        += sizeofT;
+
+    return pRawData;
+}
+
+template<typename T>
+void copyFromRawBytes( T &t, const std::uint8_t* pRawData)
+{
+    const auto sizeofT = sizeof(T);
+    std::memcpy( (void* dest)&t, (const void*)pRawData, sizeofT );
+}
+
+
+    
 
 } // namespace marty_draw_context
 

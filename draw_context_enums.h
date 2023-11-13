@@ -423,22 +423,22 @@ enum class BkMode : std::uint32_t
 {
     invalid       = (std::uint32_t)(-1),
     unknown       = (std::uint32_t)(-1),
-    opaque        = 0,
-    transparent   = 1
+    transparent   = 1,
+    opaque        = 2
 
 }; // enum class BkMode : std::uint32_t
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( BkMode, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::invalid       , "Invalid"     );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::opaque        , "Opaque"      );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::transparent   , "Transparent" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::opaque        , "Opaque"      );
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( BkMode, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( BkMode, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::invalid       , "invalid"     );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::invalid       , "unknown"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::opaque        , "opaque"      );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::transparent   , "transparent" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BkMode::opaque        , "opaque"      );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( BkMode, std::map, 1 )
 
 
@@ -446,26 +446,26 @@ enum class ArcDirectionEnum : std::uint32_t
 {
     Invalid            = (std::uint32_t)(-1),
     Unknown            = (std::uint32_t)(-1),
-    Cw                 = 0,
-    Clockwise          = 0,
     Ccw                = 1,
-    CounterClockwise   = 1
+    CounterClockwise   = 1,
+    Cw                 = 2,
+    Clockwise          = 2
 
 }; // enum class ArcDirectionEnum : std::uint32_t
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "Invalid" );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Cw        , "Cw"      );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "Ccw"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Cw        , "Cw"      );
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ArcDirectionEnum, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "invalid"          );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "unknown"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "cw"               );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "clockwise"        );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "ccw"              );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "counterclockwise" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "cw"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "clockwise"        );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ArcDirectionEnum, std::map, 1 )
 
 

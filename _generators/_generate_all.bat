@@ -66,10 +66,10 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set LINEJOINSTYLE_DEF=invalid,unknown=-1;bevel;mitter;round
 
 @set BKMODE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
-@set BKMODE_DEF=invalid,unknown=-1;opaque;transparent
+@set BKMODE_DEF=invalid,unknown=-1;transparent=1;opaque=2
 
 @set ARCDIRECTION_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_PASCAL% %SERIALIZE_PASCAL%
-@set ARCDIRECTION_DEF=invalid,unknown=-1;Cw,Clockwise;Ccw,CounterClockwise
+@set ARCDIRECTION_DEF=invalid,unknown=-1;Ccw,CounterClockwise=1;Cw,Clockwise=2
 
 @set SMOOTHINGMODE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
 @set SMOOTHINGMODE_DEF=invalid,unknown=-1;defMode=0;highSpeed,lowQuality=1;highQuality,lowSpeed=2;noSmoothing,none=3;antiAlias=4

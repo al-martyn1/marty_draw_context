@@ -116,5 +116,32 @@ umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 @set NS_EMF=--namespace=marty_draw_context/emf
 @set EMFRECORDTYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
 
-umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_EMF% %EMFRECORDTYPE_GEN_FLAGS% -E=RecordType -F=@emf_record_type.txt ..\emf_enums.h
+@set EMFFORMATSIGNATURE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set EMFFORMATSIGNATURE_GEN_DEF=invalid,unknown=-1;emf=0x464D4520;eps=0x46535045
+
+@set EMFOPENGLFLAG_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set EMFOPENGLFLAG_GEN_DEF=invalid,unknown=-1;openGlNotPresent,openGlAbsent=0;openGlPresent=1;
+
+@set EMFMETAFILEHEADERSOPTION_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set EMFMETAFILEHEADERSOPTION_GEN_DEF=invalid,unknown=-1;basicHeader=0;headerExt1=1;headerExt2=2
+
+@rem WinGDI.h:3159 - /* PIXELFORMATDESCRIPTOR flags */
+@set EMFPIXELFORMATDESCRIPTORFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA%
+@set EMFPIXELFORMATDESCRIPTORFLAGS_GEN_DEF=invalid,unknown=-1;doubleBuffer=0x00000001;stereo=0x00000002;drawToWindow=0x00000004;drawToBitmap=0x00000008;supportGdi=0x00000010;supportOpenGl=0x00000020;genericFormat=0x00000040;needPalette=0x00000080;needSystemPalette=0x00000100;swapExchange=0x00000200;swapCopy=0x00000400;swapLayerBuffers=0x00000800;genericAccelerated=0x00001000;supportDirectDraw=0x00002000;direct3dAccelerated=0x00004000;supportComposition=0x00008000;depthDontCare=0x20000000;doubleBufferDontCare=0x40000000;stereoDontCare=0x80000000
+
+@set EMFPFDPIXELTYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set EMFPFDPIXELTYPE_GEN_DEF=invalid,unknown=-1;rgba=0;colorIndex=1
+
+
+umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_EMF% ^
+%EMFRECORDTYPE_GEN_FLAGS%                  -E=RecordType                 -F=@emf_record_type.txt ^
+%EMFFORMATSIGNATURE_GEN_FLAGS%             -E=FormatSignature            -F=%EMFFORMATSIGNATURE_GEN_DEF% ^
+%EMFOPENGLFLAG_GEN_FLAGS%                  -E=OpenGlPresenceFlag         -F=%EMFOPENGLFLAG_GEN_DEF% ^
+%EMFMETAFILEHEADERSOPTION_GEN_FLAGS%       -E=MetafileHeaderOptions      -F=%EMFMETAFILEHEADERSOPTION_GEN_DEF% ^
+%EMFPIXELFORMATDESCRIPTORFLAGS_GEN_FLAGS%  -E=PixelFormatDescriptorFlags -F=%EMFPIXELFORMATDESCRIPTORFLAGS_GEN_DEF% ^
+%UINT8% %HEX2% ^
+%EMFPFDPIXELTYPE_GEN_FLAGS%                -E=PfdPixelType               -F=%EMFPFDPIXELTYPE_GEN_DEF% ^
+..\emf_enums.h
+
+
 

@@ -1187,42 +1187,6 @@ typedef IDrawContext::DcResourceLiberator       DcResourceLiberator ;
 
 
 
-template<typename T>
-std::enable_if_t<!std::is_integral<T>::value, void> convertEndiannessToDc(const IDrawContext *pDc, T &t, Endianness srcEndianness)
-{
-    pDc->convertEndiannessToHost  ((std::uint8_t*)&t, sizeof(T), srcEndianness);
-}
-
-template<typename T>
-std::enable_if_t<!std::is_integral<T>::value, void> convertEndiannessFromDc(const IDrawContext *pDc, T &t, Endianness dstEndianness)
-{
-    pDc->convertEndiannessFromHost((std::uint8_t*)&t, sizeof(T), dstEndianness);
-}
-
-template<typename T>
-const std::uint8_t* copyFromRawBytesEx( T &t, const std::uint8_t* pRawData, std::size_t &rawDataRestSize)
-{
-    const auto sizeofT = sizeof(T);
-
-    if (rawDataRestSize<sizeofT)
-    {
-        throw std::runtime_error("marty_draw_context::copyFromRawBytesEx: Not enough raw data to copy from");
-    }
-
-    std::memcpy( (void* dest)&t, (const void*)pRawData, sizeofT );
-
-    rawDataRestSize -= sizeofT;
-    pRawData        += sizeofT;
-
-    return pRawData;
-}
-
-template<typename T>
-void copyFromRawBytes( T &t, const std::uint8_t* pRawData)
-{
-    const auto sizeofT = sizeof(T);
-    std::memcpy( (void* dest)&t, (const void*)pRawData, sizeofT );
-}
 
 
     

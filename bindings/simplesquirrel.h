@@ -123,6 +123,11 @@ struct DrawingColor : public ColorRef
         return (ColorRef)*this;
     }
 
+    explicit operator std::uint32_t() const
+    {
+        return toUnsigned();
+    }
+
     static
     DrawingColor fromString(const ssq::Class&, const ssq::sqstring &colorName)
     {
@@ -1554,6 +1559,13 @@ struct DrawingContext
 
     std::vector<std::uint32_t> toUnsignedColorsVector(ssq::Object &o, const SQChar *paramName, bool allowSingleVal=false) const
     {
+        #if 1
+
+        (void)allowSingleVal;
+
+        return marty_simplesquirrel::fromArrayObjectToClassVectorConvertEx<std::uint32_t, DrawingColor>(o, paramName /* , false */  /* allowSingleVal */ );
+
+        #else
         std::vector<std::uint32_t>  resVec;
 
         if (o.isNull() || o.isEmpty())
@@ -1608,61 +1620,15 @@ struct DrawingContext
             default: {}
         }
     
-        throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::INTEGER), ssq::typeToStr(t));
+        throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::ARRAY), ssq::typeToStr(t));
+        #endif
     }
     
     std::vector<DrawCoord::value_type> toDrawCoordValueTypeVector(ssq::Object &o, const SQChar *paramName) const
     {
-        (void)paramName;
-
-        std::vector<DrawCoord::value_type>  resVec;
-
-        if (o.isNull() || o.isEmpty())
-        {
-            return resVec;
-        }
-
-        ssq::Type t = o.getType();
-        switch(t)
-        {
-            case ssq::Type::ARRAY:
-            {
-                ssq::Array a     = o.toArray();
-                std::size_t size = a.size();
-        
-                for(std::size_t i=0; i!=size; ++i)
-                {
-                    auto obj = a.get<ssq::Object>(i);
-                    resVec.emplace_back(marty_simplesquirrel::fromObjectConvertHelper<float>(obj, paramName));
-                    //resVec.emplace_back((DrawCoord::value_type)a.get<float>(i));
-                }
-    
-                return resVec;
-            }
-    
-            case ssq::Type::INTEGER:
-            case ssq::Type::FLOAT:
-            case ssq::Type::STRING:
-            case ssq::Type::BOOL:
-            case ssq::Type::NULLPTR:
-            case ssq::Type::TABLE:
-            case ssq::Type::USERDATA:
-            case ssq::Type::CLOSURE:
-            case ssq::Type::NATIVECLOSURE:
-            case ssq::Type::GENERATOR:
-            case ssq::Type::USERPOINTER:
-            case ssq::Type::THREAD:
-            case ssq::Type::FUNCPROTO:
-            case ssq::Type::CLASS:
-            case ssq::Type::INSTANCE:
-            case ssq::Type::WEAKREF:
-            case ssq::Type::OUTER:
-                [[fallthrough]];		
-            default: {}
-        }
-    
-        throw ssq::TypeException("bad cast", ssq::typeToStr(ssq::Type::FLOAT), ssq::typeToStr(t));
+        return marty_simplesquirrel::fromArrayObjectToVectorConvertEx<DrawCoord::value_type, float>(o, paramName, false /* allowSingleVal */ );
     }
+
 
     bool drawTextColored( DrawingCoords    startPos
                         , ssq::Object      widthLim
@@ -1761,6 +1727,105 @@ struct DrawingContext
                                          , fontId
                                          );
     }
+
+    bool polyCubicBeziers(ssq::Object pointsArrayObj)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = marty_simplesquirrel::fromArrayObjectToClassVectorConvertEx<DrawCoord,DrawingCoords>(pointsArrayObj, _SC("points"));
+        return pDc->polyCubicBezier(vec);
+    }
+
+    bool polyCubicBeziersTo(ssq::Object pointsArrayObj)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = marty_simplesquirrel::fromArrayObjectToClassVectorConvertEx<DrawCoord,DrawingCoords>(pointsArrayObj, _SC("points"));
+        return pDc->polyCubicBezierTo(vec);
+    }
+
+    bool polyQuadraticBeziers(ssq::Object pointsArrayObj)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = marty_simplesquirrel::fromArrayObjectToClassVectorConvertEx<DrawCoord,DrawingCoords>(pointsArrayObj, _SC("points"));
+        return pDc->polyQuadraticBezier(vec);
+    }
+
+    bool polyQuadraticBeziersTo(ssq::Object pointsArrayObj)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = marty_simplesquirrel::fromArrayObjectToClassVectorConvertEx<DrawCoord,DrawingCoords>(pointsArrayObj, _SC("points"));
+        return pDc->polyQuadraticBezierTo(vec);
+    }
+
+
+    bool polyCubicBezier(DrawingCoords cp1, DrawingCoords cp2, DrawingCoords cp3, DrawingCoords cp4)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = { DrawCoord(cp1), DrawCoord(cp2), DrawCoord(cp3), DrawCoord(cp4) };
+        return pDc->polyCubicBezier(vec);
+    }
+
+    bool polyCubicBezierTo(DrawingCoords cp2, DrawingCoords cp3, DrawingCoords cp4)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = { DrawCoord(cp2), DrawCoord(cp3), DrawCoord(cp4) };
+        return pDc->polyCubicBezierTo(vec);
+    }
+
+    bool polyQuadraticBezier(DrawingCoords cp1, DrawingCoords cp2, DrawingCoords cp3)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = { DrawCoord(cp1), DrawCoord(cp2), DrawCoord(cp3) };
+        return pDc->polyQuadraticBezier(vec);
+    }
+
+    bool polyQuadraticBezierTo(DrawingCoords cp2, DrawingCoords cp3)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        std::vector<DrawCoord> vec = { DrawCoord(cp2), DrawCoord(cp3) };
+        return pDc->polyQuadraticBezierTo(vec);
+    }
+
+
+
+    // std::vector<DrawCoord> toDrawCoordsVector(ssq::Object &o, const SQChar *paramName) const
+    // virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) = 0;
+    // virtual bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) = 0;
+    // virtual bool polyCubicBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
+    // virtual bool polyCubicBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
+    // virtual bool polyCubicBezier  (const std::vector<DrawCoord> &points) = 0;
+    // virtual bool polyCubicBezierTo(const std::vector<DrawCoord> &points) = 0;
+    //  
+    // virtual bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) = 0;
+    // virtual bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) = 0;
+    // virtual bool polyQuadraticBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
+    // virtual bool polyQuadraticBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
+    // virtual bool polyQuadraticBezier  (const std::vector<DrawCoord> &points) = 0;
+    // virtual bool polyQuadraticBezierTo(const std::vector<DrawCoord> &points) = 0;
+
 
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
@@ -1868,7 +1933,6 @@ struct DrawingContext
         cls.addFunc( _SC("fillGradientRoundRect")  , &DrawingContext::fillGradientRoundRect   );
         cls.addFunc( _SC("fillGradientCircle")     , &DrawingContext::fillGradientCircle      );
 
-
         cls.addFunc( _SC("textOut")                , &DrawingContext::textOut                 );
         cls.addFunc( _SC("textOutWithFontAndColor"), &DrawingContext::textOutWithFontAndColor );
         cls.addFunc( _SC("drawTextColored")        , &DrawingContext::drawTextColored         );
@@ -1876,6 +1940,20 @@ struct DrawingContext
         cls.addFunc( _SC("drawMultiParasColored")  , &DrawingContext::drawMultiParasColored   );
         //cls.addFunc( _SC("")  , &DrawingContext::);
         //cls.addFunc( _SC("")  , &DrawingContext::);
+
+
+        // polyCubicBeziers/polyCubicBeziersTo/polyQuadraticBeziers/polyQuadraticBeziersTo
+        cls.addFunc( _SC("polyCubicBeziers")       , &DrawingContext::polyCubicBeziers);
+        cls.addFunc( _SC("polyCubicBeziersTo")     , &DrawingContext::polyCubicBeziersTo);
+        cls.addFunc( _SC("polyQuadraticBeziers")   , &DrawingContext::polyQuadraticBeziers);
+        cls.addFunc( _SC("polyQuadraticBeziersTo") , &DrawingContext::polyQuadraticBeziersTo);
+
+        // polyCubicBezier/polyCubicBezierTo/polyQuadraticBezier/polyQuadraticBezierTo
+        cls.addFunc( _SC("polyCubicBezier")        , &DrawingContext::polyCubicBezier      );
+        cls.addFunc( _SC("polyCubicBezierTo")      , &DrawingContext::polyCubicBezierTo    );
+        cls.addFunc( _SC("polyQuadraticBezier")    , &DrawingContext::polyQuadraticBezier  );
+        cls.addFunc( _SC("polyQuadraticBezierTo")  , &DrawingContext::polyQuadraticBezierTo);
+
 
         return cls;
     }

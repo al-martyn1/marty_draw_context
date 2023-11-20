@@ -972,10 +972,10 @@ public:
              { return getActiveDc()->fillGradientCircle(pos, r, gradientParams, excludeFrame); }
 
 
-    bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) override
+    bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) const override
         { return getActiveDc()->checkPolyCubicBezierNumPoints(numPoints); }
 
-    bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) override
+    bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) const override
         { return getActiveDc()->checkPolyCubicBezierToNumPoints(numPoints); }
 
     bool polyCubicBezier  (const DrawCoord * pPoints, std::size_t numPoints) override
@@ -991,10 +991,10 @@ public:
         { return getActiveDc()->polyCubicBezierTo(points); }
 
 
-    bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) override
+    bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) const override
         { return getActiveDc()->checkPolyQuadraticBezierNumPoints(numPoints); }
 
-    bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) override
+    bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) const override
         { return getActiveDc()->checkPolyQuadraticBezierToNumPoints(numPoints); }
 
     bool polyQuadraticBezier  (const DrawCoord * pPoints, std::size_t numPoints) override

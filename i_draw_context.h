@@ -717,15 +717,15 @@ struct IDrawContext
                                    , bool                        excludeFrame
                                    ) = 0;
 
-    virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) = 0;
-    virtual bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) = 0;
+    virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) const = 0;
+    virtual bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) const = 0;
     virtual bool polyCubicBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
     virtual bool polyCubicBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
     virtual bool polyCubicBezier  (const std::vector<DrawCoord> &points) = 0;
     virtual bool polyCubicBezierTo(const std::vector<DrawCoord> &points) = 0;
 
-    virtual bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) = 0;
-    virtual bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) = 0;
+    virtual bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) const = 0;
+    virtual bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) const = 0;
     virtual bool polyQuadraticBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
     virtual bool polyQuadraticBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
     virtual bool polyQuadraticBezier  (const std::vector<DrawCoord> &points) = 0;

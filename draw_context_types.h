@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cmath>
 #include <utility>
+#include <exception>
+#include <stdexcept>
 
 #include "marty_decimal/marty_decimal.h"
 
@@ -66,6 +68,49 @@ std::size_t hash_combine(std::size_t seed, const T &v)
 #endif
 
 
+struct DrawCoord;
+DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 );
+//DrawCoord operator*( DrawCoord::value_type scale, const DrawCoord &c );
+//DrawCoord operator*( const DrawCoord &c, DrawCoord::value_type scale );
+DrawCoord operator/( const DrawCoord &c1, const DrawCoord &c2 );
+//DrawCoord operator/( const DrawCoord &c, DrawCoord::value_type d );
+DrawCoord operator+( const DrawCoord &c1, const DrawCoord &c2 );
+DrawCoord operator-( const DrawCoord &c1, const DrawCoord &c2 );
+
+#if 0
+template<typename FloatType>
+FloatType floatFromString( const char *pStr, std::size_t* pPosOut = 0 )
+{
+    std::size_t pos = 0;
+    for(; *pStr && *pStr!=' ' && *pStr!='\t'; ++pStr, ++pos) {} // skip leading WS
+
+    if (*pStr==0) // вся строка - одни пробелы
+    {
+        if (pPosOut)
+        {
+            *pPosOut = 0;
+        }
+        else
+        {
+            std::invalid_argument("Failed to convert string to float value");
+        }
+    }
+
+    std::invalid_argument if no conversion could be performed.
+
+    return FloatType(f);
+}
+
+FloatType floatFromString( const std::string& str, std::size_t* pos = nullptr )
+
+float       stof ( const std::string& str, std::size_t* pos = nullptr );
+(1)	(since C++11)
+float       stof ( const std::wstring& str, std::size_t* pos = nullptr );
+(2)	(since C++11)
+double      stod ( const std::string& str, std::size_t* pos = nullptr );
+(3)	(since C++11)
+#endif
+
 struct DrawCoord
 {
     //typedef marty::Decimal  value_type;
@@ -99,6 +144,7 @@ struct DrawCoord
         else return 0;
     }
 
+
     value_type distanceTo(const DrawCoord& other) const
     {
         if (x==other.x)      return std::abs(y-other.y);
@@ -106,6 +152,11 @@ struct DrawCoord
         else return std::sqrt(x*other.x+y*other.y);
     }
 
+    DrawCoord reflectTo(const DrawCoord& relativeTo) const
+    {
+        DrawCoord vec = relativeTo - *this;
+        return *this + vec;
+    }
 
     bool operator==( const DrawCoord &coord ) const
     {
@@ -122,6 +173,11 @@ struct DrawCoord
         return DrawCoord(-x,-y);
     }
 
+    DrawCoord operator+() const
+    {
+        return DrawCoord(x,y);
+    }
+
     DrawCoord& operator*=( const DrawCoord &coord )
     {
         x *= coord.x;
@@ -129,11 +185,24 @@ struct DrawCoord
         return *this;
     }
 
+    DrawCoord& operator*=( DrawCoord::value_type scale )
+    {
+        x *= scale;
+        y *= scale;
+        return *this;
+    }
 
     DrawCoord& operator/=( const DrawCoord &coord )
     {
         x /= coord.x;
         y /= coord.y;
+        return *this;
+    }
+
+    DrawCoord& operator/=( DrawCoord::value_type d )
+    {
+        x /= d;
+        y /= d;
         return *this;
     }
 
@@ -166,9 +235,27 @@ DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 )
 }
 
 inline
+DrawCoord operator*( DrawCoord::value_type scale, const DrawCoord &c )
+{
+    return DrawCoord{ c.x*scale, c.y*scale };
+}
+
+inline
+DrawCoord operator*( const DrawCoord &c, DrawCoord::value_type scale )
+{
+    return DrawCoord{ c.x*scale, c.y*scale };
+}
+
+inline
 DrawCoord operator/( const DrawCoord &c1, const DrawCoord &c2 )
 {
     return DrawCoord{ c1.x/c2.x, c1.y/c2.y };
+}
+
+inline
+DrawCoord operator/( const DrawCoord &c, DrawCoord::value_type d )
+{
+    return DrawCoord{ c.x/d, c.y/d };
 }
 
 inline
@@ -182,6 +269,8 @@ DrawCoord operator-( const DrawCoord &c1, const DrawCoord &c2 )
 {
     return DrawCoord{ c1.x-c2.x, c1.y-c2.y };
 }
+
+
 
 
 inline

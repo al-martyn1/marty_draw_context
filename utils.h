@@ -11,6 +11,67 @@ namespace marty_draw_context {
 
 namespace utils {
 
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+template<typename StringType> inline
+std::vector<StringType> simpleStringSplit(const StringType &str, const StringType &delim, typename StringType::size_type nSplits = -1)
+{
+    std::vector<StringType> res;
+
+    typename StringType::size_type curPos  = 0;
+    typename StringType::size_type prevPos = 0;
+    //StringType token;
+    while (res.size()!=nSplits && (curPos = str.find(delim, prevPos)) != StringType::npos)
+    {
+        res.emplace_back(str, prevPos, curPos-prevPos);
+        prevPos = curPos+delim.size();
+    }
+
+    res.emplace_back(str, prevPos);
+
+    return res;
+}
+
+//-----------------------------------------------------------------------------
+template<typename StringType> inline
+std::vector<StringType> simpleStringSplit(const StringType &str, const typename StringType::value_type *delim, typename StringType::size_type nSplits = -1)
+{
+    return simpleStringSplit( str, StringType(delim), nSplits);
+}
+
+//-----------------------------------------------------------------------------
+template<typename StringType> inline
+std::vector<StringType> simpleStringSplit(const StringType &str, const typename StringType::value_type delim, typename StringType::size_type nSplits = -1)
+{
+    typename StringType::value_type tmpDelimStr[2] = { delim, 0 };
+    return simpleStringSplit( str, tmpDelimStr, nSplits);
+}
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+template <typename IteratorType, typename IteratorTypeCmpWith> inline
+std::size_t startsWith(IteratorType b, IteratorType e, IteratorTypeCmpWith bCmpWith, IteratorTypeCmpWith eCmpWith)
+{
+    std::size_t idx = 0;
+    for(; b!=e && bCmpWith!=eCmpWith && *bCmpWith==*b; ++bCmpWith, ++b, ++idx)
+    {
+    }
+
+    if (bCmpWith==eCmpWith) // дошли до конца искомой строки
+    {
+        return idx;
+    }
+
+    return 0;
+}
+
+
 
 //----------------------------------------------------------------------------
 Endianness getHostEndianness()

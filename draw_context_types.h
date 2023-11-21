@@ -10,6 +10,8 @@
 #include <utility>
 #include <exception>
 #include <stdexcept>
+#include <cstdlib>
+#include <cerrno>
 
 #include "marty_decimal/marty_decimal.h"
 
@@ -42,6 +44,9 @@
 namespace marty_draw_context {
 
 
+
+
+//----------------------------------------------------------------------------
 // See
 // https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector
 // https://stackoverflow.com/questions/35985960/c-why-is-boosthash-combine-the-best-way-to-combine-hash-values/50978188#50978188
@@ -55,6 +60,153 @@ std::size_t hash_combine(std::size_t seed, const T &v)
     return seed ^ ( std::hash<T>()(v) + 0x9e3779b9 + (seed<<6) + (seed>>2) );
 }
 
+//----------------------------------------------------------------------------
+
+
+
+template<typename FloatType>
+FloatType floatFromString( const std::string &str, std::size_t* pPosOut = 0 )
+{
+    /*
+    // Это не нужно - std::stof сама это делает
+    // for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+
+    if (*pStr==0) // вся строка - одни пробелы
+    {
+        if (pPosOut)
+        {
+            *pPosOut = 0;
+        }
+        else
+        {
+            throw std::invalid_argument("marty_draw_context::floatFromString: Failed to convert string to float value  empty string (space only)");
+        }
+    }
+    */
+
+    float f = std::stof(str, pPosOut);
+
+    return FloatType(f);
+}
+
+template<typename FloatType>
+FloatType floatFromString( const char* pStr, std::size_t* pPosOut = 0 )
+{
+    if (!pStr)
+    {
+        throw std::runtime_error("marty_draw_context::floatFromString: pStr is null");
+    }
+
+    return floatFromString<FloatType>(std::string(pStr), pPosOut);
+}
+
+
+template<>
+double floatFromString<double>( const std::string &str, std::size_t* pPosOut )
+{
+    double f = std::stod(str, pPosOut);
+    return double(f);
+}
+
+template<>
+double floatFromString<double>( const char* pStr, std::size_t* pPosOut )
+{
+    if (!pStr)
+    {
+        throw std::runtime_error("marty_draw_context::floatFromString: pStr is null");
+    }
+
+    return floatFromString<double>(std::string(pStr), pPosOut);
+}
+
+
+template<>
+marty::Decimal floatFromString<marty::Decimal>( const char* pStr, std::size_t* pPosOut )
+{
+    //TODO: !!! Протестировать
+
+    if (!pStr)
+    {
+        throw std::runtime_error("marty_draw_context::floatFromString: pStr is null");
+    }
+
+    std::size_t pos = 0;
+    for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+
+    // Вообще-то Decimal::fromString сам пробелы хавает, но нам нужно посчитать количество символов
+
+    if (*pStr==0) // вся строка - одни пробелы
+    {
+        throw std::invalid_argument("marty_draw_context::floatFromString: Failed to convert string to float value: empty string (spaces only)");
+    }
+
+    std::size_t startPos = pos;
+
+    pos = 0;
+
+    if (*pStr=='+' || *pStr=='-')
+    {
+        ++pos;
+    }
+
+    // Возможно, после знака тоже стоит пропустить пробелы
+    // for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+
+    std::size_t dotCount = 0;
+
+    auto isDecDigit = [&](char ch) -> bool
+    {
+        if (ch>='0' && ch<='9')
+        {
+            return true;
+        }
+
+        return false;
+    };
+
+    for(; *pStr && isDecDigit(pStr[pos]) && dotCount<2; ++pos)
+    {
+        if (pStr[pos]=='.')
+        {
+            ++dotCount;
+        }
+    }
+    
+    if (pPosOut)
+    {
+        *pPosOut = startPos + pos;
+    }
+
+    return marty::Decimal::fromString(std::string(pStr, pos));
+}
+
+template<>
+marty::Decimal floatFromString<marty::Decimal>( const std::string &str, std::size_t* pPosOut )
+{
+    //TODO: !!! Протестировать
+
+    return floatFromString<marty::Decimal>(str.c_str(), pPosOut);
+}
+
+
+
+//----------------------------------------------------------------------------
+
+struct DrawCoord;
+
+DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 );
+//DrawCoord operator*( DrawCoord::value_type scale, const DrawCoord &c );
+//DrawCoord operator*( const DrawCoord &c, DrawCoord::value_type scale );
+DrawCoord operator/( const DrawCoord &c1, const DrawCoord &c2 );
+//DrawCoord operator/( const DrawCoord &c, DrawCoord::value_type d );
+DrawCoord operator+( const DrawCoord &c1, const DrawCoord &c2 );
+DrawCoord operator-( const DrawCoord &c1, const DrawCoord &c2 );
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
 
 #if defined(DEBUG) || defined(_DEBUG)
 
@@ -67,73 +219,97 @@ std::size_t hash_combine(std::size_t seed, const T &v)
 
 #endif
 
+//----------------------------------------------------------------------------
 
-struct DrawCoord;
-DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 );
-//DrawCoord operator*( DrawCoord::value_type scale, const DrawCoord &c );
-//DrawCoord operator*( const DrawCoord &c, DrawCoord::value_type scale );
-DrawCoord operator/( const DrawCoord &c1, const DrawCoord &c2 );
-//DrawCoord operator/( const DrawCoord &c, DrawCoord::value_type d );
-DrawCoord operator+( const DrawCoord &c1, const DrawCoord &c2 );
-DrawCoord operator-( const DrawCoord &c1, const DrawCoord &c2 );
 
-#if 0
-template<typename FloatType>
-FloatType floatFromString( const char *pStr, std::size_t* pPosOut = 0 )
-{
-    std::size_t pos = 0;
-    for(; *pStr && *pStr!=' ' && *pStr!='\t'; ++pStr, ++pos) {} // skip leading WS
 
-    if (*pStr==0) // вся строка - одни пробелы
-    {
-        if (pPosOut)
-        {
-            *pPosOut = 0;
-        }
-        else
-        {
-            std::invalid_argument("Failed to convert string to float value");
-        }
-    }
-
-    std::invalid_argument if no conversion could be performed.
-
-    return FloatType(f);
-}
-
-FloatType floatFromString( const std::string& str, std::size_t* pos = nullptr )
-
-float       stof ( const std::string& str, std::size_t* pos = nullptr );
-(1)	(since C++11)
-float       stof ( const std::wstring& str, std::size_t* pos = nullptr );
-(2)	(since C++11)
-double      stod ( const std::string& str, std::size_t* pos = nullptr );
-(3)	(since C++11)
-#endif
-
+//----------------------------------------------------------------------------
 struct DrawCoord
 {
     //typedef marty::Decimal  value_type;
     #if defined(UNDERWOOD_DRAWCOORD_VALUE_TYPE_IS_INTEGRAL) && UNDERWOOD_DRAWCOORD_VALUE_TYPE_IS_INTEGRAL!=0
         typedef double          value_type;
-        static constexpr bool isValueTypeIntegral() { return true; }
+        static constexpr  bool  isValueTypeIntegral() { return true; }
     #else
         typedef marty::Decimal  value_type;
-        static constexpr bool isValueTypeIntegral() { return false; }
+        static constexpr  bool  isValueTypeIntegral() { return false; }
     #endif
 
     value_type              x;
     value_type              y;
 
+
+
     DrawCoord() : x(0), y(0) {}
 
-    template<typename T>
-    DrawCoord( T tx, T ty ) : x(tx), y(ty) {}
+    // template<typename T>
+    // DrawCoord( T tx, T ty ) : x(tx), y(ty) {}
+
+    template<typename T1, typename T2>
+    DrawCoord( T1 tx, T2 ty ) : x(tx), y(ty) {}
 
     // template<typename T>
     // DrawCoord( const T &t ) : x(t), y(t) {}
 
     //DrawCoord(const DrawCoord &c) : x(c.x), y(c.y) {}
+
+    // Преобразование из строки в отдельную координату ()
+    static
+    value_type valueFromString(const char* pStr, std::size_t* pPosOut = 0)
+    {
+        return floatFromString<value_type>(pStr, pPosOut);
+    }
+
+    // Преобразование из строки в пару DrawCoord ()
+    static
+    DrawCoord fromString(const char* pStr, std::size_t* pPosOut = 0)
+    {
+        std::size_t pos = 0;
+
+        DrawCoord resCoord;
+
+        // X
+        resCoord.x = floatFromString<value_type>(pStr, &pos);
+
+        pStr += pos;
+        // Y
+        for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+    
+        // Вообще-то Decimal::fromString сам пробелы хавает, но нам нужно посчитать количество символов
+    
+        if (*pStr==0) // вся строка - одни пробелы
+        {
+            throw std::invalid_argument("marty_draw_context::DrawCoord::fromString: Failed to convert string to float value: missing Y");
+        }
+
+        if (*pStr!=',' && *pStr!=';')
+        {
+            throw std::invalid_argument("marty_draw_context::DrawCoord::fromString: Failed to convert string to float value: missing x/y separator char (','/';')");
+        }
+
+        ++pos;
+        ++pStr;
+
+        std::size_t pos2 = 0;
+
+        resCoord.y = floatFromString<value_type>(pStr, &pos2);
+
+        if (pPosOut)
+        {
+            *pPosOut = pos+pos2;
+        }
+
+        return resCoord;
+    }
+
+    static
+    DrawCoord fromString(const std::string &str, std::size_t* pPosOut = 0)
+    {
+        return fromString(str.c_str(), pPosOut);
+    }
+
+
+//double floatFromString<marty::Decimal>( const std::string str, std::size_t* pPosOut = 0 )    
 
 
     // Расстояние со знаком для точек на горизонтальной/вертикальной прямой, или 0 если такого нет
@@ -220,7 +396,9 @@ struct DrawCoord
         return *this;
     }
 
-};
+}; // DrawCoord
+
+//----------------------------------------------------------------------------
 
 inline
 DrawCoord::value_type distance(const DrawCoord& c1, const DrawCoord& c2)
@@ -270,15 +448,181 @@ DrawCoord operator-( const DrawCoord &c1, const DrawCoord &c2 )
     return DrawCoord{ c1.x-c2.x, c1.y-c2.y };
 }
 
+//----------------------------------------------------------------------------
 
 
 
+//----------------------------------------------------------------------------
 inline
 DebugStreamImplBase& operator<<( DebugStreamImplBase& s, const DrawCoord &c )
 {
     s<<c.x<<","<<c.y;
     return s;
 }
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+
+typedef DrawCoord DrawPoint;
+typedef DrawCoord DrawSize ;
+typedef DrawCoord DrawScale;
+
+
+
+//----------------------------------------------------------------------------
+// https://www.w3.org/TR/SVGTiny12/coords.html#ViewBoxAttribute
+// A list of four <number>s (<min-x>, <min-y>, <width> and <height>), separated by white space and/or a comma
+// "none"
+struct ViewBox
+{
+    DrawCoord    leftTop = DrawCoord(0,0);
+    DrawCoord    size    = DrawCoord(0,0);
+
+    static 
+    ViewBox fromString(const char* pStr, std::size_t* pPosOut = 0)
+    {
+        ViewBox vb;
+
+        if (!pStr || std::string("none")==pStr)
+        {
+            return vb;
+        }
+
+        std::size_t posTotal = 0;
+        std::size_t pos = 0;
+
+        vb.leftTop.x = DrawCoord::valueFromString(pStr, &pos);
+        posTotal += pos;
+        pStr     += pos;
+        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+
+        vb.leftTop.y = DrawCoord::valueFromString(pStr, &pos);
+        posTotal += pos;
+        pStr     += pos;
+        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+
+        vb.size.x = DrawCoord::valueFromString(pStr, &pos);
+        posTotal += pos;
+        pStr     += pos;
+        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+
+        vb.size.y = DrawCoord::valueFromString(pStr, &pos);
+        posTotal += pos;
+        pStr     += pos;
+        //for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+
+        if (pPosOut)
+        {
+            *pPosOut = posTotal;
+        }
+
+        return vb;
+
+    }
+
+    static
+    ViewBox fromString(const std::string &str, std::size_t* pPosOut = 0)
+    {
+        return fromString(str.c_str(), pPosOut);
+    }
+
+};
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+// https://www.w3.org/TR/SVGTiny12/coords.html#Units
+// The list of unit identifiers in SVG are: in, cm, mm, pt, pc, px and percentages (%).
+struct ValueWithDimension
+{
+    typedef DrawCoord::value_type  value_type;
+
+    value_type     value;
+    std::string    dim  ;
+
+    ValueWithDimension() : value(0), dim() {}
+    ValueWithDimension(value_type v) : value(v), dim() {}
+    ValueWithDimension(value_type v, const std::string &d) : value(v), dim(d) {}
+
+
+    static 
+    ValueWithDimension fromString(const char* pStr, std::size_t* pPosOut = 0)
+    {
+        std::size_t pos = 0;
+
+        ValueWithDimension vd;
+
+        vd.value = floatFromString<value_type>(pStr, &pos);
+
+        pStr += pos;
+        std::size_t posNoSkipSpaces = pos;
+
+        for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // удаляем пробелы после числа до юнитов
+
+        if ( *pStr==0 || (*pStr=='+' || *pStr=='-' || (*pStr>='0' && *pStr<='9')) ) // конец строки, или знак или цифра - это следующее число, юнитов нет
+        {
+            // Юнитов нет, возвращаем длину без скипнутых пробелов
+            if (pPosOut)
+            {
+                *pPosOut = posNoSkipSpaces;
+            }
+
+            return vd;
+        }
+
+        for(; *pStr && (*pStr!=' ' && *pStr!='\t'); ++pStr, ++pos)
+        {
+            vd.dim.append(1, *pStr);
+        }
+
+        if (pPosOut)
+        {
+            *pPosOut = pos;
+        }
+
+        return vd;
+    
+    }
+
+    static
+    ValueWithDimension fromString(const std::string &str, std::size_t* pPosOut = 0)
+    {
+        return fromString(str.c_str(), pPosOut);
+    }
+
+
+}; // struct ValueWithDimension
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+struct SizeWithDimensions
+{
+    ValueWithDimension    width ;
+    ValueWithDimension    height;
+
+    static
+    ValueWithDimension valueFromString(const char* pStr, std::size_t* pPosOut = 0)
+    {
+        return ValueWithDimension::fromString(pStr, pPosOut);
+    }
+
+    static
+    ValueWithDimension valueFromString(const std::string str, std::size_t* pPosOut = 0)
+    {
+        return ValueWithDimension::fromString(str, pPosOut);
+    }
+
+}; // struct SizeWithDimensions
+
+//----------------------------------------------------------------------------
 
 
 
@@ -299,9 +643,6 @@ struct GradientParams
 
 
 
-typedef DrawCoord DrawPoint;
-typedef DrawCoord DrawSize ;
-typedef DrawCoord DrawScale;
 
 
 template<typename FloatType> inline

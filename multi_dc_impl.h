@@ -88,9 +88,14 @@ protected:
 
     DrawingPrecise                                m_drawingPrecise = DrawingPrecise::defPrecise;
 
+    MultiDrawContext( const MultiDrawContext& ) = delete;
+    MultiDrawContext& operator=( const MultiDrawContext& ) = delete;
 
 
 public:
+
+    MultiDrawContext( MultiDrawContext&& ) = default;
+    MultiDrawContext& operator=( MultiDrawContext&& ) = default;
 
     MultiDrawContext()
     : defDc      (0)

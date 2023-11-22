@@ -60,7 +60,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set LINEDIRECTION_DEF=invalid,unknown=-1;fromLeftToRight,fromTopToBottom;fromRightToLeft,fromBottomToTop
 
 @set LINEENDCAPSTYLE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
-@set LINEENDCAPSTYLE_DEF=invalid,unknown=-1;round;square;flat
+@set LINEENDCAPSTYLE_DEF=invalid,unknown=-1;round;square;flat,butt
 
 @set LINEJOINSTYLE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
 @set LINEJOINSTYLE_DEF=invalid,unknown=-1;bevel;mitter;round
@@ -142,6 +142,17 @@ umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_EMF% ^
 %UINT8% %HEX2% ^
 %EMFPFDPIXELTYPE_GEN_FLAGS%                -E=PfdPixelType               -F=%EMFPFDPIXELTYPE_GEN_DEF% ^
 ..\emf_enums.h
+
+
+@set NS_SVG=--namespace=marty_draw_context/svg
+
+@set SVGPATHSUBCOMMAND_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set SVGPATHSUBCOMMAND_GEN_DEF=invalid,unknown=-1;emf=0x464D4520;eps=0x46535045
+
+umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_SVG% ^
+%SVGPATHSUBCOMMAND_GEN_FLAGS%              -E=PathSubcommand             -F=@svg_path_subcommand.txt ^
+..\svg_enums.h
+
 
 
 

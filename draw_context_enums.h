@@ -373,7 +373,8 @@ enum class LineEndcapStyle : std::uint32_t
     unknown   = (std::uint32_t)(-1),
     round     = 0,
     square    = 1,
-    flat      = 2
+    flat      = 2,
+    butt      = 2
 
 }; // enum class LineEndcapStyle : std::uint32_t
 
@@ -390,6 +391,7 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( LineEndcapStyle, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::round     , "round"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::square    , "square"  );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::flat      , "flat"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( LineEndcapStyle::flat      , "butt"    );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( LineEndcapStyle, std::map, 1 )
 
 

@@ -131,7 +131,7 @@ marty::Decimal floatFromString<marty::Decimal>( const char* pStr, std::size_t* p
     }
 
     std::size_t pos = 0;
-    for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+    for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
 
     // Вообще-то Decimal::fromString сам пробелы хавает, но нам нужно посчитать количество символов
 
@@ -150,7 +150,7 @@ marty::Decimal floatFromString<marty::Decimal>( const char* pStr, std::size_t* p
     }
 
     // Возможно, после знака тоже стоит пропустить пробелы
-    // for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+    // for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
 
     std::size_t dotCount = 0;
 
@@ -260,6 +260,36 @@ struct DrawCoord
         return floatFromString<value_type>(pStr, pPosOut);
     }
 
+    static
+    value_type valueFromString(const std::string &str, std::size_t* pPosOut = 0)
+    {
+        return floatFromString<value_type>(str.c_str(), pPosOut);
+    }
+
+    static
+    value_type valueFromStringExact(const char* pStr)
+    {
+        std::size_t pos = 0;
+        value_type v = valueFromString(pStr, &pos);
+
+        // У нас должно быть только значение в строке на входе, и, возможно, какие-то пробелы в хвосте. Ничего другого не допустимо
+
+        for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip trailing WS
+        
+        if (*pStr!=0)
+        {
+            throw std::invalid_argument("marty_draw_context::DrawCoord::valueFromStringExact: Failed to convert string to float value");
+        }
+
+        return v;
+    }
+
+    static
+    value_type valueFromStringExact(const std::string &str)
+    {
+        return valueFromStringExact(str.c_str());
+    }
+
     // Преобразование из строки в пару DrawCoord ()
     static
     DrawCoord fromString(const char* pStr, std::size_t* pPosOut = 0)
@@ -269,28 +299,39 @@ struct DrawCoord
         DrawCoord resCoord;
 
         // X
-        resCoord.x = floatFromString<value_type>(pStr, &pos);
+        for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
 
-        pStr += pos;
+        std::size_t
+        pos2 = 0;
+        resCoord.x = floatFromString<value_type>(pStr, &pos2);
+        pos  += pos2;
+        pStr += pos2;
+
         // Y
-        for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
+        for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip leading WS
     
-        // Вообще-то Decimal::fromString сам пробелы хавает, но нам нужно посчитать количество символов
+        // Вообще-то Decimal::fromString сам пробелы хавает, но нам нужно посчитать количество символов. Да и Decimal::fromString не хавает \r\n
     
         if (*pStr==0) // вся строка - одни пробелы
         {
             throw std::invalid_argument("marty_draw_context::DrawCoord::fromString: Failed to convert string to float value: missing Y");
         }
 
-        if (*pStr!=',' && *pStr!=';')
+        // -20+30 или -20-30 - это две компоненты, разделитель ','/';' - отсутствует, признаком разделения на компоненты выступает знак числа.
+        // Такая херня практикуется в формате SVG
+        if (*pStr!=',' && *pStr!=';' && *pStr!='+' && *pStr!='-')
         {
             throw std::invalid_argument("marty_draw_context::DrawCoord::fromString: Failed to convert string to float value: missing x/y separator char (','/';')");
         }
 
-        ++pos;
-        ++pStr;
+        if (*pStr==',' || *pStr==';')
+        {
+            ++pos;
+            ++pStr;
+        }
 
-        std::size_t pos2 = 0;
+        //std::size_t 
+        pos2 = 0;
 
         resCoord.y = floatFromString<value_type>(pStr, &pos2);
 
@@ -497,22 +538,22 @@ struct ViewBox
         vb.leftTop.x = DrawCoord::valueFromString(pStr, &pos);
         posTotal += pos;
         pStr     += pos;
-        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+        for(; *pStr && (*pStr==',' || *pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
 
         vb.leftTop.y = DrawCoord::valueFromString(pStr, &pos);
         posTotal += pos;
         pStr     += pos;
-        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+        for(; *pStr && (*pStr==',' || *pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
 
         vb.size.x = DrawCoord::valueFromString(pStr, &pos);
         posTotal += pos;
         pStr     += pos;
-        for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+        for(; *pStr && (*pStr==',' || *pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
 
         vb.size.y = DrawCoord::valueFromString(pStr, &pos);
         posTotal += pos;
         pStr     += pos;
-        //for(; *pStr && (*pStr==',' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
+        //for(; *pStr && (*pStr==',' || *pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++posTotal) {}
 
         if (pPosOut)
         {
@@ -562,7 +603,7 @@ struct ValueWithDimension
         pStr += pos;
         std::size_t posNoSkipSpaces = pos;
 
-        for(; *pStr && (*pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // удаляем пробелы после числа до юнитов
+        for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // удаляем пробелы после числа до юнитов
 
         if ( *pStr==0 || (*pStr=='+' || *pStr=='-' || (*pStr>='0' && *pStr<='9')) ) // конец строки, или знак или цифра - это следующее число, юнитов нет
         {
@@ -575,7 +616,7 @@ struct ValueWithDimension
             return vd;
         }
 
-        for(; *pStr && (*pStr!=' ' && *pStr!='\t'); ++pStr, ++pos)
+        for(; *pStr && (*pStr!='\r' && *pStr!='\n' && *pStr!=' ' && *pStr!='\t'); ++pStr, ++pos)
         {
             vd.dim.append(1, *pStr);
         }

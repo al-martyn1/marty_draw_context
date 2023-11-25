@@ -1,0 +1,8 @@
+invalid,unknown = -1
+matrix          =  0 // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+translate            // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+scale                // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+rotate               // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+skewX                // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+skewY                // https://www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute
+

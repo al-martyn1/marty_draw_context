@@ -136,6 +136,7 @@ enum class FontStyleFlags : std::uint32_t
     normal       = 0x00,
     none         = 0x00,
     italic       = 0x01,
+    oblique      = 0x01,
     underlined   = 0x02,
     strikeout    = 0x04
 
@@ -156,6 +157,7 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( FontStyleFlags, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::normal       , "normal"     );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::normal       , "none"       );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::italic       , "italic"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::italic       , "oblique"    );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::strikeout    , "strikeout"  );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( FontStyleFlags::underlined   , "underlined" );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( FontStyleFlags, std::map, 1 )

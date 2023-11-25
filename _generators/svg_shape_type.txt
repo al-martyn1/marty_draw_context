@@ -1,0 +1,11 @@
+invalid,unknown                     = -1
+group                               =  0 // https://www.w3.org/TR/SVGTiny12/struct.html#Groups
+path                                     // https://www.w3.org/TR/SVGTiny12/paths.html
+rect                                     // https://www.w3.org/TR/SVGTiny12/shapes.html
+circle                                   // https://www.w3.org/TR/SVGTiny12/shapes.html
+ellipse                                  // https://www.w3.org/TR/SVGTiny12/shapes.html
+line                                     // https://www.w3.org/TR/SVGTiny12/shapes.html
+polyline                                 // https://www.w3.org/TR/SVGTiny12/shapes.html
+polygon                                  // https://www.w3.org/TR/SVGTiny12/shapes.html
+text                                     // https://www.w3.org/TR/SVGTiny12/text.html#TextElement
+textArea                                 // https://www.w3.org/TR/SVGTiny12/text.html#TextAreaElement

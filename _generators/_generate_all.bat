@@ -42,7 +42,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set VERTALIGN_DEF=invalid,alignInvalid=-1;top,alignTop=0;center,alignCenter;bottom,alignBottom
 
 @set FONTSTYLEFLAGS_GEN_FLAGS=        --enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA%
-@set FONTSTYLEFLAGS_DEF=invalid=-1;normal,none=0;italic=1;underlined=2;strikeout=4;
+@set FONTSTYLEFLAGS_DEF=invalid=-1;normal,none=0;italic,oblique=1;underlined=2;strikeout=4;
 
 @set GRADIENTROUNDRECTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %FLAGENUM_EXTRA%
 @set GRADIENTROUNDRECTFLAGS_DEF=invalid,unknown=-1;round,roundBoth,fillFull,none=0;squareBegin;squareEnd;noFillBegin;noFillEnd
@@ -147,12 +147,12 @@ umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_EMF% ^
 @set NS_SVG=--namespace=marty_draw_context/svg
 
 @set SVGPATHSUBCOMMAND_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
-@set SVGPATHSUBCOMMAND_GEN_DEF=invalid,unknown=-1;emf=0x464D4520;eps=0x46535045
+@set SVGSHAPETYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
+@set SVGTRANSFORMTYPE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex
 
 umba-enum-gen %GEN_OPTS% %UINT32% %HEX8% %TPL_OVERRIDE% %NS_SVG% ^
 %SVGPATHSUBCOMMAND_GEN_FLAGS%              -E=PathSubcommand             -F=@svg_path_subcommand.txt ^
+%SVGSHAPETYPE_GEN_FLAGS%                   -E=ShapeType                  -F=@svg_shape_type.txt ^
+%SVGTRANSFORMTYPE_GEN_FLAGS%               -E=TransformType              -F=@svg_transform_type.txt ^
 ..\svg_enums.h
-
-
-
 

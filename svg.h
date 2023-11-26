@@ -16,6 +16,8 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <unordered_set>
+#include <unordered_map>
 
 //----------------------------------------------------------------------------
 
@@ -402,6 +404,8 @@ protected:
     std::string                  id         ;
     std::vector<PathDataEntry>   pathEntries; //!< Если shapeType==ShapeType::path
     std::vector<DrawCoord>       shapeParams; //!< Геометрические параметры всех фигур, кроме path. В зависимости от типа фигуры там лежат разные значения.
+    std::vector<Shape>           groupShapes;
+
 
     void expandShapeParams(std::size_t n, const DrawCoord &defVal = DrawCoord(0,0))
     {
@@ -411,14 +415,68 @@ protected:
         }
     }
 
+    static
+    std::vector<DrawCoord> parseCoordsVectorString(const char* pStr, std::size_t* pPosOut)
+    {
+        std::vector<DrawCoord> resVec;
+
+        std::size_t pos = 0;
+        do
+        {
+            for(; *pStr && (*pStr==',' || *pStr==';' || *pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // remove separators before
+            if (*pStr==0)
+            {
+                break;
+            }
+            std::size_t pos2 = 0;
+            resVec.emplace_back(DrawCoord::fromString(pStr, &pos2));
+            pStr += pos2;
+            pos  += pos2;
+            for(; *pStr && (*pStr=='\r' || *pStr=='\n' || *pStr==' ' || *pStr=='\t'); ++pStr, ++pos) {} // skip WS
+        }
+        while(*pStr!=0);
+
+        if (pPosOut)
+        {
+            *pPosOut = pos;
+        }
+
+        return resVec;
+    }
+
+
 public:
 
     ShapeType                          getShapeType() const { return shapeType  ; }
     std::string                        getId()        const { return id         ; }
     const std::vector<PathDataEntry>&  getPathData()  const { return pathEntries; }
 
+    bool isShapeValid() const
+    {
+        switch(shapeType)
+        {
+            case ShapeType::path     : return isPathValid()    ;
+            case ShapeType::rect     : return isRectValid()    ;
+            case ShapeType::circle   : return isCircleValid()  ;
+            case ShapeType::ellipse  : return isEllipseValid() ;
+            case ShapeType::line     : return isLineValid()    ;
+            case ShapeType::polyline : return isPolylineValid();
+            case ShapeType::polygon  : return isPolygonValid() ;
+
+            case ShapeType::group    : return isGroupValid()   ;
+
+            case ShapeType::text     : [[fallthrough]];
+            case ShapeType::textArea : [[fallthrough]];
+
+            case ShapeType::unknown  : [[fallthrough]];
+
+            default: return false;
+        };
+    }
+
     bool isPathValid() const
     {
+        MARTY_IDC_ASSERT(shapeType==ShapeType::path);
         return pathEntries.size()>0; //TODO: !!! На самом деле надо более комплексную проверку сделать
     }
 
@@ -769,6 +827,12 @@ protected:
         shapeParams.emplace_back(c);
     }
 
+    void setPolylinePoints( const std::vector<DrawCoord> &v )
+    {
+        MARTY_IDC_ASSERT(shapeType==ShapeType::polyline);
+        shapeParams = v;
+    }
+
 public:
 
 
@@ -811,6 +875,13 @@ protected:
         MARTY_IDC_ASSERT(shapeType==ShapeType::polygon);
         shapeParams.emplace_back(c);
     }
+
+    void setPolygonPoints( const std::vector<DrawCoord> &v )
+    {
+        MARTY_IDC_ASSERT(shapeType==ShapeType::polygon);
+        shapeParams = v;
+    }
+
 
 //TODO: !!! text сделаем потом
 
@@ -887,9 +958,7 @@ public:
     static
     Shape fromPathXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
-        //Path path;
         Shape shape;
-
         shape.shapeType = ShapeType::path;
 
         // https://www.w3.org/TR/SVGTiny12/paths.html
@@ -918,7 +987,7 @@ public:
                 else
                 {
                     //TODO: !!! Need to parse other attrs
-                    std::cerr << "  !!! Unknown attr: path:" << attrName << ", value: " << attr.value() << "\n";
+                    std::cerr << "  !!! Unknown attr: path:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
                 }
                 
             }
@@ -932,7 +1001,6 @@ public:
     Shape fromRectXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
         Shape shape;
-
         shape.shapeType = ShapeType::rect;
 
         // https://www.w3.org/TR/SVGTiny12/shapes.html
@@ -990,7 +1058,7 @@ public:
                 {
                     //TODO: !!! Need to parse other attrs
 
-                    std::cerr << "  !!! Unknown attr: rect:" << attrName << ", value: " << attr.value() << "\n";
+                    std::cerr << "  !!! Unknown attr: rect:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
                 }
                 
             }
@@ -1004,7 +1072,6 @@ public:
     Shape fromCircleXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
         Shape shape;
-
         shape.shapeType = ShapeType::circle;
 
         // https://www.w3.org/TR/SVGTiny12/shapes.html
@@ -1020,7 +1087,7 @@ public:
                 //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
                 //cerr << "  - Not SVG attr: " << attr.name() << "\n";
             }
-            else // if ()
+            else
             {
                 if (attrName=="id")
                 {
@@ -1046,7 +1113,7 @@ public:
                 {
                     //TODO: !!! Need to parse other attrs
 
-                    std::cerr << "  !!! Unknown attr: circle:" << attrName << ", value: " << attr.value() << "\n";
+                    std::cerr << "  !!! Unknown attr: circle:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
                 }
 
             }
@@ -1059,12 +1126,61 @@ public:
     static
     Shape fromEllipseXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
-        MARTY_ARG_USED(node);
-        MARTY_ARG_USED(nsPrefixNamespaces);
-
         Shape shape;
-
         shape.shapeType = ShapeType::ellipse;
+
+        pugi::xml_attribute attr = node.first_attribute();
+        for(; attr; attr=attr.next_attribute())
+        {
+            std::string attrName;
+            std::string attrNs = parseXmlAttrName(nsPrefixNamespaces, attr.name(), attrName);
+
+            if (attrNs!=svgNs)
+            {
+                //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
+                //cerr << "  - Not SVG attr: " << attr.name() << "\n";
+            }
+            else
+            {
+                if (attrName=="id")
+                {
+                    shape.id = attr.value();
+                }
+
+                // https://www.w3.org/TR/SVGTiny12/shapes.html
+            
+                // ellipse
+                // cx = "<coordinate>"  The x-axis coordinate of the center of the ellipse. The lacuna value is '0'.
+                // cy = "<coordinate>"  The y-axis coordinate of the center of the ellipse. The lacuna value is '0'.
+                // rx = "<length>"      The x-axis radius of the ellipse. A negative value is unsupported. A value of zero disables rendering of the element. The lacuna value is '0'.
+                // ry = "<length>"      The y-axis radius of the ellipse. A negative value is unsupported. A value of zero disables rendering of the element. The lacuna value is '0'.
+
+                else if (attrName=="cx")
+                {
+                    shape.setEllipseCenterX(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="cy")
+                {
+                    shape.setEllipseCenterY(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="rx")
+                {
+                    shape.setEllipseWidth(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="ry")
+                {
+                    shape.setEllipseHeight(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else
+                {
+                    //TODO: !!! Need to parse other attrs
+
+                    std::cerr << "  !!! Unknown attr: ellipse:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
+                }
+
+            }
+
+        } // for
 
         return shape;
     }
@@ -1072,25 +1188,118 @@ public:
     static
     Shape fromLineXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
-        MARTY_ARG_USED(node);
-        MARTY_ARG_USED(nsPrefixNamespaces);
-
         Shape shape;
-
         shape.shapeType = ShapeType::line;
 
+        pugi::xml_attribute attr = node.first_attribute();
+        for(; attr; attr=attr.next_attribute())
+        {
+            std::string attrName;
+            std::string attrNs = parseXmlAttrName(nsPrefixNamespaces, attr.name(), attrName);
+
+            if (attrNs!=svgNs)
+            {
+                //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
+                //cerr << "  - Not SVG attr: " << attr.name() << "\n";
+            }
+            else
+            {
+                if (attrName=="id")
+                {
+                    shape.id = attr.value();
+                }
+
+                // https://www.w3.org/TR/SVGTiny12/shapes.html
+            
+                // line
+                // x1 = "<coordinate>" The x-axis coordinate of the start of the line. The lacuna value is '0'.
+                // y1 = "<coordinate>" The y-axis coordinate of the start of the line. The lacuna value is '0'.
+                // x2 = "<coordinate>" The x-axis coordinate of the end of the line. The lacuna value is '0'.
+                // y2 = "<coordinate>" The y-axis coordinate of the end of the line. The lacuna value is '0'.
+            
+                else if (attrName=="x1")
+                {
+                    shape.setLineStartX(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="y1")
+                {
+                    shape.setLineStartY(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="x2")
+                {
+                    shape.setLineEndX(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else if (attrName=="y2")
+                {
+                    shape.setLineEndY(DrawCoord::valueFromStringExact(attr.value()));
+                }
+                else
+                {
+                    //TODO: !!! Need to parse other attrs
+
+                    std::cerr << "  !!! Unknown attr: line:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
+                }
+
+            }
+
+        } // for
+     
         return shape;
     }
     
     static
     Shape fromPolylineXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
-        MARTY_ARG_USED(node);
-        MARTY_ARG_USED(nsPrefixNamespaces);
-
         Shape shape;
-
         shape.shapeType = ShapeType::polyline;
+
+        pugi::xml_attribute attr = node.first_attribute();
+        for(; attr; attr=attr.next_attribute())
+        {
+            std::string attrName;
+            std::string attrNs = parseXmlAttrName(nsPrefixNamespaces, attr.name(), attrName);
+
+            if (attrNs!=svgNs)
+            {
+                //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
+                //cerr << "  - Not SVG attr: " << attr.name() << "\n";
+            }
+            else
+            {
+                if (attrName=="id")
+                {
+                    shape.id = attr.value();
+                }
+
+                // https://www.w3.org/TR/SVGTiny12/shapes.html
+            
+                // polyline
+                // points = "<points-data>" The points that make up the polyline. All coordinate values are in the user coordinate system.
+                //                          An empty attribute value (points="") disables rendering of the element. The lacuna value is the empty string.
+                // points="50,375
+                //         150,375 150,325 250,325 250,375
+                //         350,375 350,250 450,250 450,375
+                //         550,375 550,175 650,175 650,375
+                //         750,375 750,100 850,100 850,375
+                //         950,375 950,25 1050,25 1050,375
+                //         1150,375"
+            
+                // void addPolylinePoint( const DrawCoord &c )
+
+                else if (attrName=="points")
+                {
+                    shape.setPolylinePoints(parseCoordsVectorString(attr.value(), 0));
+                }
+                else
+                {
+                    //TODO: !!! Need to parse other attrs
+
+                    std::cerr << "  !!! Unknown attr: polyline:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
+                }
+
+            }
+
+        } // for
 
         return shape;
     }
@@ -1098,22 +1307,323 @@ public:
     static
     Shape fromPolygonXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
     {
-        MARTY_ARG_USED(node);
-        MARTY_ARG_USED(nsPrefixNamespaces);
-
         Shape shape;
-
         shape.shapeType = ShapeType::polygon;
+
+        pugi::xml_attribute attr = node.first_attribute();
+        for(; attr; attr=attr.next_attribute())
+        {
+            std::string attrName;
+            std::string attrNs = parseXmlAttrName(nsPrefixNamespaces, attr.name(), attrName);
+
+            if (attrNs!=svgNs)
+            {
+                //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
+                //cerr << "  - Not SVG attr: " << attr.name() << "\n";
+            }
+            else
+            {
+                if (attrName=="id")
+                {
+                    shape.id = attr.value();
+                }
+
+                // https://www.w3.org/TR/SVGTiny12/shapes.html
+            
+                // polygon
+                // Почти как polyline, но замыкается как path
+                // points = "<points-data>" The points that make up the polygon. 
+                //                          All coordinate values are in the user coordinate system.
+                // points="50,375
+                //         150,375 150,325 250,325 250,375
+                //         350,375 350,250 450,250 450,375
+                //         550,375 550,175 650,175 650,375
+                //         750,375 750,100 850,100 850,375
+                //         950,375 950,25 1050,25 1050,375
+                //         1150,375"
+
+                else if (attrName=="points")
+                {
+                    shape.setPolygonPoints(parseCoordsVectorString(attr.value(), 0));
+                }
+                else
+                {
+                    //TODO: !!! Need to parse other attrs
+
+                    std::cerr << "  !!! Unknown attr: polygon:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
+                }
+
+            }
+
+        } // for
 
         return shape;
     }
-    
+
+
+public:
+
+    // https://www.w3.org/TR/SVGTiny12/struct.html#GElement
+
+    const std::vector<Shape>& getGroupShapes() const
+    {
+        MARTY_IDC_ASSERT(shapeType==ShapeType::group);
+        return groupShapes;
+    }
+
+    bool isGroupValid() const
+    {
+        MARTY_IDC_ASSERT(shapeType==ShapeType::group);
+        return true; //TODO: !!! На самом деле надо более комплексную проверку сделать
+    }
+
+protected:
+
+    static
+    Shape fromGroupXmlNode(pugi::xml_node groupNode, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
+    {
+        Shape shape;
+        shape.shapeType = ShapeType::group;
+
+        pugi::xml_node node = groupNode.first_child();
+        for(; node; node=node.next_sibling())
+        {
+            std::string name;
+            std::string ns = parseXmlTagName(nsPrefixNamespaces, node.name(), name);
+            if (ns!=svgNs)
+            {
+                //cerr << "- Not SVG node: " << node.name() << "\n";
+            }
+            else
+            {
+                shape.groupShapes.emplace_back(fromXmlNode(node, nsPrefixNamespaces));
+                
+            } // if
+
+        } // for node
+
+
+        pugi::xml_attribute attr = node.first_attribute();
+        for(; attr; attr=attr.next_attribute())
+        {
+            std::string attrName;
+            std::string attrNs = parseXmlAttrName(nsPrefixNamespaces, attr.name(), attrName);
+
+            if (attrNs!=svgNs)
+            {
+                //throw std::runtime_error(std::string("marty_draw_context::svg::PathData: unknown"));
+                //cerr << "  - Not SVG attr: " << attr.name() << "\n";
+            }
+            else
+            {
+                if (attrName=="id")
+                {
+                    shape.id = attr.value();
+                }
+
+                // else if (attrName=="points")
+                // {
+                //     shape.setPolygonPoints(parseCoordsVectorString(attr.value(), 0));
+                // }
+                else
+                {
+                    //TODO: !!! Need to parse other attrs
+
+                    std::cerr << "  !!! Unknown attr: g:" << attrName << ", value: " << attr.value() << "\n" << std::flush;
+                }
+
+            }
+
+        } // for attr
+
+
+        return shape;
+    }
+
+
+
+    //typedef Shape (Shape::*ShapeParseNodeMethod)(pugi::xml_node, const std::unordered_map< std::string, std::string > &);
+    typedef Shape (*ShapeParseNodeMethod)(pugi::xml_node, const std::unordered_map< std::string, std::string > &);
+
+
+protected:
+
+    static
+    std::unordered_map<std::string, ShapeParseNodeMethod> makeShapeParseNodeMethodsMap()
+    {
+        std::unordered_map<std::string, ShapeParseNodeMethod>  m;
+
+        m["path"    ] = &Shape::fromPathXmlNode     ;
+        m["rect"    ] = &Shape::fromRectXmlNode     ;
+        m["circle"  ] = &Shape::fromCircleXmlNode   ;
+        m["ellipse" ] = &Shape::fromEllipseXmlNode  ;
+        m["line"    ] = &Shape::fromLineXmlNode     ;
+        m["polyline"] = &Shape::fromPolylineXmlNode ;
+        m["polygon" ] = &Shape::fromPolygonXmlNode  ;
+        m["g"       ] = &Shape::fromGroupXmlNode    ;
+
+        return m;
+    }
+
+    static
+    std::unordered_set<std::string> makeShapeParseNodeMethodsSet()
+    {
+        std::unordered_set<std::string> s;
+
+        const std::unordered_map<std::string, ShapeParseNodeMethod> &m = getShapeParseNodeMethodsMap();
+
+        std::unordered_map<std::string, ShapeParseNodeMethod>::const_iterator mit = m.begin();
+        for(; mit!=m.end(); ++mit)
+        {
+            s.insert(mit->first);
+        }
+
+        return s;
+    }
+
+
+public:
+
+    static
+    const std::unordered_map<std::string, ShapeParseNodeMethod>& getShapeParseNodeMethodsMap()
+    {
+        static std::unordered_map<std::string, ShapeParseNodeMethod> m = makeShapeParseNodeMethodsMap();
+        return m;
+    }
+
+    static
+    const std::unordered_set<std::string>& getShapeParseNodeMethodsSet()
+    {
+        static std::unordered_set<std::string> s = makeShapeParseNodeMethodsSet();
+        return s;
+    }
+
+    static
+    bool isKnownShapeName(const std::string &name)
+    {
+        const std::unordered_set<std::string>& s = getShapeParseNodeMethodsSet();
+        return s.find(name)!=s.end();
+    }
+
+    static
+    Shape fromXmlNode(pugi::xml_node node, const std::unordered_map< std::string, std::string > &nsPrefixNamespaces)
+    {
+        std::string name;
+        std::string ns = parseXmlTagName(nsPrefixNamespaces, node.name(), name);
+        if (ns!=svgNs)
+        {
+            throw std::runtime_error( std::string("Not an SVG node: ") + node.name() );
+        }
+
+        const std::unordered_map<std::string, ShapeParseNodeMethod>& m = getShapeParseNodeMethodsMap();
+
+        std::unordered_map<std::string, ShapeParseNodeMethod>::const_iterator mit = m.find(name);
+        if (mit==m.end())
+        {
+            throw std::runtime_error( std::string("Unknown shape node: ") + name );
+        }
+
+        auto pfn = mit->second;
+
+        return (*pfn)(node, nsPrefixNamespaces);
+
+    }
 
 
 }; // struct Shape
 
+//----------------------------------------------------------------------------
 
 
+
+//----------------------------------------------------------------------------
+using SizeWithDimensions    = marty_draw_context::SizeWithDimensions;
+using ViewBox               = marty_draw_context::ViewBox           ;
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+struct Image
+{
+    SizeWithDimensions    size   ;
+    ViewBox               viewBox;
+
+    std::vector<Shape>    shapes ;
+
+protected:
+
+    static inline const std::string svgNs = "http://www.w3.org/2000/svg";
+
+
+public:
+
+    static
+    Image fromSvgXmlNode(pugi::xml_node svgNode)
+    {
+        Image img;
+
+        std::unordered_map< std::string, std::string > nsPrefixNamespaces; // "svg" -> http://www.w3.org/2000/svg
+
+        pugi::xml_attribute svgAttr = svgNode.first_attribute();
+        for(; svgAttr; svgAttr=svgAttr.next_attribute())
+        {
+            // xmlns:svg="http://www.w3.org/2000/svg"
+
+            std::string name;
+            std::string ns = parseXmlAttrName(svgAttr.name(), name);
+
+            //if (attrParts[0]=="xmlns")
+            if (ns=="xmlns")
+            {
+                nsPrefixNamespaces[name] = svgAttr.value();
+            }
+            else if (name=="width")
+            {
+                img.size.width   = SizeWithDimensions::valueFromString(svgAttr.value() /* , &nextConvertPos */ );
+            }
+            else if (name=="height")
+            {
+                img.size.height  = SizeWithDimensions::valueFromString(svgAttr.value() /* , &nextConvertPos */ );
+            }
+            else if (name=="viewBox")
+            {
+                img.viewBox = ViewBox::fromString(svgAttr.value() /* , &nextConvertPos */ );
+            }
+        }
+
+
+
+        pugi::xml_node node = svgNode.first_child();
+        for(; node; node=node.next_sibling())
+        {
+            std::string name;
+            std::string ns = parseXmlTagName(nsPrefixNamespaces, node.name(), name);
+            if (ns!=svgNs)
+            {
+                //std::cerr << "- Not SVG node: " << node.name() << "\n" << std::flush;
+            }
+            else
+            {
+                if (Shape::isKnownShapeName(name))
+                {
+                    img.shapes.emplace_back(Shape::fromXmlNode(node, nsPrefixNamespaces));
+                }
+                else
+                {
+                    std::cerr << "!!! Unknown tag: " << name << "\n" << std::flush;
+                }
+                
+            } // if
+
+        } // for
+
+        return img;
+    }
+
+
+}; // struct Image
 
 
 } // namespace svg

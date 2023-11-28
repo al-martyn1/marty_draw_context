@@ -1571,13 +1571,20 @@ public:
         {
             // xmlns:svg="http://www.w3.org/2000/svg"
 
+            std::string svgAttrFullName = svgAttr.name();
+            std::string svgAttrValue    = svgAttr.value();
+
             std::string name;
-            std::string ns = parseXmlAttrName(svgAttr.name(), name);
+            std::string ns = parseXmlAttrName(svgAttrFullName, name);
 
             //if (attrParts[0]=="xmlns")
             if (ns=="xmlns")
             {
-                nsPrefixNamespaces[name] = svgAttr.value();
+                nsPrefixNamespaces[name] = svgAttrValue;
+            }
+            else if (ns=="" && name=="xmlns")
+            {
+                nsPrefixNamespaces[std::string()] = svgAttrValue;
             }
             else if (name=="width")
             {

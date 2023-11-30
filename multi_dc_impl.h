@@ -94,18 +94,42 @@ protected:
 
 public:
 
-    MultiDrawContext( MultiDrawContext&& ) = default;
-    MultiDrawContext& operator=( MultiDrawContext&& ) = default;
+    MultiDrawContext( MultiDrawContext&& dcOther )
+        : engineName       (std::move(dcOther.engineName ))
+        , defDc            (std::move(dcOther.defDc      ))
+        , pixelDc          (std::move(dcOther.pixelDc    ))
+        , textDc           (std::move(dcOther.textDc     ))
+        , smoothingDc      (std::move(dcOther.smoothingDc))
+        , m_preciseHandlers(std::move(dcOther.m_preciseHandlers))
+        , m_allUniques     (std::move(dcOther.m_allUniques))
+        , m_firstImpl      (std::move(dcOther.m_firstImpl))
+        , m_drawingPrecise (std::move(dcOther.m_drawingPrecise))
+    {}
+
+    MultiDrawContext& operator=( MultiDrawContext&& dcOther)
+    {
+        engineName        = std::move(dcOther.engineName );
+        defDc             = std::move(dcOther.defDc      );
+        pixelDc           = std::move(dcOther.pixelDc    );
+        textDc            = std::move(dcOther.textDc     );
+        smoothingDc       = std::move(dcOther.smoothingDc);
+        m_preciseHandlers = std::move(dcOther.m_preciseHandlers);
+        m_allUniques      = std::move(dcOther.m_allUniques);
+        m_firstImpl       = std::move(dcOther.m_firstImpl);
+        m_drawingPrecise  = std::move(dcOther.m_drawingPrecise);
+
+        return *this;
+    }
 
     MultiDrawContext()
-    : defDc      (0)
-    , pixelDc    (0)
-    , textDc     (0)
-    , smoothingDc(0)
-    , m_preciseHandlers()
-    , m_allUniques()
-    , m_firstImpl(0)
-    , m_drawingPrecise(DrawingPrecise::defPrecise)
+        : defDc      (0)
+        , pixelDc    (0)
+        , textDc     (0)
+        , smoothingDc(0)
+        , m_preciseHandlers()
+        , m_allUniques()
+        , m_firstImpl(0)
+        , m_drawingPrecise(DrawingPrecise::defPrecise)
     {}
 
     virtual ~MultiDrawContext() override

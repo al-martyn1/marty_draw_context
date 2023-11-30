@@ -361,6 +361,9 @@ public:
 
     void flushBits() override { return getActiveDc()->flushBits(); }
 
+    DrawCoord::value_type distanceBetween( const DrawCoord &pos1, const DrawCoord &pos2 ) const override       { return getActiveDc()->distanceBetween(pos1, pos2); }
+    DrawCoord             reflectPoint   ( const DrawCoord &pos , const DrawCoord &relativeTo ) const override { return getActiveDc()->reflectPoint(pos, relativeTo); }
+
     void setStringEncoding(const std::string &encName) override { return delegateCallAll([&](I& i) { return i.setStringEncoding(encName); }); }
     std::string getStringEncoding() override                    { return getActiveDc()->getStringEncoding(); }
     void logFontsInfo() override                                { getActiveDc()->logFontsInfo(); }

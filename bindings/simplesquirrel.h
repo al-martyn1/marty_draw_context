@@ -336,6 +336,18 @@ struct DrawingCoords
         return DrawingCoords(x/c.x, y/c.y);
     }
 
+    ssq::sqstring toString() const
+    {
+        return marty_simplesquirrel::to_sqstring(
+            marty_draw_context::floatToString(x) + 
+            std::string(",")                     +
+            marty_draw_context::floatToString(x) 
+        );
+    }
+
+    // marty_simplesquirrel::to_sqstring
+    //marty_simplesquirrel::to_sqstring
+
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Coords"))
     {
@@ -359,6 +371,8 @@ struct DrawingCoords
         cls.addFunc( _SC("_unm") , &DrawingCoords::unmImpl);
         cls.addFunc( _SC("_mul") , &DrawingCoords::mulImpl);
         cls.addFunc( _SC("_div") , &DrawingCoords::divImpl);
+
+        cls.addFunc( _SC("toString"), &DrawingCoords::toString);
 
         return cls;
     }
@@ -1809,7 +1823,23 @@ struct DrawingContext
         return pDc->polyQuadraticBezierTo(vec);
     }
 
+    float distanceBetween( DrawingCoords pos1, DrawingCoords pos2)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return 0.0;
 
+        return (float)pDc->distanceBetween(pos1,pos2);
+    }
+
+    DrawingCoords reflectPoint( DrawingCoords pos, DrawingCoords relativeTo)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return DrawingCoords(0,0);
+
+        return DrawingCoords(pDc->reflectPoint(pos,relativeTo));
+    }
 
     // std::vector<DrawCoord> toDrawCoordsVector(ssq::Object &o, const SQChar *paramName) const
     // virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) = 0;
@@ -1839,6 +1869,9 @@ struct DrawingContext
 
         cls.addFunc( _SC("getRawSize")             , &DrawingContext::getRawSize            );
         cls.addFunc( _SC("getSize")                , &DrawingContext::getSize               );
+
+        cls.addFunc( _SC("distanceBetween")        , &DrawingContext::distanceBetween       );
+        cls.addFunc( _SC("reflectPoint")           , &DrawingContext::reflectPoint          );
 
         cls.addFunc( _SC("getResourcesState")      , &DrawingContext::getResourcesState     );
         cls.addFunc( _SC("restoreResourcesState")  , &DrawingContext::restoreResourcesState );
@@ -1985,6 +2018,41 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
     // ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
     ssq::sqstring scriptText; // = 
                       //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
+
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "CallbackResultFlags", ""   , itemSep, enumSep // , knownEnumNames
+                                          , CallbackResultFlags::none               , CallbackResultFlags::repaint       
+                                          , CallbackResultFlags::captureMouse       , CallbackResultFlags::releaseCapture
+                                          , CallbackResultFlags::disableTimerUpdate , CallbackResultFlags::enableTimerUpdate
+                                          )
+                     );
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonEvent", ""   , itemSep, enumSep // , knownEnumNames
+                                          , MouseButtonEvent::released   , MouseButtonEvent::pressed    , MouseButtonEvent::doubleClick
+                                          )
+                     );
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButton", ""   , itemSep, enumSep // , knownEnumNames
+                                          , MouseButton::none
+                                          , MouseButton::leftButton   , MouseButton::rightButton  
+                                          , MouseButton::middleButton , MouseButton::midButton    
+                                          , MouseButton::xButton1     , MouseButton::xButton2
+                                          )
+                     );
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonStateFlags", ""   , itemSep, enumSep // , knownEnumNames
+                                          , MouseButtonStateFlags::none
+                                          , MouseButtonStateFlags::leftButtonPressed   , MouseButtonStateFlags::rightButtonPressed  
+                                          , MouseButtonStateFlags::shiftPressed        , MouseButtonStateFlags::controlPressed      
+                                          , MouseButtonStateFlags::middleButtonPressed , MouseButtonStateFlags::midButtonPressed    
+                                          , MouseButtonStateFlags::xButton1Pressed     , MouseButtonStateFlags::xButton2Pressed     
+                                          )
+                     );
+
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseMoveEventType", ""   , itemSep, enumSep // , knownEnumNames
+                                          , MouseMoveEventType::move , MouseMoveEventType::hover, MouseMoveEventType::leave //, MouseMoveEventType::enter
+                                          )
+                     );
 
     scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizingEventEdge", ""   , itemSep, enumSep // , knownEnumNames
                                           , WindowSizingEventEdge::none       , WindowSizingEventEdge::left       , WindowSizingEventEdge::right

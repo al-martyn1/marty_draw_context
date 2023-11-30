@@ -32,14 +32,10 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Endianness, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Endianness, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Endianness, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "invalid"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "unknown"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "big-endian"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "big_endian"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "bigendian"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "little-endian" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "little_endian" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "littleendian"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "invalid"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "unknown"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "bigendian"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "littleendian" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Endianness, std::map, 1 )
 
 
@@ -67,26 +63,16 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( HorAlign, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( HorAlign, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( HorAlign, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "left"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "align-left"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "align_left"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "alignleft"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "invalid"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "align-invalid" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "align_invalid" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "aligninvalid"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "center"        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "align-center"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "align_center"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "aligncenter"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "right"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align-right"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "align_right"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "alignright"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "width"         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "align-width"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "align_width"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "alignwidth"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "left"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::left      , "alignleft"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "invalid"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::invalid   , "aligninvalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "center"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::center    , "aligncenter"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "right"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::right     , "alignright"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "width"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( HorAlign::width     , "alignwidth"   );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( HorAlign, std::map, 1 )
 
 
@@ -111,22 +97,14 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( VertAlign, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( VertAlign, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( VertAlign, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "invalid"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "align-invalid" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "align_invalid" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "aligninvalid"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "center"        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "align-center"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "align_center"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "aligncenter"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "top"           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "align-top"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "align_top"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "aligntop"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "bottom"        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "align-bottom"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "align_bottom"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "alignbottom"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "invalid"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::invalid   , "aligninvalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "center"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::center    , "aligncenter"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "top"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::top       , "aligntop"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "bottom"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( VertAlign::bottom    , "alignbottom"  );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( VertAlign, std::map, 1 )
 
 
@@ -194,28 +172,16 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( GradientRoundRectFillFlags, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no-fill-begin" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "nofillbegin"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "no_fill_begin" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "invalid"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "unknown"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square-end"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "square_end"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "squareend"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square-begin"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "square_begin"  );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "squarebegin"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "none"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round_both"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round"         );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round-both"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "roundboth"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill-full"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fill_full"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fillfull"      );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no-fill-end"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "nofillend"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "no_fill_end"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillBegin   , "nofillbegin" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "invalid"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::invalid       , "unknown"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareEnd     , "squareend"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::squareBegin   , "squarebegin" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "none"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "round"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "roundboth"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::round         , "fillfull"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( GradientRoundRectFillFlags::noFillEnd     , "nofillend"   );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( GradientRoundRectFillFlags, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(GradientRoundRectFillFlags, std::set)
@@ -707,6 +673,185 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( WindowSizeRequestType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::maxHide     , "maxhide"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( WindowSizeRequestType::maximized   , "maximized" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( WindowSizeRequestType, std::map, 1 )
+
+
+enum class MouseButtonEvent : std::uint32_t
+{
+    invalid       = (std::uint32_t)(-1),
+    unknown       = (std::uint32_t)(-1),
+    released      = 0,
+    pressed       = 1,
+    doubleClick   = 2
+
+}; // enum class MouseButtonEvent : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseButtonEvent, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::doubleClick   , "DoubleClick" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::invalid       , "Invalid"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::released      , "Released"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::pressed       , "Pressed"     );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( MouseButtonEvent, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( MouseButtonEvent, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButtonEvent::doubleClick   , "doubleclick" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButtonEvent::invalid       , "invalid"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButtonEvent::invalid       , "unknown"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButtonEvent::released      , "released"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButtonEvent::pressed       , "pressed"     );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( MouseButtonEvent, std::map, 1 )
+
+
+enum class MouseButton : std::uint32_t
+{
+    invalid        = (std::uint32_t)(-1),
+    unknown        = (std::uint32_t)(-1),
+    none           = 0,
+    leftButton     = 1,
+    rightButton    = 2,
+    middleButton   = 3,
+    midButton      = 3,
+    xButton1       = 4,
+    xButton2       = 5
+
+}; // enum class MouseButton : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseButton, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::invalid        , "Invalid"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::none           , "None"         );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::middleButton   , "MiddleButton" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::leftButton     , "LeftButton"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::rightButton    , "RightButton"  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::xButton1       , "XButton1"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::xButton2       , "XButton2"     );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( MouseButton, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( MouseButton, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::invalid        , "invalid"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::invalid        , "unknown"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::none           , "none"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::middleButton   , "middlebutton" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::middleButton   , "midbutton"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::leftButton     , "leftbutton"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::rightButton    , "rightbutton"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::xButton1       , "xbutton1"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseButton::xButton2       , "xbutton2"     );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( MouseButton, std::map, 1 )
+
+
+enum class MouseButtonStateFlags : std::uint32_t
+{
+    invalid               = (std::uint32_t)(-1),
+    unknown               = (std::uint32_t)(-1),
+    none                  = 0x00000000,
+    leftButtonPressed     = 0x00000001,
+    rightButtonPressed    = 0x00000002,
+    shiftPressed          = 0x00000004,
+    controlPressed        = 0x00000008,
+    middleButtonPressed   = 0x00000010,
+    midButtonPressed      = 0x00000010,
+    xButton1Pressed       = 0x00000020,
+    xButton2Pressed       = 0x00000040
+
+}; // enum class MouseButtonStateFlags : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_FLAGS(MouseButtonStateFlags)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( MouseButtonStateFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::xButton1Pressed       , "XButton1Pressed"     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::invalid               , "Invalid"             );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::none                  , "None"                );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::middleButtonPressed   , "MiddleButtonPressed" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::leftButtonPressed     , "LeftButtonPressed"   );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::rightButtonPressed    , "RightButtonPressed"  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::shiftPressed          , "ShiftPressed"        );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::controlPressed        , "ControlPressed"      );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( MouseButtonStateFlags::xButton2Pressed       , "XButton2Pressed"     );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( MouseButtonStateFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( MouseButtonStateFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::xButton1Pressed       , "xbutton1pressed"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::invalid               , "invalid"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::invalid               , "unknown"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::none                  , "none"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::middleButtonPressed   , "middlebuttonpressed" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::middleButtonPressed   , "midbuttonpressed"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::leftButtonPressed     , "leftbuttonpressed"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::rightButtonPressed    , "rightbuttonpressed"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::shiftPressed          , "shiftpressed"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::controlPressed        , "controlpressed"      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( MouseButtonStateFlags::xButton2Pressed       , "xbutton2pressed"     );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( MouseButtonStateFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(MouseButtonStateFlags, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(MouseButtonStateFlags, std::set)
+
+
+enum class MouseMoveEventType : std::uint32_t
+{
+    invalid   = (std::uint32_t)(-1),
+    unknown   = (std::uint32_t)(-1),
+    move      = 0,
+    hover     = 1,
+    leave     = 2
+
+}; // enum class MouseMoveEventType : std::uint32_t
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseMoveEventType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseMoveEventType::leave     , "Leave"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseMoveEventType::invalid   , "Invalid" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseMoveEventType::move      , "Move"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseMoveEventType::hover     , "Hover"   );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( MouseMoveEventType, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( MouseMoveEventType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseMoveEventType::leave     , "leave"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseMoveEventType::invalid   , "invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseMoveEventType::invalid   , "unknown" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseMoveEventType::move      , "move"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( MouseMoveEventType::hover     , "hover"   );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( MouseMoveEventType, std::map, 1 )
+
+
+enum class CallbackResultFlags : std::uint32_t
+{
+    invalid              = (std::uint32_t)(-1),
+    unknown              = (std::uint32_t)(-1),
+    none                 = 0x00000000,
+    repaint              = 0x00000001,
+    captureMouse         = 0x00000002,
+    releaseCapture       = 0x00000004,
+    disableTimerUpdate   = 0x00000008,
+    enableTimerUpdate    = 0x00000010
+
+}; // enum class CallbackResultFlags : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_FLAGS(CallbackResultFlags)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( CallbackResultFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::captureMouse         , "CaptureMouse"       );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::invalid              , "Invalid"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::none                 , "None"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::releaseCapture       , "ReleaseCapture"     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::repaint              , "Repaint"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::disableTimerUpdate   , "DisableTimerUpdate" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( CallbackResultFlags::enableTimerUpdate    , "EnableTimerUpdate"  );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( CallbackResultFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( CallbackResultFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::captureMouse         , "capturemouse"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::invalid              , "invalid"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::invalid              , "unknown"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::none                 , "none"               );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::releaseCapture       , "releasecapture"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::repaint              , "repaint"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::disableTimerUpdate   , "disabletimerupdate" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( CallbackResultFlags::enableTimerUpdate    , "enabletimerupdate"  );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( CallbackResultFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(CallbackResultFlags, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(CallbackResultFlags, std::set)
 
 } // namespace marty_draw_context
 

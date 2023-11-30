@@ -201,6 +201,8 @@ struct IDrawContext
     virtual DcResourcesState getResourcesState() = 0;
     virtual void restoreResourcesState(const DcResourcesState &rcState) = 0;
 
+    virtual DrawCoord::value_type distanceBetween( const DrawCoord &pos1, const DrawCoord &pos2 ) const = 0;
+    virtual DrawCoord             reflectPoint   ( const DrawCoord &pos , const DrawCoord &relativeTo ) const = 0;
 
     virtual float_t getFitFontHeight(const DrawSize &boxSize) = 0;
     virtual float_t getAwgFontWidth(const FontParamsA &fp) = 0;

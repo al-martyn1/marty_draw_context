@@ -61,62 +61,26 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( PathSubcommand, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( PathSubcommand, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( PathSubcommand, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToAbs      , "cubic-bezier-reflected-cp-to-abs"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToAbs      , "cubic_bezier_reflected_cp_to_abs"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToAbs      , "cubicbezierreflectedcptoabs"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::invalid                          , "invalid"                              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::invalid                          , "unknown"                              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertAbs                    , "line-to-vert-abs"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertAbs                    , "line_to_vert_abs"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertAbs                    , "linetovertabs"                        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToAbs                        , "move-to-abs"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToAbs                        , "move_to_abs"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToAbs                        , "movetoabs"                            );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePath                        , "close-path"                           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePath                        , "close_path"                           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePath                        , "closepath"                            );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertRel                    , "line-to-vert-rel"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertRel                    , "line_to_vert_rel"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertRel                    , "linetovertrel"                        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToRel                        , "move-to-rel"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToRel                        , "move_to_rel"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToRel                        , "movetorel"                            );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePathZ                       , "close-path-z"                         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePathZ                       , "close_path_z"                         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePathZ                       , "closepathz"                           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToAbs                        , "line-to-abs"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToAbs                        , "line_to_abs"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToAbs                        , "linetoabs"                            );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToRel                        , "line-to-rel"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToRel                        , "line_to_rel"                          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToRel                        , "linetorel"                            );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorAbs                     , "line-to-hor-abs"                      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorAbs                     , "line_to_hor_abs"                      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorAbs                     , "linetohorabs"                         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorRel                     , "line-to-hor-rel"                      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorRel                     , "line_to_hor_rel"                      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorRel                     , "linetohorrel"                         );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToAbs                 , "cubic-bezier-to-abs"                  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToAbs                 , "cubic_bezier_to_abs"                  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToAbs                 , "cubicbeziertoabs"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToRel                 , "cubic-bezier-to-rel"                  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToRel                 , "cubic_bezier_to_rel"                  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToRel                 , "cubicbeziertorel"                     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToRel      , "cubic-bezier-reflected-cp-to-rel"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToRel      , "cubic_bezier_reflected_cp_to_rel"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToRel      , "cubicbezierreflectedcptorel"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToAbs             , "quadratic-bezier-to-abs"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToAbs             , "quadratic_bezier_to_abs"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToAbs             , "quadraticbeziertoabs"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToRel             , "quadratic-bezier-to-rel"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToRel             , "quadratic_bezier_to_rel"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToRel             , "quadraticbeziertorel"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToAbs  , "quadratic-bezier-reflected-cp-to-abs" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToAbs  , "quadratic_bezier_reflected_cp_to_abs" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToAbs  , "quadraticbezierreflectedcptoabs"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToRel  , "quadratic-bezier-reflected-cp-to-rel" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToRel  , "quadratic_bezier_reflected_cp_to_rel" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToRel  , "quadraticbezierreflectedcptorel"      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToAbs      , "cubicbezierreflectedcptoabs"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::invalid                          , "invalid"                         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::invalid                          , "unknown"                         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertAbs                    , "linetovertabs"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToAbs                        , "movetoabs"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePath                        , "closepath"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToVertRel                    , "linetovertrel"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::moveToRel                        , "movetorel"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::closePathZ                       , "closepathz"                      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToAbs                        , "linetoabs"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToRel                        , "linetorel"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorAbs                     , "linetohorabs"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::lineToHorRel                     , "linetohorrel"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToAbs                 , "cubicbeziertoabs"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierToRel                 , "cubicbeziertorel"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToRel      , "cubicbezierreflectedcptorel"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToAbs             , "quadraticbeziertoabs"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierToRel             , "quadraticbeziertorel"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToAbs  , "quadraticbezierreflectedcptoabs" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( PathSubcommand::quadraticBezierReflectedCpToRel  , "quadraticbezierreflectedcptorel" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( PathSubcommand, std::map, 1 )
 
 
@@ -152,20 +116,18 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ShapeType, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ShapeType, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ShapeType, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::invalid    , "invalid"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::invalid    , "unknown"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::group      , "group"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::path       , "path"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::rect       , "rect"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::line       , "line"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::ellipse    , "ellipse"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::circle     , "circle"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::polyline   , "polyline"  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::polygon    , "polygon"   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::text       , "text"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::textArea   , "text-area" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::textArea   , "text_area" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::textArea   , "textarea"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::invalid    , "invalid"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::invalid    , "unknown"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::group      , "group"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::path       , "path"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::rect       , "rect"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::line       , "line"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::ellipse    , "ellipse"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::circle     , "circle"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::polyline   , "polyline" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::polygon    , "polygon"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::text       , "text"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ShapeType::textArea   , "textarea" );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ShapeType, std::map, 1 )
 
 
@@ -196,13 +158,9 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( TransformType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::invalid     , "invalid"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::invalid     , "unknown"   );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::matrix      , "matrix"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewX       , "skew-x"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewX       , "skew_x"    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewX       , "skewx"     );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::translate   , "translate" );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::scale       , "scale"     );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewY       , "skew-y"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewY       , "skew_y"    );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::skewY       , "skewy"     );
     MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TransformType::rotate      , "rotate"    );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( TransformType, std::map, 1 )

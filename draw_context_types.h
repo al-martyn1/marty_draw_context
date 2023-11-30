@@ -119,7 +119,6 @@ double floatFromString<double>( const char* pStr, std::size_t* pPosOut )
     return floatFromString<double>(std::string(pStr), pPosOut);
 }
 
-
 template<>
 marty::Decimal floatFromString<marty::Decimal>( const char* pStr, std::size_t* pPosOut )
 {
@@ -188,10 +187,34 @@ marty::Decimal floatFromString<marty::Decimal>( const std::string &str, std::siz
     return floatFromString<marty::Decimal>(str.c_str(), pPosOut);
 }
 
+//----------------------------------------------------------------------------
+
 
 
 //----------------------------------------------------------------------------
+inline
+std::string floatToString(float v)
+{
+    return std::to_string(v);
+}
 
+inline
+std::string floatToString(double v)
+{
+    return std::to_string(v);
+}
+
+inline
+std::string floatToString(const marty::Decimal &v)
+{
+    return v.toString();
+}
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
 struct DrawCoord;
 
 DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 );

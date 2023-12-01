@@ -104,7 +104,9 @@ public:
         , m_allUniques     (std::move(dcOther.m_allUniques))
         , m_firstImpl      (std::move(dcOther.m_firstImpl))
         , m_drawingPrecise (std::move(dcOther.m_drawingPrecise))
-    {}
+    {
+        dcOther.m_drawingPrecise = DrawingPrecise::defPrecise; // ресетим dcOther.m_drawingPrecise
+    }
 
     MultiDrawContext& operator=( MultiDrawContext&& dcOther)
     {
@@ -117,6 +119,8 @@ public:
         m_allUniques      = std::move(dcOther.m_allUniques);
         m_firstImpl       = std::move(dcOther.m_firstImpl);
         m_drawingPrecise  = std::move(dcOther.m_drawingPrecise);
+
+        dcOther.m_drawingPrecise = DrawingPrecise::defPrecise; // ресетим dcOther.m_drawingPrecise
 
         return *this;
     }

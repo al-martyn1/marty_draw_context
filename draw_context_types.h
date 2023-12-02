@@ -387,9 +387,17 @@ struct DrawCoord
 
     value_type distanceTo(const DrawCoord& other) const
     {
-        if (x==other.x)      return std::abs(y-other.y);
-        else if (y==other.y) return std::abs(x-other.x);
-        else return std::sqrt(x*other.x+y*other.y);
+        // if (x==other.x)      return std::abs(y-other.y);
+        // else if (y==other.y) return std::abs(x-other.x);
+        // else 
+        // {
+        //  
+        // }
+        
+        auto dx = x-other.x;
+        auto dy = y-other.y;
+
+        return std::sqrt(dx*dx+dy*dy);
     }
 
     DrawCoord reflectTo(const DrawCoord& relativeTo) const

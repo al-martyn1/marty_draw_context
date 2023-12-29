@@ -333,6 +333,16 @@ struct DrawingCoords
 
     DrawingCoords divImpl(DrawingCoords c)
     {
+        //RuntimeException(const char* msg, const char* source, const char* func, int line):Exception(msg) {
+        if (c.x==0 || c.y==0)
+        {
+            throw ssq::RuntimeException( c.x==0 ? "division by zero (DrawingCoords.x)" : "division by zero (DrawingCoords.y)"
+                                       , "somehere in '.nut' files"
+                                       , "DrawingCoords._div"
+                                       , 0
+                                       );
+        }
+
         return DrawingCoords(x/c.x, y/c.y);
     }
 
@@ -373,6 +383,8 @@ struct DrawingCoords
         cls.addFunc( _SC("_div") , &DrawingCoords::divImpl);
 
         cls.addFunc( _SC("toString"), &DrawingCoords::toString);
+        cls.addFunc( _SC("tostring"), &DrawingCoords::toString);
+        cls.addFunc( _SC("_tostring"), &DrawingCoords::toString);
 
         return cls;
     }

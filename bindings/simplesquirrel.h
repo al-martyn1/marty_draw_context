@@ -2019,7 +2019,7 @@ struct DrawingContext
 
 //----------------------------------------------------------------------------
 inline
-ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationType generationType /* char itemSep, char enumSep */
+ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationOptions generationOptions /* char itemSep, char enumSep */
                                    //, std::set<ssq::sqstring> *pKnownEnumNames = 0
                                    , const std::string &prefix = "Drawing"
                                    )
@@ -2038,19 +2038,19 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
                       //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
 
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "CallbackResultFlags", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "CallbackResultFlags", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , CallbackResultFlags::none               , CallbackResultFlags::repaint       
                                           , CallbackResultFlags::captureMouse       , CallbackResultFlags::releaseCapture
                                           , CallbackResultFlags::disableTimerUpdate , CallbackResultFlags::enableTimerUpdate
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonEvent", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonEvent", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButtonEvent::released   , MouseButtonEvent::pressed    , MouseButtonEvent::doubleClick
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButton", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButton", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButton::none
                                           , MouseButton::leftButton   , MouseButton::rightButton  
                                           , MouseButton::middleButton , MouseButton::midButton    
@@ -2058,7 +2058,7 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonStateFlags", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonStateFlags", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButtonStateFlags::none
                                           , MouseButtonStateFlags::leftButtonPressed   , MouseButtonStateFlags::rightButtonPressed  
                                           , MouseButtonStateFlags::shiftPressed        , MouseButtonStateFlags::controlPressed      
@@ -2067,39 +2067,39 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseMoveEventType", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseMoveEventType", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseMoveEventType::move , MouseMoveEventType::hover, MouseMoveEventType::leave //, MouseMoveEventType::enter
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizingEventEdge", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizingEventEdge", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , WindowSizingEventEdge::none       , WindowSizingEventEdge::left       , WindowSizingEventEdge::right
                                           , WindowSizingEventEdge::top        , WindowSizingEventEdge::topLeft    , WindowSizingEventEdge::topRigh
                                           , WindowSizingEventEdge::bottom     , WindowSizingEventEdge::bottomLeft , WindowSizingEventEdge::bottomRight
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizeRequestType", ""   , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizeRequestType", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , WindowSizeRequestType::restored , WindowSizeRequestType::minimized, WindowSizeRequestType::maximized, WindowSizeRequestType::maxShow, WindowSizeRequestType::maxHide
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "VertAlign", ""       , generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "VertAlign", ""       , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , VertAlign::top, VertAlign::center, VertAlign::bottom
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
                                           , GradientRoundRectFillFlags::squareEnd
@@ -2108,23 +2108,23 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
                                           , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , GradientType::vertical, GradientType::horizontal
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , LineType::diagonal, LineType::vertical, LineType::horizontal
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawTextFlags" , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawTextFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , DrawTextFlags::none                     , DrawTextFlags::calcOnly                 , DrawTextFlags::fitGlyphStartPos
                                           , DrawTextFlags::fitWidthDisable          , DrawTextFlags::fitHeightStartPos        , DrawTextFlags::fitHeightDisable
                                           , DrawTextFlags::endEllipsis              , DrawTextFlags::pathEllipsis             , DrawTextFlags::wordEllipsis
@@ -2146,17 +2146,17 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
     //                                       )
     //                  );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", generationType // itemSep, enumSep// , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", generationOptions // itemSep, enumSep// , knownEnumNames
                                           , LineJoinStyle::bevel, LineJoinStyle::mitter, LineJoinStyle::round
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , BkMode::opaque, BkMode::transparent
                                           )
                      );
@@ -2171,18 +2171,18 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
     //                                       )
     //                  );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , SmoothingMode::defMode, SmoothingMode::highSpeed, SmoothingMode::highQuality, SmoothingMode::noSmoothing, SmoothingMode::antiAlias
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", generationType // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , DrawingPrecise::defPrecise, DrawingPrecise::pixelPrecise, DrawingPrecise::textPrecise, DrawingPrecise::smoothingPrecise
                                           )
                      );
 
     scriptText.append(
-                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , generationType // enumSep /* itemSep */ , enumSep // , knownEnumNames
+                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , generationOptions // enumSep /* itemSep */ , enumSep // , knownEnumNames
                                           , EColorRawEnum::AliceBlue       , EColorRawEnum::AntiqueWhite   , EColorRawEnum::Aqua             , EColorRawEnum::Aquamarine          
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               
@@ -2236,10 +2236,10 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationT
 
 //----------------------------------------------------------------------------
 inline
-void exposeEnums(ssq::VM &vm, marty_simplesquirrel::EnumScriptGenerationType generationType, const std::string &prefix = "Drawing")
+void exposeEnums(ssq::VM &vm, const marty_simplesquirrel::EnumScriptGenerationOptions& generationOptions, const std::string &prefix = "Drawing")
 {
     //ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', 0, prefix);
-    ssq::sqstring scriptText = enumsExposeMakeScript(generationType, prefix);
+    ssq::sqstring scriptText = enumsExposeMakeScript(generationOptions, prefix);
     ssq::Script script = vm.compileSource(scriptText.c_str());
     vm.run(script);
 }
@@ -2451,11 +2451,11 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
 
 //----------------------------------------------------------------------------
 template<typename TVM>
-ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns)
+ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns, const marty_simplesquirrel::EnumScriptGenerationOptions &generationOptions)
 {
     //ssq::sqstring preparedScriptText1 = marty_draw_context::simplesquirrel::prepareScriptEnums(scriptText, ns, true);
     std::set<ssq::sqstring> knownEnumNames;
-    ssq::sqstring preparedScriptText1 = enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationType::multiLineScript // ' ', ';'
+    ssq::sqstring preparedScriptText1 = enumsExposeMakeScript( generationOptions
                                                              //, &knownEnumNames
                                                              , ns /* prefix */
                                                              );

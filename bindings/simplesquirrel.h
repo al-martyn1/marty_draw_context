@@ -2085,6 +2085,7 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                      );
 
     scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , generationOptions // itemSep, enumSep // , knownEnumNames
+                                          //, std::vector<std::pair<std::string, int> >{ {"AlignLeft", HorAlign::alignLeft}, {"AlignCenter", HorAlign::alignCenter}, {"AlignRight", HorAlign::alignRight}, {"AlignWidth", HorAlign::alignWidth} }
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           )
                      );
@@ -2108,7 +2109,13 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", generationOptions // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "FontWeight"     , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"Ultralight", (int)FontWeight::ultralight}
+                                                                                     , {"Regular"   , (int)FontWeight::regular}
+                                                                                     , {"Demibold"  , (int)FontWeight::demibold}
+                                                                                     , {"Ultrabold" , (int)FontWeight::ultrabold}
+                                                                                     , {"Black"     , (int)FontWeight::black}
+                                                                                     }
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
                                           , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
                                           )
@@ -2124,7 +2131,11 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawTextFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "DrawTextFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"DefMode", (int)DrawTextFlags::defMode}
+                                                                                     , {"FitGlyphEntire", (int)DrawTextFlags::fitGlyphEntire}
+                                                                                     , {"FitGlyphDefault", (int)DrawTextFlags::fitGlyphDefault}
+                                                                                     }
                                           , DrawTextFlags::none                     , DrawTextFlags::calcOnly                 , DrawTextFlags::fitGlyphStartPos
                                           , DrawTextFlags::fitWidthDisable          , DrawTextFlags::fitHeightStartPos        , DrawTextFlags::fitHeightDisable
                                           , DrawTextFlags::endEllipsis              , DrawTextFlags::pathEllipsis             , DrawTextFlags::wordEllipsis
@@ -2135,18 +2146,17 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                                           )
                      );
 
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "LineDirection"    , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"FromTopToBottom" , (int)LineDirection::fromTopToBottom}
+                                                                                     , {"FromBottomToTop" , (int)LineDirection::fromBottomToTop}
+                                                                                     }
+                                          , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
+                                          )
+                     );
 
-    // Автоматом в алиасы генератор не умеет, запилил руцами
-    //scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
-    scriptText.append(_SC("class "));
-    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
-    scriptText.append(_SC(".LineDirection{static FromLeftToRight=0; static FromTopToBottom=0; static FromRightToLeft=1; static FromBottomToTop=1; };"));
-    // scriptText.append(makeEnumScriptString( prefix, "LineDirection"   , itemSep, enumSep, knownEnumNames
-    //                                       , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
-    //                                       )
-    //                  );
-
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "LineEndcapStyle"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"Butt" , (int)LineEndcapStyle::butt}
+                                                                                     }
                                           , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
                                           )
                      );
@@ -2161,17 +2171,19 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                                           )
                      );
 
-    // Автоматом в алиасы генератор не умеет, запилил руцами
-    //scriptText.append(_SC("enum ArcDirection{Cw=0 Clockwise=0 Ccw=1 CounterClockwise=1};"));
-    scriptText.append(_SC("class "));
-    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
-    scriptText.append(_SC(".ArcDirection{static Cw=0; static Clockwise=0; static Ccw=1; static CounterClockwise=1; };"));
-    // scriptText.append(makeEnumScriptString( prefix, "ArcDirectionEnum"   , itemSep, enumSep, knownEnumNames
-    //                                       , ArcDirectionEnum::Cw, ArcDirectionEnum::Cсw
-    //                                       )
-    //                  );
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "ArcDirection"  , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"CounterClockwise" , (int)ArcDirectionEnum::CounterClockwise}
+                                                                                     , {"Clockwise"        , (int)ArcDirectionEnum::Clockwise}
+                                                                                     }
+                                          , ArcDirectionEnum::Ccw, ArcDirectionEnum::Cw
+                                          )
+                     );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "SmoothingMode" , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"LowQuality" , (int)SmoothingMode::lowQuality}
+                                                                                     , {"LowSpeed"   , (int)SmoothingMode::lowSpeed}
+                                                                                     , {"None"       , (int)SmoothingMode::none}
+                                                                                     }
                                           , SmoothingMode::defMode, SmoothingMode::highSpeed, SmoothingMode::highQuality, SmoothingMode::noSmoothing, SmoothingMode::antiAlias
                                           )
                      );

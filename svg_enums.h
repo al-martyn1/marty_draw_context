@@ -38,6 +38,8 @@ enum class PathSubcommand : std::uint32_t
 
 }; // enum class PathSubcommand : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(PathSubcommand)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( PathSubcommand, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( PathSubcommand::cubicBezierReflectedCpToAbs      , "CubicBezierReflectedCpToAbs"     );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( PathSubcommand::invalid                          , "Invalid"                         );
@@ -101,6 +103,8 @@ enum class ShapeType : std::uint32_t
 
 }; // enum class ShapeType : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(ShapeType)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ShapeType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ShapeType::invalid    , "Invalid"  );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ShapeType::group      , "Group"    );
@@ -143,6 +147,8 @@ enum class TransformType : std::uint32_t
     skewY       = 0x00000005 /*!< https=//www.w3.org/TR/SVGTiny12/coords.html#TransformAttribute */
 
 }; // enum class TransformType : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(TransformType)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( TransformType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( TransformType::invalid     , "Invalid"   );

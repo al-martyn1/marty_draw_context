@@ -2172,10 +2172,10 @@ ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationO
                      );
 
     scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "ArcDirection"  , "", generationOptions // itemSep, enumSep // , knownEnumNames
-                                          , std::vector<std::pair<std::string, int> >{ {"CounterClockwise" , (int)ArcDirectionEnum::CounterClockwise}
-                                                                                     , {"Clockwise"        , (int)ArcDirectionEnum::Clockwise}
+                                          , std::vector<std::pair<std::string, int> >{ {"Ccw" , (int)ArcDirectionEnum::Ccw}
+                                                                                     , {"Cw"  , (int)ArcDirectionEnum::Cw}
                                                                                      }
-                                          , ArcDirectionEnum::Ccw, ArcDirectionEnum::Cw
+                                          , ArcDirectionEnum::CounterClockwise, ArcDirectionEnum::Clockwise
                                           )
                      );
 

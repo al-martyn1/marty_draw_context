@@ -32,7 +32,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @rem flags,
 
 @set ENDIANNESS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL%
-@set ENDIANNESS_DEF=invalid,unknown=-1;littleEndian=0;bigEndian=1
+@set ENDIANNESS_DEF=invalid,unknown=-1;littleEndian=0;bigEndian,networkByteOrder=1
 
 
 @set HORALIGN_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL%
@@ -69,7 +69,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set BKMODE_DEF=invalid,unknown=-1;transparent=1;opaque=2
 
 @set ARCDIRECTION_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_PASCAL% %SERIALIZE_PASCAL%
-@set ARCDIRECTION_DEF=invalid,unknown=-1;CounterClockwise,Ccw=1;Clockwise,Cw=2
+@set ARCDIRECTION_DEF=invalid,unknown=-1;Clockwise,Cw=0;CounterClockwise,Ccw=1
 
 @set SMOOTHINGMODE_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class %VALUES_CAMEL% %SERIALIZE_PASCAL%
 @set SMOOTHINGMODE_DEF=invalid,unknown=-1;defMode=0;highSpeed,lowQuality=1;highQuality,lowSpeed=2;noSmoothing,none=3;antiAlias=4

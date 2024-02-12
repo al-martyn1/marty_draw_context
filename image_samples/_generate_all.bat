@@ -1,0 +1,10 @@
+@set CMN_OPTS=--mime --overwrite -q --size --bin --array 
+@rem --static
+
+umba-2c %CMN_OPTS% bulb01.ico     bulb01_ico.cpp
+umba-2c %CMN_OPTS% bulb02.ico     bulb02_ico.cpp
+umba-2c %CMN_OPTS% bulb03.ico     bulb03_ico.cpp
+umba-2c %CMN_OPTS% bulb04.ico     bulb04_ico.cpp
+umba-2c %CMN_OPTS% bulb01_16.png  bulb01_16_png.cpp
+umba-2c %CMN_OPTS% bulb01_32.png  bulb01_32_png.cpp
+umba-2c %CMN_OPTS% bulb01_96.png  bulb01_96_png.cpp

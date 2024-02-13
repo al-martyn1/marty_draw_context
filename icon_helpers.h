@@ -265,9 +265,9 @@ bool findIconInDirectory( const std::vector<std::uint8_t> &iconsDirectoryRawData
 
         int dDelta = d - distances[i];
 
-        if (maxDelta<dDelta)
+        if (minDelta<dDelta)
         {
-            maxDelta    = dDelta;
+            minDelta    = dDelta;
             idxFoundDelta = i;
         }
     }

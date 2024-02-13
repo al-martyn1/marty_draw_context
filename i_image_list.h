@@ -1,3 +1,4 @@
+#pragma once
 
 #include <exception>
 #include <stdexcept>
@@ -5,6 +6,7 @@
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <sstream>
 
 #include "marty_decimal/marty_decimal.h"
 
@@ -29,7 +31,40 @@ struct ImageSize
     int width ; // xSize
     int height; // ySize
 
-};
+
+    int sizeDistance() const
+    {
+        return (int)(0.5+std::sqrt((double)(width*width + height*height)));
+    }
+
+    bool isVertical() const
+    {
+        return width > height
+               ? false  // horizontal - ширина больше высоты - горизонтальная картинка
+               : true   // vertiacal
+               ;
+    }
+
+    double vhScale() const // коэффициент вертикальности, >1 - вертикально, <1 - горизонтально
+    {
+        if (width==0)
+        {
+            return (double)1.0;
+        }
+
+        return (double)height / (double)width;
+    }
+
+    std::string toString() const
+    {
+        std::ostringstream oss;
+        oss << width << "," << height;
+        return oss.str();
+    }
+
+
+}; // struct ImageSize
+
 //----------------------------------------------------------------------------
 
 
@@ -52,8 +87,8 @@ struct IImageList
     virtual std::size_t getNumberOfImagesByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType) = 0;
     virtual std::size_t getNumberOfImagesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     ) = 0;
 
-    virtual std::size_t findBestFitImageByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize *pFoundSize=0) = 0;
-    virtual std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize *pFoundSize=0) = 0;
+    virtual std::size_t findBestFitImageByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
+    virtual std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
 
     // Возвращает индекс нового изображения в списке, или <0
     virtual int addImageByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, std::size_t imageIdx) = 0;

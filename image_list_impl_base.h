@@ -20,12 +20,12 @@ struct ImageListImplBase : public IImageList
         return getNumberOfImagesByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext));
     }
 
-    std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize *pFoundSize=0) override
+    std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize requestedSize, ImageSize *pFoundSize=0) override
     {
-        return findBestFitImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), pFoundSize);
+        return findBestFitImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), requestedSize, pFoundSize);
     }
 
-    virtual int addImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , std::size_t imageIdx) override
+    virtual int addImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, std::size_t imageIdx) override
     {
         return addImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), imageIdx);
     }

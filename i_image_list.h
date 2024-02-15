@@ -69,6 +69,15 @@ struct ImageSize
 
 
 
+struct ImageListImageInfo
+{
+    ImageSize            imageSize;
+    std::string          mimeType ;
+
+}; // struct ImageListImageInfo
+
+
+typedef const ImageListImageInfo* ImageListImageInfoConstPtr;
 
 
 //----------------------------------------------------------------------------
@@ -78,6 +87,14 @@ struct IImageList
 
     virtual ~IImageList() {}
 
+
+
+    virtual void clear() = 0;
+    virtual int  size()  const = 0;
+    virtual bool empty() const = 0;
+
+
+    virtual bool getImageInfo( int imageIdx, ImageListImageInfo *pInfo ) const = 0;
 
     // Файл/данные изображения могут содержать коллекцию изображений, как разного размера (.ico), так и одинакового (.gif)
 
@@ -91,8 +108,11 @@ struct IImageList
     virtual std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
 
     // Возвращает индекс нового изображения в списке, или <0
-    virtual int addImageByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, std::size_t imageIdx) = 0;
-    virtual int addImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , std::size_t imageIdx) = 0;
+    virtual int addImageByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, std::size_t imageRawIdx) = 0;
+    virtual int addImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , std::size_t imageRawIdx) = 0;
+
+    virtual int addImageFitSizeByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
+    virtual int addImageFitSizeByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
 
 
 }; // struct IImageList

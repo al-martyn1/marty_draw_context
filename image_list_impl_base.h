@@ -1,3 +1,4 @@
+#pragma once
 
 #include "i_image_list.h"
 #include "mime.h"
@@ -29,6 +30,12 @@ struct ImageListImplBase : public IImageList
     {
         return addImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), imageIdx);
     }
+
+    virtual int addImageFitSizeByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize requestedSize, ImageSize *pFoundSize=0) override
+    {
+        return addImageFitSizeByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), requestedSize, pFoundSize);
+    }
+
 
 }; // struct ImageListImplBase
 

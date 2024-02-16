@@ -8,3 +8,11 @@ umba-2c %CMN_OPTS% bulb04.ico     bulb04_ico.cpp
 umba-2c %CMN_OPTS% bulb01_16.png  bulb01_16_png.cpp
 umba-2c %CMN_OPTS% bulb01_32.png  bulb01_32_png.cpp
 umba-2c %CMN_OPTS% bulb01_96.png  bulb01_96_png.cpp
+
+umba-2c %CMN_OPTS% bulb01_16.bmp  bulb01_16_bmp.cpp
+umba-2c %CMN_OPTS% bulb01_16a.bmp bulb01_16a_bmp.cpp
+umba-2c %CMN_OPTS% bulb01_32.bmp  bulb01_32_bmp.cpp
+umba-2c %CMN_OPTS% bulb01_32a.bmp bulb01_32a_bmp.cpp
+umba-2c %CMN_OPTS% bulb01_96.bmp  bulb01_96_bmp.cpp
+umba-2c %CMN_OPTS% bulb01_96a.bmp bulb01_96a_bmp.cpp
+

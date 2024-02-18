@@ -16,3 +16,6 @@ umba-2c %CMN_OPTS% bulb01_32a.bmp bulb01_32a_bmp.cpp
 umba-2c %CMN_OPTS% bulb01_96.bmp  bulb01_96_bmp.cpp
 umba-2c %CMN_OPTS% bulb01_96a.bmp bulb01_96a_bmp.cpp
 
+umba-2c %CMN_OPTS% bw_cells.bmp   bw_cells_bmp.cpp
+umba-2c %CMN_OPTS% plane_on_red_bg.bmp plane_on_red_bg_bmp.cpp
+

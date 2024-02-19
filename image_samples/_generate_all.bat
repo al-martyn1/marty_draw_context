@@ -17,5 +17,7 @@ umba-2c %CMN_OPTS% bulb01_96.bmp  bulb01_96_bmp.cpp
 umba-2c %CMN_OPTS% bulb01_96a.bmp bulb01_96a_bmp.cpp
 
 umba-2c %CMN_OPTS% bw_cells.bmp   bw_cells_bmp.cpp
-umba-2c %CMN_OPTS% plane_on_red_bg.bmp plane_on_red_bg_bmp.cpp
+umba-2c %CMN_OPTS% plane_on_red_bg_320x200.bmp  plane_on_red_bg_320x200_bmp.cpp
+umba-2c %CMN_OPTS% plane_on_red_bg_24bpp.bmp    plane_on_red_bg_24bpp_bmp.cpp
+umba-2c %CMN_OPTS% plane_on_red_bg_8bpp.bmp     plane_on_red_bg_8bpp_bmp.cpp
 

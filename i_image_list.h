@@ -73,11 +73,14 @@ struct ImageListImageInfo
 {
     ImageSize            imageSize;
     std::string          mimeType ;
+    bool                 hasAlpha = false;
+    bool                 hasMask  = false;
 
 }; // struct ImageListImageInfo
 
 
 typedef const ImageListImageInfo* ImageListImageInfoConstPtr;
+typedef       ImageListImageInfo* ImageListImageInfoPtr;
 
 
 //----------------------------------------------------------------------------
@@ -113,6 +116,11 @@ struct IImageList
 
     virtual int addImageFitSizeByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
     virtual int addImageFitSizeByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize requestedSize, ImageSize *pFoundSize=0) = 0;
+
+    // Only for images without alpha
+    virtual bool createMaskRgb(int imageIdx, std::uint8_t r, std::uint8_t g, std::uint8_t b) = 0;
+    virtual bool createMaskColor(int imageIdx, ColorRef clr) = 0;
+    virtual bool createMaskByPos(int imageIdx, ImageSize maskColorPixelPos) = 0;
 
 
 }; // struct IImageList

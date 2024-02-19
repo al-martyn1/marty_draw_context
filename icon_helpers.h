@@ -17,11 +17,10 @@
 
 #endif
 
-// marty_draw_context::icon_helpers::win32::
+// marty_draw_context::icon_helpers::
 
 namespace marty_draw_context{
 namespace icon_helpers {
-namespace win32 {
 
 
 // https://learn.microsoft.com/en-us/previous-versions/ms997538(v=msdn.10)
@@ -38,6 +37,7 @@ void convertEndiannessFromHost(T &t, Endianness srcEndianness)
     endianness::convertEndiannessFromHost((std::uint8_t*)&t, sizeof(T), srcEndianness);
 }
 
+#include "pushpack1.h"
 struct IconDirectoryEntry
 {
     std::uint8_t         bWidth;          // Width, in pixels, of the image
@@ -51,22 +51,25 @@ struct IconDirectoryEntry
 
     void convertEndiannessToHost()
     {
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(wPlanes      , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(wBitCount    , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(dwBytesInRes , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(dwImageOffset, Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(wPlanes      , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(wBitCount    , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(dwBytesInRes , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(dwImageOffset, Endianness::littleEndian);
     }
 
     void convertEndiannessFromHost()
     {
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(wPlanes      , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(wBitCount    , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(dwBytesInRes , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(dwImageOffset, Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(wPlanes      , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(wBitCount    , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(dwBytesInRes , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(dwImageOffset, Endianness::littleEndian);
     }
 
 };
+#include "packpop.h"
 
+
+#include "pushpack1.h"
 struct IconDirectoryHeader
 {
     std::uint16_t        idReserved;   // Reserved (must be 0)
@@ -75,20 +78,23 @@ struct IconDirectoryHeader
 
     void convertEndiannessToHost()
     {
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(idReserved, Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(idType    , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessToHost(idCount   , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(idReserved, Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(idType    , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessToHost(idCount   , Endianness::littleEndian);
     }
 
     void convertEndiannessFromHost()
     {
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(idReserved, Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(idType    , Endianness::littleEndian);
-        marty_draw_context::icon_helpers::win32::convertEndiannessFromHost(idCount   , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(idReserved, Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(idType    , Endianness::littleEndian);
+        marty_draw_context::icon_helpers::convertEndiannessFromHost(idCount   , Endianness::littleEndian);
     }
 
 };
+#include "packpop.h"
 
+
+#include "pushpack1.h"
 struct IconDirectory
 {
     // IconDirectoryHeader
@@ -98,6 +104,7 @@ struct IconDirectory
 
     IconDirectoryEntry   idEntries[1]; // An entry for each image (idCount of 'em)
 };
+#include "packpop.h"
 
 
 // inline
@@ -317,7 +324,6 @@ HICON createIconFromIconDirectory( const std::vector<std::uint8_t> &iconsDirecto
 #endif
 
 
-} // namespace win32
 } // namespace icon_helpers
 } // namespace marty_draw_context{
 

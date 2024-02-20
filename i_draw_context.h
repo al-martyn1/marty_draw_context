@@ -739,7 +739,10 @@ struct IDrawContext
     virtual std::shared_ptr<IImageList> createSharedImageList() const = 0;
 
     virtual bool drawImageSimple( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos) = 0;
-    virtual bool drawImageSimple( IImageList *pImgList, int idx, const DrawCoord &pos) = 0;
+    virtual bool drawImageSimple( IImageList                 *pImgList, int idx, const DrawCoord &pos) = 0;
+
+    virtual bool drawImageSimpleEx( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) = 0;
+    virtual bool drawImageSimpleEx( IImageList                 *pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) = 0;
 
 
 public:

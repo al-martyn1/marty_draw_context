@@ -77,6 +77,7 @@ struct MultiDrawContext : public IDrawContext
     std::shared_ptr<IDrawContext>                 pixelDc     = 0;
     std::shared_ptr<IDrawContext>                 textDc      = 0;
     std::shared_ptr<IDrawContext>                 smoothingDc = 0;
+    //std::shared_ptr<IDrawContext>                 imagesDc    = 0;
 
 
 protected:
@@ -100,6 +101,7 @@ public:
         , pixelDc          (std::move(dcOther.pixelDc    ))
         , textDc           (std::move(dcOther.textDc     ))
         , smoothingDc      (std::move(dcOther.smoothingDc))
+        //, imagesDc         (std::move(dcOther.imagesDc   ))
         , m_preciseHandlers(std::move(dcOther.m_preciseHandlers))
         , m_allUniques     (std::move(dcOther.m_allUniques))
         , m_firstImpl      (std::move(dcOther.m_firstImpl))
@@ -115,6 +117,7 @@ public:
         pixelDc           = std::move(dcOther.pixelDc    );
         textDc            = std::move(dcOther.textDc     );
         smoothingDc       = std::move(dcOther.smoothingDc);
+        //imagesDc          = std::move(dcOther.imagesDc   );
         m_preciseHandlers = std::move(dcOther.m_preciseHandlers);
         m_allUniques      = std::move(dcOther.m_allUniques);
         m_firstImpl       = std::move(dcOther.m_firstImpl);
@@ -130,6 +133,7 @@ public:
         , pixelDc    (0)
         , textDc     (0)
         , smoothingDc(0)
+        //, imagesDc   (0)
         , m_preciseHandlers()
         , m_allUniques()
         , m_firstImpl(0)
@@ -452,6 +456,14 @@ public:
 
     DcOffsetScale getOffsetScale() override                      { return getActiveDc()->getOffsetScale(); }
     void restoreOffsetScale(const DcOffsetScale &dcOs) override  { return delegateCallAll([&](I& i) { return i.restoreOffsetScale(dcOs); }); }
+
+    IImageList* createImageList() const override                       { return getActiveDc()->createImageList(); }
+    void destroyImageList(IImageList* pImgList) const override         { getActiveDc()->destroyImageList(pImgList); }
+    std::shared_ptr<IImageList> createSharedImageList() const override { return getActiveDc()->createSharedImageList(); }
+
+    bool drawImageSimple( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos) override { return getActiveDc()->drawImageSimple(pImgList, idx, pos); }
+    bool drawImageSimple( IImageList *pImgList, int idx, const DrawCoord &pos) override                 { return getActiveDc()->drawImageSimple(pImgList, idx, pos); }
+
 
 
     DrawCoord getCurPos( ) override                              { return getActiveDc()->getCurPos(); }

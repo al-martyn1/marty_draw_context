@@ -21,3 +21,6 @@ umba-2c %CMN_OPTS% plane_on_red_bg_320x200.bmp  plane_on_red_bg_320x200_bmp.cpp
 umba-2c %CMN_OPTS% plane_on_red_bg_24bpp.bmp    plane_on_red_bg_24bpp_bmp.cpp
 umba-2c %CMN_OPTS% plane_on_red_bg_8bpp.bmp     plane_on_red_bg_8bpp_bmp.cpp
 
+umba-2c %CMN_OPTS% fx_power_shield.bmp     fx_power_shield_bmp.cpp
+umba-2c %CMN_OPTS% fx_power_shield.png     fx_power_shield_png.cpp
+

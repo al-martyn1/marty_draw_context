@@ -9,7 +9,7 @@
 @set HEX8=--hex-width=8
 
 @rem set EXTRA=--enum-flags=extra
-@same but more detailed
+@rem same but more detailed
 @set FLAGENUM_EXTRA=--enum-flags=serialize-set,deserialize-set
 
 @set FLAGS=--enum-flags=flags
@@ -32,7 +32,7 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @rem flags,
 
 @set ENDIANNESS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL%
-@set ENDIANNESS_DEF=invalid,unknown=-1;littleEndian=0;bigEndian=1
+@set ENDIANNESS_DEF=invalid,unknown=-1;littleEndian=0;bigEndian,networkByteOrder=1
 
 
 @set HORALIGN_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL%

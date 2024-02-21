@@ -27,4 +27,5 @@ umba-2c %CMN_OPTS% fx_power_shield.png     fx_power_shield_png.cpp
 umba-2c %CMN_OPTS% heroes.bmp     heroes_bmp.cpp
 umba-2c %CMN_OPTS% heroes.jpg     heroes_jpg.cpp
 
+umba-2c %CMN_OPTS% semi_transparent_red_circle.bmp semi_transparent_red_circle_bmp.cpp
 

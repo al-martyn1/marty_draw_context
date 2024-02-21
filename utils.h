@@ -1,6 +1,7 @@
 #pragma once
 
 #include "i_draw_context.h"
+#include "i_image_list.h"
 
 //----------------------------------------------------------------------------
 namespace marty_draw_context {
@@ -192,6 +193,215 @@ void copyFromRawBytes( T &t, const std::uint8_t* pRawData)
 
 //----------------------------------------------------------------------------
 
+
+
+
+//----------------------------------------------------------------------------
+inline
+std::vector<int> findNearestImageSizeHelperMakeSizeDistances(const std::vector<ImageSize> &sizes)
+{
+    std::vector<int> sizeDistances; sizeDistances.reserve(sizes.size());
+
+    for(auto sz : sizes)
+    {
+        sizeDistances.emplace_back(sz.sizeDistance());
+    }
+
+    return sizeDistances;
+}
+
+//----------------------------------------------------------------------------
+//TODO: !!! Пока алгоритм такой, есть говнецо, но пока пусть так
+
+inline
+std::size_t findNearestImageSize(const std::vector<ImageSize> &sizes, ImageSize requestedSize)
+{
+    if (sizes.empty())
+    {
+        return (std::size_t)-1; // not found
+    }
+
+    if (sizes.size()<2)
+    {
+        // есть единственное изображение в коллеции
+        return 0u;
+    }
+
+    std::vector<int> sizeDistances = findNearestImageSizeHelperMakeSizeDistances(sizes);
+
+
+    // Ищем приближение для скалинга вниз - те минимально больше
+
+    int requestedSizeDistance   = requestedSize.sizeDistance();
+    // double requestedSizeVhScale = requestedSize.vhScale();
+    
+    int          minDelta     = 32767; // Вряд ли картинки в разумное время будут больше такого размера
+    std::size_t  idxMinDelta  = (std::size_t)-1;
+
+    std::size_t idx = 0u;
+
+    auto isQuadratImage = [](ImageSize sz) -> bool
+    {
+        double vhScale = sz.vhScale();
+        if (vhScale>0.8 && vhScale<1.2)
+        {
+            return true;
+        }
+
+        return false;
+    };
+
+    // Ищем большее изображение
+    {
+    
+        idx = 0u;
+        for (; idx!=sizes.size(); ++idx)
+        {
+            if (requestedSize.isVertical()!=sizes[idx].isVertical())
+            {
+                continue; // ориентация изображения не совпадает с запрошенной
+            }
+    
+            if (sizeDistances[idx]<requestedSizeDistance) // Размеры текущей - меньше искомых?
+            {
+                continue;
+            }
+    
+            // Here distances[i]>d
+    
+            int dDelta = sizeDistances[idx] - requestedSizeDistance;
+    
+            if (minDelta>dDelta)
+            {
+                minDelta    = dDelta;
+                idxMinDelta = idx;
+            }
+        }
+    
+        if (idxMinDelta!=(std::size_t)-1) // нашли
+        {
+            return idxMinDelta;
+        }
+    
+    
+        // Изображение чуть больше не найдено, попробуем поискать другую ориентацию, если у нас ширина/высота не сильно отличаются
+    
+        if (isQuadratImage(requestedSize)) // запрошенное изображение близко к квадратному?
+        {
+            idx = 0u;
+            for (; idx!=sizes.size(); ++idx)
+            {
+                if (requestedSize.isVertical()==sizes[idx].isVertical())
+                {
+                    continue; // ориентация изображения совпадает с запрошенной - но эти варианты мы уже проверили
+                }
+    
+                if (isQuadratImage(sizes[idx]))
+                {
+                    continue; // слишком неквадратное, не подходит
+                }
+        
+                if (sizeDistances[idx]<requestedSizeDistance) // Размеры текущей - меньше искомых?
+                {
+                    continue;
+                }
+        
+                // Here distances[i]>d
+        
+                int dDelta = sizeDistances[idx] - requestedSizeDistance;
+        
+                if (minDelta>dDelta)
+                {
+                    minDelta    = dDelta;
+                    idxMinDelta = idx;
+                }
+            }
+        
+            if (idxMinDelta!=(std::size_t)-1) // нашли
+            {
+                return idxMinDelta;
+            }
+        
+        }
+
+    }
+
+    // будем искать меньшее изображение для upscaling'а
+    {
+        idx = 0u;
+        for (; idx!=sizes.size(); ++idx)
+        {
+            if (requestedSize.isVertical()!=sizes[idx].isVertical())
+            {
+                continue; // ориентация изображения не совпадает с запрошенной
+            }
+    
+            if (sizeDistances[idx]>requestedSizeDistance) // Размеры текущей - больше искомых?
+            {
+                continue;
+            }
+    
+            int dDelta = requestedSizeDistance - sizeDistances[idx];
+    
+            if (minDelta>dDelta)
+            {
+                minDelta    = dDelta;
+                idxMinDelta = idx;
+            }
+        }
+    
+        if (idxMinDelta!=(std::size_t)-1) // нашли
+        {
+            return idxMinDelta;
+        }
+    
+    
+        // Изображение чуть меньше не найдено, попробуем поискать другую ориентацию, если у нас ширина/высота не сильно отличаются
+    
+        if (isQuadratImage(requestedSize)) // запрошенное изображение близко к квадратному?
+        {
+            idx = 0u;
+            for (; idx!=sizes.size(); ++idx)
+            {
+                if (requestedSize.isVertical()==sizes[idx].isVertical())
+                {
+                    continue; // ориентация изображения совпадает с запрошенной - но эти варианты мы уже проверили
+                }
+    
+                if (isQuadratImage(sizes[idx]))
+                {
+                    continue; // слишком неквадратное, не подходит
+                }
+        
+                if (sizeDistances[idx]>requestedSizeDistance) // Размеры текущей - больше искомых?
+                {
+                    continue;
+                }
+        
+                int dDelta = requestedSizeDistance - sizeDistances[idx];
+        
+                if (minDelta<dDelta)
+                {
+                    minDelta    = dDelta;
+                    idxMinDelta = idx;
+                }
+            }
+        
+            if (idxMinDelta!=(std::size_t)-1) // нашли
+            {
+                return idxMinDelta;
+            }
+        
+        }
+    
+    
+    }
+
+    // Ничего не найдено, берём первый попавшийся размер
+
+    return 0u;
+
+}
 
 
 } // namespace utils

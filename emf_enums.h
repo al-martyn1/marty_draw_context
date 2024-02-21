@@ -141,6 +141,8 @@ enum class RecordType : std::uint32_t
 
 }; // enum class RecordType : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(RecordType)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( RecordType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( RecordType::header                    , "Header"                  );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( RecordType::polylineTo                , "PolylineTo"              );
@@ -395,6 +397,8 @@ enum class FormatSignature : std::uint32_t
 
 }; // enum class FormatSignature : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(FormatSignature)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( FormatSignature, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( FormatSignature::invalid   , "Invalid" );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( FormatSignature::emf       , "Emf"     );
@@ -418,6 +422,8 @@ enum class OpenGlPresenceFlag : std::uint32_t
     openGlPresent      = 0x00000001
 
 }; // enum class OpenGlPresenceFlag : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(OpenGlPresenceFlag)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( OpenGlPresenceFlag, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( OpenGlPresenceFlag::invalid            , "Invalid"          );
@@ -443,6 +449,8 @@ enum class MetafileHeaderOptions : std::uint32_t
     headerExt2    = 0x00000002
 
 }; // enum class MetafileHeaderOptions : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(MetafileHeaderOptions)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MetafileHeaderOptions, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MetafileHeaderOptions::basicHeader   , "BasicHeader" );
@@ -548,6 +556,8 @@ enum class PfdPixelType : std::uint8_t
     colorIndex   = 0x01
 
 }; // enum class PfdPixelType : std::uint8_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(PfdPixelType)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( PfdPixelType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( PfdPixelType::invalid      , "Invalid"    );

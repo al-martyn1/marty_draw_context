@@ -18,12 +18,15 @@ namespace marty_draw_context{
 
 enum class Endianness : std::uint32_t
 {
-    invalid        = (std::uint32_t)(-1),
-    unknown        = (std::uint32_t)(-1),
-    littleEndian   = 0x00,
-    bigEndian      = 0x01
+    invalid            = (std::uint32_t)(-1),
+    unknown            = (std::uint32_t)(-1),
+    littleEndian       = 0x00,
+    bigEndian          = 0x01,
+    networkByteOrder   = 0x01
 
 }; // enum class Endianness : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(Endianness)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Endianness, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Endianness::invalid        , "Invalid"      );
@@ -32,10 +35,11 @@ MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Endianness, std::map, 1 )
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Endianness, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Endianness, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "invalid"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "unknown"      );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "bigendian"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "littleendian" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "invalid"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::invalid        , "unknown"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "bigendian"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::bigEndian      , "networkbyteorder" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Endianness::littleEndian   , "littleendian"     );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Endianness, std::map, 1 )
 
 
@@ -53,6 +57,8 @@ enum class HorAlign : std::uint32_t
     alignWidth     = 0x03
 
 }; // enum class HorAlign : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(HorAlign)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( HorAlign, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( HorAlign::left      , "Left"    );
@@ -88,6 +94,8 @@ enum class VertAlign : std::uint32_t
     alignBottom    = 0x02
 
 }; // enum class VertAlign : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(VertAlign)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( VertAlign, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( VertAlign::invalid   , "Invalid" );
@@ -218,6 +226,8 @@ enum class FontWeight : int
 
 }; // enum class FontWeight : int
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(FontWeight)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( FontWeight, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( FontWeight::invalid      , "Invalid"    );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( FontWeight::extrabold    , "Extrabold"  );
@@ -268,6 +278,8 @@ enum class GradientType : std::uint32_t
 
 }; // enum class GradientType : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(GradientType)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( GradientType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( GradientType::invalid      , "Invalid"    );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( GradientType::vertical     , "Vertical"   );
@@ -291,6 +303,8 @@ enum class LineType : std::uint32_t
     horizontal   = 2
 
 }; // enum class LineType : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(LineType)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineType::invalid      , "Invalid"    );
@@ -319,6 +333,8 @@ enum class LineDirection : std::uint32_t
 
 }; // enum class LineDirection : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(LineDirection)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineDirection, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineDirection::invalid           , "Invalid"         );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineDirection::fromLeftToRight   , "FromLeftToRight" );
@@ -345,6 +361,8 @@ enum class LineEndcapStyle : std::uint32_t
     butt      = 2
 
 }; // enum class LineEndcapStyle : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(LineEndcapStyle)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineEndcapStyle, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineEndcapStyle::invalid   , "Invalid" );
@@ -373,6 +391,8 @@ enum class LineJoinStyle : std::uint32_t
 
 }; // enum class LineJoinStyle : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(LineJoinStyle)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( LineJoinStyle, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::mitter    , "Mitter"  );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( LineJoinStyle::invalid   , "Invalid" );
@@ -398,6 +418,8 @@ enum class BkMode : std::uint32_t
 
 }; // enum class BkMode : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(BkMode)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( BkMode, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::invalid       , "Invalid"     );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BkMode::transparent   , "Transparent" );
@@ -416,26 +438,28 @@ enum class ArcDirectionEnum : std::uint32_t
 {
     Invalid            = (std::uint32_t)(-1),
     Unknown            = (std::uint32_t)(-1),
-    Ccw                = 1,
+    Clockwise          = 0,
+    Cw                 = 0,
     CounterClockwise   = 1,
-    Cw                 = 2,
-    Clockwise          = 2
+    Ccw                = 1
 
 }; // enum class ArcDirectionEnum : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(ArcDirectionEnum)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "Invalid" );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "Ccw"     );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Cw        , "Cw"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Invalid            , "Invalid"          );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::Clockwise          , "Clockwise"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ArcDirectionEnum::CounterClockwise   , "CounterClockwise" );
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ArcDirectionEnum, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ArcDirectionEnum, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "invalid"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid   , "unknown"          );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "ccw"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Ccw       , "counterclockwise" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "cw"               );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Cw        , "clockwise"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid            , "invalid"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Invalid            , "unknown"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Clockwise          , "clockwise"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::Clockwise          , "cw"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::CounterClockwise   , "counterclockwise" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ArcDirectionEnum::CounterClockwise   , "ccw"              );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ArcDirectionEnum, std::map, 1 )
 
 
@@ -453,6 +477,8 @@ enum class SmoothingMode : std::uint32_t
     antiAlias     = 4
 
 }; // enum class SmoothingMode : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(SmoothingMode)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( SmoothingMode, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( SmoothingMode::highSpeed     , "HighSpeed"   );
@@ -487,6 +513,8 @@ enum class DrawingPrecise : std::uint32_t
     smoothingPrecise   = 3
 
 }; // enum class DrawingPrecise : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(DrawingPrecise)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( DrawingPrecise, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( DrawingPrecise::invalid            , "Invalid"          );
@@ -613,6 +641,8 @@ enum class WindowSizingEventEdge : std::uint32_t
 
 }; // enum class WindowSizingEventEdge : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(WindowSizingEventEdge)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( WindowSizingEventEdge, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::left          , "Left"        );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizingEventEdge::invalid       , "Invalid"     );
@@ -654,6 +684,8 @@ enum class WindowSizeRequestType : std::uint32_t
 
 }; // enum class WindowSizeRequestType : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(WindowSizeRequestType)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( WindowSizeRequestType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::maxShow     , "MaxShow"   );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( WindowSizeRequestType::invalid     , "Invalid"   );
@@ -685,6 +717,8 @@ enum class MouseButtonEvent : std::uint32_t
 
 }; // enum class MouseButtonEvent : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(MouseButtonEvent)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseButtonEvent, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::doubleClick   , "DoubleClick" );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButtonEvent::invalid       , "Invalid"     );
@@ -714,6 +748,8 @@ enum class MouseButton : std::uint32_t
     xButton2       = 5
 
 }; // enum class MouseButton : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(MouseButton)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseButton, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseButton::invalid        , "Invalid"      );
@@ -796,6 +832,8 @@ enum class MouseMoveEventType : std::uint32_t
     leave     = 2
 
 }; // enum class MouseMoveEventType : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(MouseMoveEventType)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( MouseMoveEventType, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( MouseMoveEventType::leave     , "Leave"   );

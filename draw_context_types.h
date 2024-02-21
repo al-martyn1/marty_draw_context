@@ -478,6 +478,7 @@ DrawCoord::value_type distance(const DrawCoord& c1, const DrawCoord& c2)
     return c1.distanceTo(c2);
 }
 
+//------------------------------
 inline
 DrawCoord operator*( const DrawCoord &c1, const DrawCoord &c2 )
 {
@@ -496,6 +497,20 @@ DrawCoord operator*( const DrawCoord &c, DrawCoord::value_type scale )
     return DrawCoord{ c.x*scale, c.y*scale };
 }
 
+
+inline
+DrawCoord operator*( std::size_t n, const DrawCoord &c2 )
+{
+    return DrawCoord{ c2.x*(DrawCoord::value_type)n, c2.y*(DrawCoord::value_type)n };
+}
+
+inline
+DrawCoord operator*( const DrawCoord &c1, std::size_t n )
+{
+    return DrawCoord{ c1.x*(DrawCoord::value_type)n, c1.y*(DrawCoord::value_type)n };
+}
+
+//------------------------------
 inline
 DrawCoord operator/( const DrawCoord &c1, const DrawCoord &c2 )
 {

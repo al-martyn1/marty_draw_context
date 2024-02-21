@@ -44,6 +44,7 @@
 #include "dc_debug/uw_log.h"
 
 #include "draw_context_types.h"
+#include "i_image_list.h"
 
 
 //----------------------------------------------------------------------------
@@ -732,6 +733,17 @@ struct IDrawContext
     virtual bool polyQuadraticBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
     virtual bool polyQuadraticBezier  (const std::vector<DrawCoord> &points) = 0;
     virtual bool polyQuadraticBezierTo(const std::vector<DrawCoord> &points) = 0;
+
+    virtual IImageList* createImageList() const = 0;
+    virtual void destroyImageList(IImageList* pImgList) const = 0;
+    virtual std::shared_ptr<IImageList> createSharedImageList() const = 0;
+
+    virtual bool drawImageSimple( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos) = 0;
+    virtual bool drawImageSimple( IImageList                 *pImgList, int idx, const DrawCoord &pos) = 0;
+
+    virtual bool drawImageSimpleEx( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) = 0;
+    virtual bool drawImageSimpleEx( IImageList                 *pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) = 0;
+
 
 public:
 

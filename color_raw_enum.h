@@ -164,6 +164,8 @@ enum class EColorRawEnum : std::uint32_t
 
 }; // enum class EColorRawEnum : std::uint32_t
 
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(EColorRawEnum)
+
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( EColorRawEnum, std::map, 1 )
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Beige                 , "Beige"                );
     MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( EColorRawEnum::Peru                  , "Peru"                 );

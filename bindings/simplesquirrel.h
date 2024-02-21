@@ -5,6 +5,12 @@
 #pragma once
 
 
+
+#include "marty_simplesquirrel/warnings_disable.h"
+//
+#include "marty_simplesquirrel/simplesquirrel.h"
+#include "marty_simplesquirrel/class_info.h"
+//
 #include <simplesquirrel/simplesquirrel.hpp>
 
 #include <cstdint>
@@ -20,9 +26,14 @@
 #include "../draw_context_enums.h"
 #include "../draw_context_types.h"
 #include "../i_draw_context.h"
+#include "../i_image_list.h"
+#include "../../marty_dc_impl_win32/image_list_impl.h"
 
-//
-#include "marty_simplesquirrel/simplesquirrel.h"
+
+#if defined(MDC_USE_DOTNUT)
+    #include "../dotNut/bindings/simplesquirrel/ObjectBase.h"
+    #include "../dotNut/bindings/simplesquirrel/BinaryData.h"
+#endif
 
 
 //----------------------------------------------------------------------------
@@ -89,9 +100,80 @@ namespace simplesquirrel {
 //----------------------------------------------------------------------------
 
 
+//----------------------------------------------------------------------------
+ssq::Class exposeImageSize(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("ImageSize"))
+{
+    const bool staticMethod = true ;
+    //const bool classMethod  = false;
+
+    auto cls = vm.addClass( className.c_str()
+                          , [](int w, int h)
+                            {
+                                if (w<0)
+                                    w = -w;
+                                if (h<0)
+                                    h = -h;
+                                return new marty_draw_context::ImageSize{w,h};
+                            }
+                          , true // release
+                          );
+
+    cls.addVar(_SC("x")     , &marty_draw_context::ImageSize::width);
+    cls.addVar(_SC("y")     , &marty_draw_context::ImageSize::height);
+    cls.addVar(_SC("width") , &marty_draw_context::ImageSize::width);
+    cls.addVar(_SC("height"), &marty_draw_context::ImageSize::height);
+
+    return cls;
+}
+
+//----------------------------------------------------------------------------
+ssq::Class exposeImageInfo(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("ImageInfo"))
+{
+    const bool staticMethod = true ;
+    //const bool classMethod  = false;
+
+    auto cls = vm.addClass( className.c_str()
+                          , []()
+                            {
+                                return new marty_draw_context::ImageListImageInfo();
+                            }
+                          , true // release
+                          );
+
+    cls.addVar(_SC("size")  , &marty_draw_context::ImageListImageInfo::imageSize);
+
+    cls.addFunc( _SC("getMimeType")
+               , [](marty_draw_context::ImageListImageInfo* self) -> ssq::sqstring
+                 {
+                     MARTY_DC_BIND_SQUIRREL_ASSERT(self);
+                     return marty_simplesquirrel::to_sqstring(self->mimeType);
+                 }
+               );
+
+    cls.addFunc( _SC("getHasAlpha")
+               , [](marty_draw_context::ImageListImageInfo* self) -> bool
+                 {
+                     MARTY_DC_BIND_SQUIRREL_ASSERT(self);
+                     return self->hasAlpha;
+                 }
+               );
+
+    cls.addFunc( _SC("getHasMask")
+               , [](marty_draw_context::ImageListImageInfo* self) -> bool
+                 {
+                     MARTY_DC_BIND_SQUIRREL_ASSERT(self);
+                     return self->hasMask;
+                 }
+               );
+
+    return cls;
+}
 
 
 
+
+
+//----------------------------------------------------------------------------
 
 
 
@@ -182,6 +264,50 @@ struct DrawingColor : public ColorRef
         return (int)(std::int32_t)toUnsigned();
     }
 
+    float toFloatBindHelper() const
+    {
+        return (float)(std::int32_t)toUnsigned();
+    }
+
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "Color")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
+
+        //clsInfo.addFunc("integer len() const");
+        //clsInfo.addMember("table{ string name -> string value } env");
+        //clsInfo.addClass( BinaryData                    ::getClassInfo() );
+
+        //clsInfo.addFunc("constuctor(any_integral intValOrName)");
+        clsInfo.addConstructor("integer|float|string|array of integer[r,g,b,a]|Drawing.Color clrInit");
+
+        clsInfo.addFunc("static Drawing.Color fromRgb(integer r, integer g, integer b)");
+        clsInfo.addFunc("static Drawing.Color fromUnsigned(integer u)");
+        clsInfo.addFunc("static Drawing.Color fromInt(integer u)");
+        clsInfo.addFunc("static Drawing.Color fromInteger(integer u)");
+        clsInfo.addFunc("static Drawing.Color fromString(string nameOrIntStr)");
+
+        clsInfo.addFunc("integer toUnsigned() const");
+        clsInfo.addFunc("integer toInt() const");
+        //clsInfo.addFunc("integer toInteger() const");
+        clsInfo.addFunc("integer tointeger() const");
+
+        //clsInfo.addFunc("float toFloat() const");
+        clsInfo.addFunc("float tofloat() const");
+
+        //clsInfo.addFunc("string toString() const");
+        clsInfo.addFunc("string tostring() const");
+        clsInfo.addFunc("string _tostring() const");
+
+
+        clsInfo.addMember("integer r");
+        clsInfo.addMember("integer g");
+        clsInfo.addMember("integer b");
+        clsInfo.addMember("integer a");
+
+        return clsInfo;
+    }
+
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Color"))
     {
         const bool staticMethod = true ;
@@ -207,16 +333,38 @@ struct DrawingColor : public ColorRef
                                         case ssq::Type::STRING:
                                             return new DrawingColor(fromString(ssq::Class(), o.toString()));
 
-                                        case ssq::Type::CLASS:
+                                        case ssq::Type::ARRAY:
                                         {
-                                            auto cls = o.toClass();
-                                            break;
+                                            std::vector<int> rgbaVec = marty_simplesquirrel::fromArrayObjectToVectorConvert<int>(o, _SC("val"), false /* allowSingleVal */ );
+                                            while(rgbaVec.size()<4)
+                                            {
+                                                rgbaVec.emplace_back(0);
+                                            }
+
+                                            ColorRef colorRef;
+                                            colorRef.r = (std::uint8_t)(unsigned)rgbaVec[0];
+                                            colorRef.g = (std::uint8_t)(unsigned)rgbaVec[1];
+                                            colorRef.b = (std::uint8_t)(unsigned)rgbaVec[2];
+                                            colorRef.a = (std::uint8_t)(unsigned)rgbaVec[3];
+                                            return new DrawingColor(colorRef);
                                         }
+
+                                        case ssq::Type::INSTANCE:
+                                        {
+                                            try
+                                            {
+                                                return new DrawingColor(o.to<DrawingColor>());
+                                            }
+                                            catch(...)
+                                            {
+                                            }
+                                        }
+                                        [[fallthrough]];
 
                                         case ssq::Type::BOOL:
                                         case ssq::Type::NULLPTR:
                                         case ssq::Type::TABLE:
-                                        case ssq::Type::ARRAY:
+                                        //case ssq::Type::ARRAY:
                                         case ssq::Type::USERDATA:
                                         case ssq::Type::CLOSURE:
                                         case ssq::Type::NATIVECLOSURE:
@@ -224,10 +372,11 @@ struct DrawingColor : public ColorRef
                                         case ssq::Type::USERPOINTER:
                                         case ssq::Type::THREAD:
                                         case ssq::Type::FUNCPROTO:
-                                        case ssq::Type::INSTANCE:
+                                        //case ssq::Type::INSTANCE:
+                                        case ssq::Type::CLASS:
                                         case ssq::Type::WEAKREF:
                                         case ssq::Type::OUTER:
-                                            [[fallthrough]];		
+                                            [[fallthrough]];
                                         default: {}
                                     }
 
@@ -243,10 +392,32 @@ struct DrawingColor : public ColorRef
         cls.addFunc( _SC("fromUnsigned"), &DrawingColor::fromUnsignedBindHelper);
 
         cls.addFunc( _SC("toInt")       , &DrawingColor::toIntBindHelper);
+        cls.addFunc( _SC("toInteger")   , &DrawingColor::toIntBindHelper);
+        cls.addFunc( _SC("tointeger")   , &DrawingColor::toIntBindHelper);
+
+        cls.addFunc( _SC("toFloat")     , &DrawingColor::toFloatBindHelper);
+        cls.addFunc( _SC("tofloat")     , &DrawingColor::toFloatBindHelper);
+
         cls.addFunc( _SC("fromInt")     , &DrawingColor::fromIntBindHelper, staticMethod);
+        cls.addFunc( _SC("fromInteger") , &DrawingColor::fromIntBindHelper, staticMethod);
 
         cls.addFunc( _SC("fromString")  , &DrawingColor::fromString);
         cls.addFunc( _SC("toString")
+                   , [](DrawingColor* self) -> ssq::sqstring
+                     {
+                         MARTY_DC_BIND_SQUIRREL_ASSERT(self);
+                         return marty_simplesquirrel::to_sqstring(self->serialize());
+                     }
+                   );
+        cls.addFunc( _SC("tostring")
+                   , [](DrawingColor* self) -> ssq::sqstring
+                     {
+                         MARTY_DC_BIND_SQUIRREL_ASSERT(self);
+                         return marty_simplesquirrel::to_sqstring(self->serialize());
+                     }
+                   );
+
+        cls.addFunc( _SC("_tostring")
                    , [](DrawingColor* self) -> ssq::sqstring
                      {
                          MARTY_DC_BIND_SQUIRREL_ASSERT(self);
@@ -281,6 +452,233 @@ struct DrawingColor : public ColorRef
 
 
 
+//----------------------------------------------------------------------------
+#if defined(MDC_USE_DOTNUT)
+
+struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
+{
+    static const inline std::string        className = "ImageList";
+
+    typedef dotNut::simplesquirrel::ObjectBase  ObjectBase;
+
+    std::shared_ptr<marty_draw_context::IImageList> m_pImgList;
+
+    ImageListWrapper(HSQUIRRELVM hVm) : ObjectBase(hVm), m_pImgList(marty_draw_context::createSharedImageList()) {}
+    ImageListWrapper(HSQUIRRELVM hVm, std::shared_ptr<marty_draw_context::IImageList> pList) : ObjectBase(hVm), m_pImgList(pList) {}
+
+    ImageListWrapper() = delete;
+    ImageListWrapper(const ImageListWrapper &) = default;
+    ImageListWrapper& operator=(const ImageListWrapper &) = default;
+    ImageListWrapper(ImageListWrapper &&) = default;
+    ImageListWrapper& operator=(ImageListWrapper &&) = default;
+
+
+    bool checkPtr(const char* methodName) const
+    {
+        return checkPtrImpl< std::shared_ptr<marty_draw_context::IImageList> >(m_pImgList, methodName);
+    }
+
+    marty_draw_context::IImageList* getCheckedPtr(const char* methodName) const
+    {
+        return getCheckedPtrImpl<marty_draw_context::IImageList, std::shared_ptr<marty_draw_context::IImageList> >(m_pImgList, methodName);
+    }
+
+    bool isSet() const
+    {
+        return checkPtr("");
+    }
+
+    void clear()
+    {
+        getCheckedPtr("clear")->clear();
+    }
+
+    int  size() const
+    {
+        return getCheckedPtr("size")->size();
+    }
+
+    bool empty() const
+    {
+        return getCheckedPtr("")->empty();
+    }
+
+
+    marty_draw_context::ImageListImageInfo getImageInfo(int imageIdx) const
+    {
+        marty_draw_context::ImageListImageInfo info;
+        getCheckedPtr("getImageInfo")->getImageInfo(imageIdx, &info);
+        return info;
+    }
+
+
+    ssq::Array getAvailSizesByMime(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType) const
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+
+        std::vector<marty_draw_context::ImageSize> sizes = getCheckedPtr("getAvailSizesByMime")->getAvailSizesByMime(binData.data, strMime);
+
+        ssq::Array res = ssq::Array(getHandle());
+
+        for(auto s: sizes)
+        {
+            res.push(s);
+        }
+
+        return res;
+    }
+
+    ssq::Array getAvailSizesByExt(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext) const
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+
+        std::vector<marty_draw_context::ImageSize> sizes = getCheckedPtr("getAvailSizesByExt")->getAvailSizesByExt(binData.data, strExt);
+
+        ssq::Array res = ssq::Array(getHandle());
+
+        for(auto s: sizes)
+        {
+            res.push(s);
+        }
+
+        return res;
+    }
+
+
+    int getNumberOfImagesByMime(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType) const
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        return (int)getCheckedPtr("getNumberOfImagesByMime")->getNumberOfImagesByMime(binData.data, strMime);
+    }
+
+    int getNumberOfImagesByExt(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext) const
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        return (int)getCheckedPtr("getNumberOfImagesByExt")->getNumberOfImagesByExt(binData.data, strExt);
+    }
+
+
+    int findBestFitImageByMime(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType, marty_draw_context::ImageSize requestedSize) const
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        return (int)getCheckedPtr("findBestFitImageByMime")->findBestFitImageByMime(binData.data, strMime, requestedSize, 0);
+    }
+
+    int findBestFitImageByExt(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext, marty_draw_context::ImageSize requestedSize) const
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        return (int)getCheckedPtr("findBestFitImageByExt")->findBestFitImageByMime(binData.data, strExt, requestedSize, 0);
+    }
+
+
+    marty_draw_context::ImageSize findBestFitImageByMimeGetFoundSize(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType, marty_draw_context::ImageSize requestedSize) const
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        marty_draw_context::ImageSize foundSize;
+        getCheckedPtr("findBestFitImageByMimeGetFoundSize")->findBestFitImageByMime(binData.data, strMime, requestedSize, &foundSize);
+        return foundSize;
+    }
+
+    marty_draw_context::ImageSize findBestFitImageByExtGetFoundSize(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext, marty_draw_context::ImageSize requestedSize) const
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        marty_draw_context::ImageSize foundSize;
+        getCheckedPtr("findBestFitImageByExtGetFoundSize")->findBestFitImageByMime(binData.data, strExt, requestedSize, &foundSize);
+        return foundSize;
+    }
+
+    int addImageByMime(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType, int imageRawIdx)
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        return getCheckedPtr("addImageByMime")->addImageByMime(binData.data, strMime, (std::size_t )imageRawIdx);
+    }
+
+    int addImageByExt(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext, int imageRawIdx)
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        return getCheckedPtr("addImageByExt")->addImageByExt(binData.data, strExt, (std::size_t )imageRawIdx);
+    }
+
+    int addImageFitSizeByMime(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring mimeType, marty_draw_context::ImageSize requestedSize)
+    {
+        std::string strMime = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        return getCheckedPtr("addImageFitSizeByMime")->addImageFitSizeByMime(binData.data, strMime, requestedSize, 0);
+    }
+
+    int addImageFitSizeByExt(dotNut::simplesquirrel::BinaryData binData, ssq::sqstring ext, marty_draw_context::ImageSize requestedSize)
+    {
+        std::string strExt = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        return getCheckedPtr("addImageFitSizeByMime")->addImageFitSizeByMime(binData.data, strExt, requestedSize, 0);
+    }
+
+    //bool createMaskRgb(int imageIdx, std::uint8_t r, std::uint8_t g, std::uint8_t b) = 0;
+    bool createMaskByColor(int imageIdx, DrawingColor clr)
+    {
+        return getCheckedPtr("createMaskByColor")->createMaskByColor(imageIdx, clr);
+    }
+
+    bool createMaskByPos(int imageIdx, marty_draw_context::ImageSize maskColorPixelPos)
+    {
+        return getCheckedPtr("createMaskByPos")->createMaskByPos(imageIdx, maskColorPixelPos);
+    }
+
+
+
+    static
+    ssq::Class expose(ssq::Table /* VM */ & vm, ssq::sqstring clsName = _SC("ImageList"))
+    {
+        if (clsName.empty())
+        {
+            clsName = marty_simplesquirrel::to_sqstring(className);
+        }
+
+        auto hvm = vm.getHandle();
+
+        auto cls = vm.addClass( clsName.c_str()
+                              , [&]()
+                                {
+                                    return new ImageListWrapper(hvm);
+                                }
+                              , true // release
+                              );
+
+        cls.addFunc( _SC("isSet")                              , &ImageListWrapper::isSet);
+        cls.addFunc( _SC("clear")                              , &ImageListWrapper::clear);
+        cls.addFunc( _SC("size")                               , &ImageListWrapper::size);
+        cls.addFunc( _SC("empty")                              , &ImageListWrapper::empty);
+        cls.addFunc( _SC("getImageInfo")                       , &ImageListWrapper::getImageInfo);
+        cls.addFunc( _SC("getAvailSizesByMime")                , &ImageListWrapper::getAvailSizesByMime);
+        cls.addFunc( _SC("getAvailSizesByExt")                 , &ImageListWrapper::getAvailSizesByExt);
+        cls.addFunc( _SC("getNumberOfImagesByMime")            , &ImageListWrapper::getNumberOfImagesByMime);
+        cls.addFunc( _SC("getNumberOfImagesByExt")             , &ImageListWrapper::getNumberOfImagesByExt);
+        cls.addFunc( _SC("findBestFitImageByMime")             , &ImageListWrapper::findBestFitImageByMime);
+        cls.addFunc( _SC("findBestFitImageByExt")              , &ImageListWrapper::findBestFitImageByExt);
+        cls.addFunc( _SC("findBestFitImageByMimeGetFoundSize") , &ImageListWrapper::findBestFitImageByMimeGetFoundSize);
+        cls.addFunc( _SC("findBestFitImageByExtGetFoundSize")  , &ImageListWrapper::findBestFitImageByExtGetFoundSize);
+        cls.addFunc( _SC("findBestFitImageByMimeGetFoundSize") , &ImageListWrapper::findBestFitImageByMimeGetFoundSize);
+        cls.addFunc( _SC("findBestFitImageByExtGetFoundSize")  , &ImageListWrapper::findBestFitImageByExtGetFoundSize);
+        cls.addFunc( _SC("addImageByMime")                     , &ImageListWrapper::addImageByMime);
+        cls.addFunc( _SC("addImageByExt")                      , &ImageListWrapper::addImageByExt);
+        cls.addFunc( _SC("addImageFitSizeByMime")              , &ImageListWrapper::addImageFitSizeByMime);
+        cls.addFunc( _SC("addImageFitSizeByExt")               , &ImageListWrapper::addImageFitSizeByExt);
+        cls.addFunc( _SC("createMaskByColor")                  , &ImageListWrapper::createMaskByColor);
+        cls.addFunc( _SC("createMaskByPos")                    , &ImageListWrapper::createMaskByPos);
+        //cls.addFunc( _SC("")     , &ImageListWrapper::);
+
+        return cls;
+    }
+
+}; // struct ImageListWrapper
+
+
+// dotNut::simplesquirrel::BinaryData
+// struct BinaryData : public ObjectBase
+// {
+//     static const inline std::string        className = "BinaryData";
+//     std::vector<std::uint8_t>              data;
+
+    
+#endif
 //----------------------------------------------------------------------------
 struct DrawingCoords
 {
@@ -355,9 +753,28 @@ struct DrawingCoords
         );
     }
 
-    // marty_simplesquirrel::to_sqstring
-    //marty_simplesquirrel::to_sqstring
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "Coords")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
 
+        clsInfo.addConstructor("integer|float|string x, integer|float|string y");
+
+        clsInfo.addMember("float x");
+        clsInfo.addMember("float y");
+
+        clsInfo.addFunc("Drawing." + clsName + " _add(Drawing." + clsName + " c) const");
+        clsInfo.addFunc("Drawing." + clsName + " _sub(Drawing." + clsName + " c) const");
+        clsInfo.addFunc("Drawing." + clsName + " _unm(Drawing." + clsName + " c) const");
+        clsInfo.addFunc("Drawing." + clsName + " _mul(Drawing." + clsName + " c) const");
+        clsInfo.addFunc("Drawing." + clsName + " _div(Drawing." + clsName + " c) const");
+
+        //clsInfo.addFunc("string toString() const");
+        clsInfo.addFunc("string tostring() const");
+        clsInfo.addFunc("string _tostring() const");
+
+        return clsInfo;
+    }
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Coords"))
     {
@@ -445,6 +862,22 @@ struct DrawingFontParams
         return fpRes;
     }
 
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "FontParams")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
+
+        clsInfo.addConstructor("integer|float|string height, Drawing.FontWeight weight, Drawing.FontStyleFlags fontStyleFlags, string fontFace");
+
+        clsInfo.addMember("float height");
+        clsInfo.addMember("Drawing.FontWeight weight");
+        clsInfo.addMember("Drawing.FontStyleFlags fontStyleFlags");
+        clsInfo.addMember("string fontFace");
+
+        return clsInfo;
+    }
+
+
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("FontParams"))
     {
         auto cls = vm.addClass( className.c_str()
@@ -502,6 +935,20 @@ struct DrawingGradientParams
         return gpRes;
     }
     
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "GradientParams")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
+
+        clsInfo.addConstructor("Drawing.Color colorBegin, Drawing.Color colorMid, Drawing.Color colorEnd, integer|float|string midPointPos");
+
+        clsInfo.addMember("Drawing.Color colorBegin");
+        clsInfo.addMember("Drawing.Color colorMid");
+        clsInfo.addMember("Drawing.Color colorEnd");
+        clsInfo.addMember("float midPoint");
+
+        return clsInfo;
+    }
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("GradientParams"))
     {
@@ -637,6 +1084,20 @@ struct DrawingPenParams
         pp.endcaps = (LineEndcapStyle)endcaps;
         pp.join    = (LineJoinStyle)join   ;
         return pp;
+    }
+
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "PenParams")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
+
+        clsInfo.addConstructor("integer|float|string width, Drawing.LineEndcapStyle endcaps, Drawing.LineJoinStyle join");
+
+        clsInfo.addMember("float width");
+        clsInfo.addMember("Drawing.LineEndcapStyle endcaps");
+        clsInfo.addMember("Drawing.LineJoinStyle join");
+
+        return clsInfo;
     }
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("PenParams"))
@@ -1033,7 +1494,7 @@ struct DrawingContext
         return pDc->getCurPen();     
     }
 
-    ColorRef getPenColor(int penId) const
+    DrawingColor getPenColor(int penId) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
@@ -1324,13 +1785,14 @@ struct DrawingContext
                       , DrawingCoords rightBottom
                       , DrawingCoords arcStartRefPoint
                       , DrawingCoords arcEndRefPoint
-                      , bool          directionCounterclockwise
+                      //, bool          directionCounterclockwise
+                      , int arcDirection // ArcDirectionEnum
                       ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
-        return pDc->ellipticArcTo(leftTop, rightBottom, arcStartRefPoint, arcEndRefPoint, directionCounterclockwise);
+        return pDc->ellipticArcTo(leftTop, rightBottom, arcStartRefPoint, arcEndRefPoint, arcDirection ? true : false /* directionCounterclockwise */ );
     }
 
     mutable DrawingCoords lastArcEndPos;
@@ -1340,14 +1802,17 @@ struct DrawingContext
         return lastArcEndPos;
     }
 
-    bool arcToPos(DrawingCoords centerPos, DrawingCoords endPos, bool directionCounterclockwise) const
+    bool arcToPos( DrawingCoords centerPos, DrawingCoords endPos
+                 , bool directionCounterclockwise
+                 , int arcDirection // ArcDirectionEnum
+                 ) const
     {
         MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
         if (!pDc)
             return false;
 
         DrawCoord calculatedEndPos;
-        bool res = pDc->arcTo(centerPos, endPos, directionCounterclockwise, &calculatedEndPos);
+        bool res = pDc->arcTo(centerPos, endPos, arcDirection ? true : false /* directionCounterclockwise */, &calculatedEndPos);
         if (res)
         {
             lastArcEndPos = static_cast<DrawingCoords>(calculatedEndPos);
@@ -1853,21 +2318,219 @@ struct DrawingContext
         return DrawingCoords(pDc->reflectPoint(pos,relativeTo));
     }
 
-    // std::vector<DrawCoord> toDrawCoordsVector(ssq::Object &o, const SQChar *paramName) const
-    // virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) = 0;
-    // virtual bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezier  (const std::vector<DrawCoord> &points) = 0;
-    // virtual bool polyCubicBezierTo(const std::vector<DrawCoord> &points) = 0;
-    //  
-    // virtual bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) = 0;
-    // virtual bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezier  (const std::vector<DrawCoord> &points) = 0;
-    // virtual bool polyQuadraticBezierTo(const std::vector<DrawCoord> &points) = 0;
 
+    bool drawImageSimple(ImageListWrapper imgListWrapper, int idx, DrawingCoords pos)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        return pDc->drawImageSimple(imgListWrapper.m_pImgList, idx, DrawCoord(pos) );
+    }
+
+    bool drawImageSimpleEx(ImageListWrapper imgListWrapper, int idx, DrawingCoords pos, ImageSize imgPartLeftTop, ImageSize imgPartSize)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        return pDc->drawImageSimpleEx(imgListWrapper.m_pImgList, idx, DrawCoord(pos), imgPartLeftTop, imgPartSize );
+    }
+
+
+
+    static
+    marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "Context")
+    {
+        auto clsInfo = marty_simplesquirrel::ClassInfo(clsName);
+
+        // clsInfo.addConstructor("any_integral width, Drawing.LineEndcapStyle endcaps, Drawing.LineJoinStyle join");
+        //  
+
+        clsInfo.addFunc("void flushBits()");
+        clsInfo.addFunc("Drawing.DrawingPrecise setDrawingPrecise(Drawing.DrawingPrecise p)");
+        clsInfo.addFunc("Drawing.DrawingPrecise getDrawingPrecise() const");
+        clsInfo.addFunc("Drawing.Coords getRawSize() const");
+        clsInfo.addFunc("Drawing.Coords getSize() const");
+        clsInfo.addFunc("float distanceBetween(Drawing.Coords pos1, Drawing.Coords pos2) const");
+        clsInfo.addFunc("Drawing.Coords reflectPoint(Drawing.Coords point, Drawing.Coords reflectRelativeTo) const");
+
+        // clsInfo.addFunc("getResourcesState"); //TODO: !!!
+        // clsInfo.addFunc("restoreResourcesState"); //TODO: !!!
+
+        // clsInfo.addFunc("getOffsetScale"); //TODO: !!!
+        // clsInfo.addFunc("restoreOffsetScale"); //TODO: !!!
+
+        clsInfo.addFunc("bool setCollectMarkers(bool newCollectMarkersMode)");
+        clsInfo.addFunc("bool getCollectMarkers() const");
+        clsInfo.addFunc("bool markerAdd(Drawing.Coords markerPos)");
+        clsInfo.addFunc("bool markerAddEx(Drawing.Coords markerPos, integer|float|string markerSize)");
+        clsInfo.addFunc("bool markersClear() const");
+        clsInfo.addFunc("bool markersDraw() const");
+        clsInfo.addFunc("bool markersDrawEx(int penId) const");
+
+        clsInfo.addFunc("float markerSetDefSize(integer|float|string markerSize)");
+        clsInfo.addFunc("float markerGetDefSize() const");
+
+        clsInfo.addFunc("Drawing.SmoothingMode  setSmoothingMode( Drawing.SmoothingMode smoothingMode)");
+        clsInfo.addFunc("Drawing.SmoothingMode  getSmoothingMode() const");
+
+        clsInfo.addFunc("Drawing.Color setTextColor(Drawing.Color clr)");
+        clsInfo.addFunc("Drawing.Color getTextColor() const");
+
+        clsInfo.addFunc("Drawing.Color setBkColor(Drawing.Color clr)");
+        clsInfo.addFunc("Drawing.Color getBkColor() const");
+
+        clsInfo.addFunc("Drawing.BkMode setBkMode(Drawing.BkMode bkMode)");
+        clsInfo.addFunc("Drawing.BkMode getBkMode() const");
+
+        clsInfo.addFunc("Drawing.Coords getDialigBaseUnits() const");
+
+        clsInfo.addFunc("Drawing.Coords mapRawToLogicPos(Drawing.Coords c) const");
+        clsInfo.addFunc("Drawing.Coords mapRawToLogicSize(Drawing.Coords c) const");
+
+        clsInfo.addFunc("Drawing.Coords getPixelSize() const");
+
+        clsInfo.addFunc("Drawing.Coords getScaledPos( Drawing.Coords c ) const");
+        clsInfo.addFunc("Drawing.Coords getScaledSize( Drawing.Coords c ) const");
+
+        clsInfo.addFunc("Drawing.Coords setOffset( Drawing.Coords c )");
+        clsInfo.addFunc("Drawing.Coords getOffset( ) const");
+
+        clsInfo.addFunc("Drawing.Coords setScale( Drawing.Coords c )");
+        clsInfo.addFunc("Drawing.Coords getScale( ) const");
+
+        clsInfo.addFunc("float setPenScale( integer|float|string scale )");
+        clsInfo.addFunc("float getPenScale( ) const");
+
+        clsInfo.addFunc("integer createSolidPen( Drawing.PenParams penParams, Drawing.Color clr )");
+        clsInfo.addFunc("integer selectPen( integer penId ) const");
+        clsInfo.addFunc("integer selectNewSolidPen( Drawing.PenParams penParams, Drawing.Color clr ) const");
+        clsInfo.addFunc("integer getCurPen() const");
+        clsInfo.addFunc("Drawing.Color getPenColor(integer penId)");
+        clsInfo.addFunc("Drawing.PenParams getPenParams(integer penId) const");
+        clsInfo.addFunc("integer setDefaultCosmeticPen( integer penId )");
+        clsInfo.addFunc("integer getDefaultCosmeticPen( ) const");
+
+        clsInfo.addFunc("integer createSolidBrush( Drawing.Color rgb )");
+        clsInfo.addFunc("integer selectBrush( integer brushId )");
+        clsInfo.addFunc("integer selectNewSolidBrush( Drawing.Color rgb )");
+        clsInfo.addFunc("integer getCurBrush() const");
+
+        clsInfo.addFunc("integer createFont(Drawing.FontParams fontParams)");
+        clsInfo.addFunc("integer createFontEx(Drawing.FontParams fontParams, integer|float|string height)");
+        clsInfo.addFunc("integer createOrFindFont(Drawing.FontParams fontParams)");
+        clsInfo.addFunc("integer createOrFindFontEx(Drawing.FontParams fontParams, integer|float|string height)");
+
+        clsInfo.addFunc("integer selectFont( integer fontId )");
+        clsInfo.addFunc("integer selectNewFont(Drawing.FontParams fontParams)");
+        clsInfo.addFunc("integer selectNewFontEx(Drawing.FontParams fontParams, integer|float|string height) const");
+
+        clsInfo.addFunc("integer createFontWithFace(Drawing.FontParams fontParams, string fontFace)");
+        clsInfo.addFunc("integer createOrFindFontWithFace(Drawing.FontParams fontParams, string fontFace)");
+
+        clsInfo.addFunc("integer  getCurFont() const");
+        clsInfo.addFunc("Drawing.FontParams getFontParamsById(integer id) const");
+
+        clsInfo.addFunc("bool beginPath()");
+        clsInfo.addFunc("bool beginPathFrom(Drawing.Coords c)");
+        clsInfo.addFunc("bool endPath( bool bStroke, bool bFill )");
+        clsInfo.addFunc("bool closeFigure()");
+        clsInfo.addFunc("bool isPathStarted() const");
+
+        clsInfo.addFunc("bool moveTo( Drawing.Coords to )");
+        clsInfo.addFunc("bool lineTo( Drawing.Coords to )");
+
+        clsInfo.addFunc("bool ellipse(Drawing.Coords leftTop, Drawing.Coords rightBottom)");
+        clsInfo.addFunc("bool fillEllipse(Drawing.Coords leftTop, Drawing.Coords rightBottom, bool drawFrame)");
+
+        clsInfo.addFunc("bool ellipticArcTo( Drawing.Coords leftTop, Drawing.Coords rightBottom, Drawing.Coords arcStartRefPoint, Drawing.Coords arcEndRefPoint, Drawing.ArcDirection arcDirection) const");
+        clsInfo.addFunc("Drawing.Coords getLastArcEndPos() const");
+        clsInfo.addFunc("bool arcToPos(Drawing.Coords centerPos, Drawing.Coords endPos, Drawing.ArcDirection arcDirection)");
+        clsInfo.addFunc("bool arcByAngleDeg(Drawing.Coords centerPos, integer|float|string angle)");
+
+        clsInfo.addFunc("bool roundRectFigure( integer|float|string cornersR, array of Drawing.Coords points )");
+
+        clsInfo.addFunc("bool circle(Drawing.Coords centerPos, integer|float|string r)");
+        clsInfo.addFunc("bool fillCircle(Drawing.Coords centerPos, integer|float|string r, bool drawFrame)");
+        clsInfo.addFunc("bool roundRect(integer|float|string cornersR, Drawing.Coords leftTop, Drawing.Coords rightBottom)");
+        clsInfo.addFunc("bool fillRoundRect(integer|float|string cornersR, Drawing.Coords leftTop, Drawing.Coords rightBottom, bool drawFrame)");
+        clsInfo.addFunc("bool rect(Drawing.Coords leftTop, Drawing.Coords rightBottom)");
+        clsInfo.addFunc("bool fillRect(Drawing.Coords leftTop, Drawing.Coords rightBottom, bool drawFrame)");
+        clsInfo.addFunc("bool fillGradientRect(Drawing.Coords leftTop, Drawing.Coords rightBottom, Drawing.GradientParams gradientParams, Drawing.GradientType gradientType, bool excludeFrame)");
+        clsInfo.addFunc("bool fillGradientRoundRect( integer|float|string cornersR, Drawing.Coords leftTop, Drawing.Coords rightBottom, Drawing.GradientParams gradientParams, Drawing.GradientType gradientType, bool excludeFrame, float fillBreakPos, Drawing.GradientRoundRectFillFlags fillFlags)");
+        clsInfo.addFunc("bool fillGradientCircle(Drawing.Coords pos, integer|float|string r, Drawing.GradientParams gradientParams, bool excludeFrame)");
+
+        clsInfo.addFunc("bool textOut(Drawing.Coords pos, string text)");
+        clsInfo.addFunc("bool textOutWithFontAndColor(Drawing.Coords pos, int fontId, Drawing.Color clr, string text)");
+
+        clsInfo.addFunc("bool drawTextColored( Drawing.Coords startPos"
+                                             ", integer|float|string widthLim"
+                                             ", DrawTextFlags flags"
+                                             ", string    text"
+                                             ", string    stopChars"
+                                             ", array of Drawing.Color colors"
+                                             ", array of Drawing.Color bkColors"
+                                             ", int fontId"
+                                             ")"
+                                             );
+        clsInfo.addFunc("bool drawParaColored( Drawing.Coords   startPos"
+                                            ", Drawing.Coords  limits"
+                                            ", integer|float|string lineSpacing"
+                                            ", integer|float|string paraIndent"
+                                            ", integer|float|string tabSize"
+                                            ", DrawTextFlags flags"
+                                            ", Drawing.HorAlign horAlign"
+                                            ", Drawing.VertAlign vertAlign"
+                                            ", string text"
+                                            ", array of Drawing.Color colors"
+                                            ", array of Drawing.Color bkColors"
+                                            ", array of integer|float|string tabStopPositions"
+                                            ", int fontId"
+                                            ")"
+                                            );
+        clsInfo.addFunc("bool drawMultiParasColored( Drawing.Coords startPos"
+                                                  ", Drawing.Coords  limits"
+                                                  ", integer|float|string lineSpacing"
+                                                  ", integer|float|string paraIndent"
+                                                  ", integer|float|string tabSize"
+                                                  ", DrawTextFlags flags"
+                                                  ", Drawing.HorAlign horAlign"
+                                                  ", Drawing.VertAlign vertAlign"
+                                                  ", string text"
+                                                  ", array of Drawing.Color colors"
+                                                  ", array of Drawing.Color bkColors"
+                                                  ", array of integer|float|string tabStopPositions"
+                                                  ", array of Drawing.Color paraColors"
+                                                  ", array of Drawing.Color paraBkColors"
+                                                  ", int fontId"
+                                                   ")"
+                                             );
+
+        //  
+        clsInfo.addFunc("bool polyQuadraticBezier(Drawing.Coords cp1, Drawing.Coords cp2, Drawing.Coords cp3)");
+        clsInfo.addFunc("bool polyQuadraticBezierTo(Drawing.Coords cp2, Drawing.Coords cp3)");
+
+        clsInfo.addFunc("bool polyCubicBezier(Drawing.Coords cp1, Drawing.Coords cp2, Drawing.Coords cp3, Drawing.Coords cp4)");
+        clsInfo.addFunc("bool polyCubicBezierTo(Drawing.Coords cp2, Drawing.Coords cp3, Drawing.Coords cp4)");
+
+        clsInfo.addFunc("bool polyCubicBeziers(array of Drawing.Coords points)");
+        clsInfo.addFunc("bool polyCubicBeziersTo(array of Drawing.Coords points)");
+
+        clsInfo.addFunc("bool polyQuadraticBeziers(array of Drawing.Coords points)");
+        clsInfo.addFunc("bool polyQuadraticBeziersTo(array of Drawing.Coords points)");
+
+        
+        clsInfo.addFunc("float distanceBetween( Drawing.Coords pos1, Drawing.Coords pos2)");
+        clsInfo.addFunc("Drawing.Coords reflectPoint( Drawing.Coords pos, Drawing.Coords relativeTo)");
+
+
+        // clsInfo.addFunc("");
+        // clsInfo.addFunc("");
+
+
+        return clsInfo;
+    }
 
 
     static ssq::Class expose(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("Context"))
@@ -2016,35 +2679,38 @@ struct DrawingContext
 
 //----------------------------------------------------------------------------
 inline
-ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sqstring> *pKnownEnumNames = 0, const std::string &prefix = "Drawing")
+ssq::sqstring enumsExposeMakeScript( marty_simplesquirrel::EnumScriptGenerationOptions generationOptions /* char itemSep, char enumSep */
+                                   //, std::set<ssq::sqstring> *pKnownEnumNames = 0
+                                   , const std::string &prefix = "Drawing"
+                                   )
 {
 
     // auto strVal = enum_serialize_flags(FontStyleFlags::italic);
     // //auto strVal = enum_serialize(val);
     // (void)strVal;
 
-    std::set<ssq::sqstring> knownEnumNames;
+    //std::set<ssq::sqstring> knownEnumNames;
 
-    itemSep = enumSep;
+    // itemSep = enumSep;
 
     // ssq::sqstring makeEnumClassScriptString( const std::string &enumPrefix, const std::string &enumNameOnly, const std::string &itemTypeString, char itemSep, char enumSep, std::set<ssq::sqstring> &known, EnumVal... vals)
     ssq::sqstring scriptText; // = 
                       //makeEnumScriptString( prefix, "Colors"   , itemSep, enumSep, knownEnumNames
 
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "CallbackResultFlags", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "CallbackResultFlags", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , CallbackResultFlags::none               , CallbackResultFlags::repaint       
                                           , CallbackResultFlags::captureMouse       , CallbackResultFlags::releaseCapture
                                           , CallbackResultFlags::disableTimerUpdate , CallbackResultFlags::enableTimerUpdate
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonEvent", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonEvent", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButtonEvent::released   , MouseButtonEvent::pressed    , MouseButtonEvent::doubleClick
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButton", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButton", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButton::none
                                           , MouseButton::leftButton   , MouseButton::rightButton  
                                           , MouseButton::middleButton , MouseButton::midButton    
@@ -2052,7 +2718,7 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonStateFlags", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseButtonStateFlags", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseButtonStateFlags::none
                                           , MouseButtonStateFlags::leftButtonPressed   , MouseButtonStateFlags::rightButtonPressed  
                                           , MouseButtonStateFlags::shiftPressed        , MouseButtonStateFlags::controlPressed      
@@ -2061,39 +2727,40 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseMoveEventType", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "MouseMoveEventType", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , MouseMoveEventType::move , MouseMoveEventType::hover, MouseMoveEventType::leave //, MouseMoveEventType::enter
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizingEventEdge", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizingEventEdge", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , WindowSizingEventEdge::none       , WindowSizingEventEdge::left       , WindowSizingEventEdge::right
                                           , WindowSizingEventEdge::top        , WindowSizingEventEdge::topLeft    , WindowSizingEventEdge::topRigh
                                           , WindowSizingEventEdge::bottom     , WindowSizingEventEdge::bottomLeft , WindowSizingEventEdge::bottomRight
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizeRequestType", ""   , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "WindowSizeRequestType", ""   , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , WindowSizeRequestType::restored , WindowSizeRequestType::minimized, WindowSizeRequestType::maximized, WindowSizeRequestType::maxShow, WindowSizeRequestType::maxHide
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "HorAlign", ""       , generationOptions // itemSep, enumSep // , knownEnumNames
+                                          //, std::vector<std::pair<std::string, int> >{ {"AlignLeft", HorAlign::alignLeft}, {"AlignCenter", HorAlign::alignCenter}, {"AlignRight", HorAlign::alignRight}, {"AlignWidth", HorAlign::alignWidth} }
                                           , HorAlign::left, HorAlign::center, HorAlign::right
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "VertAlign", ""       , itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString(prefix + ".", "VertAlign", ""       , generationOptions // itemSep, enumSep // , knownEnumNames
                                           , VertAlign::top, VertAlign::center, VertAlign::bottom
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontStyleFlags", "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , FontStyleFlags::normal, FontStyleFlags::italic, FontStyleFlags::underlined, FontStyleFlags::strikeout // , FontStyleFlags::italic|FontStyleFlags::strikeout
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientRoundRectFillFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , GradientRoundRectFillFlags::round
                                           , GradientRoundRectFillFlags::squareBegin
                                           , GradientRoundRectFillFlags::squareEnd
@@ -2102,23 +2769,33 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "FontWeight"     , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "FontWeight"     , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"Ultralight", (int)FontWeight::ultralight}
+                                                                                     , {"Regular"   , (int)FontWeight::regular}
+                                                                                     , {"Demibold"  , (int)FontWeight::demibold}
+                                                                                     , {"Ultrabold" , (int)FontWeight::ultrabold}
+                                                                                     , {"Black"     , (int)FontWeight::black}
+                                                                                     }
                                           , FontWeight::thin, FontWeight::extralight, FontWeight::light, FontWeight::normal
                                           , FontWeight::semibold, FontWeight::bold, FontWeight::extrabold, FontWeight::heavy
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "GradientType"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , GradientType::vertical, GradientType::horizontal
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineType"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , LineType::diagonal, LineType::vertical, LineType::horizontal
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawTextFlags" , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "DrawTextFlags" , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"DefMode", (int)DrawTextFlags::defMode}
+                                                                                     , {"FitGlyphEntire", (int)DrawTextFlags::fitGlyphEntire}
+                                                                                     , {"FitGlyphDefault", (int)DrawTextFlags::fitGlyphDefault}
+                                                                                     }
                                           , DrawTextFlags::none                     , DrawTextFlags::calcOnly                 , DrawTextFlags::fitGlyphStartPos
                                           , DrawTextFlags::fitWidthDisable          , DrawTextFlags::fitHeightStartPos        , DrawTextFlags::fitHeightDisable
                                           , DrawTextFlags::endEllipsis              , DrawTextFlags::pathEllipsis             , DrawTextFlags::wordEllipsis
@@ -2129,54 +2806,55 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
                                           )
                      );
 
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "LineDirection"    , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"FromTopToBottom" , (int)LineDirection::fromTopToBottom}
+                                                                                     , {"FromBottomToTop" , (int)LineDirection::fromBottomToTop}
+                                                                                     }
+                                          , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
+                                          )
+                     );
 
-    // Автоматом в алиасы генератор не умеет, запилил руцами
-    //scriptText.append(_SC("enum LineDirection{FromLeftToRight=0 FromTopToBottom=0 FromRightToLeft=1 FromBottomToTop=1};"));
-    scriptText.append(_SC("class "));
-    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
-    scriptText.append(_SC(".LineDirection{static FromLeftToRight=0; static FromTopToBottom=0; static FromRightToLeft=1; static FromBottomToTop=1; };"));
-    // scriptText.append(makeEnumScriptString( prefix, "LineDirection"   , itemSep, enumSep, knownEnumNames
-    //                                       , LineDirection::fromLeftToRight, LineDirection::fromRightToLeft
-    //                                       )
-    //                  );
-
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineEndcapStyle"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "LineEndcapStyle"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"Butt" , (int)LineEndcapStyle::butt}
+                                                                                     }
                                           , LineEndcapStyle::round, LineEndcapStyle::square, LineEndcapStyle::flat
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", itemSep, enumSep// , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "LineJoinStyle"   , "", generationOptions // itemSep, enumSep// , knownEnumNames
                                           , LineJoinStyle::bevel, LineJoinStyle::mitter, LineJoinStyle::round
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "BkMode"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , BkMode::opaque, BkMode::transparent
                                           )
                      );
 
-    // Автоматом в алиасы генератор не умеет, запилил руцами
-    //scriptText.append(_SC("enum ArcDirection{Cw=0 Clockwise=0 Ccw=1 CounterClockwise=1};"));
-    scriptText.append(_SC("class "));
-    scriptText.append(marty_simplesquirrel::to_sqstring(prefix));
-    scriptText.append(_SC(".ArcDirection{static Cw=0; static Clockwise=0; static Ccw=1; static CounterClockwise=1; };"));
-    // scriptText.append(makeEnumScriptString( prefix, "ArcDirectionEnum"   , itemSep, enumSep, knownEnumNames
-    //                                       , ArcDirectionEnum::Cw, ArcDirectionEnum::Cсw
-    //                                       )
-    //                  );
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "ArcDirection"  , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"Ccw" , (int)ArcDirectionEnum::Ccw}
+                                                                                     , {"Cw"  , (int)ArcDirectionEnum::Cw}
+                                                                                     }
+                                          , ArcDirectionEnum::CounterClockwise, ArcDirectionEnum::Clockwise
+                                          )
+                     );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "SmoothingMode"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptStringEx( prefix + ".", "SmoothingMode" , "", generationOptions // itemSep, enumSep // , knownEnumNames
+                                          , std::vector<std::pair<std::string, int> >{ {"LowQuality" , (int)SmoothingMode::lowQuality}
+                                                                                     , {"LowSpeed"   , (int)SmoothingMode::lowSpeed}
+                                                                                     , {"None"       , (int)SmoothingMode::none}
+                                                                                     }
                                           , SmoothingMode::defMode, SmoothingMode::highSpeed, SmoothingMode::highQuality, SmoothingMode::noSmoothing, SmoothingMode::antiAlias
                                           )
                      );
 
-    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", itemSep, enumSep // , knownEnumNames
+    scriptText.append(marty_simplesquirrel::makeEnumClassScriptString( prefix + ".", "DrawingPrecise"   , "", generationOptions // itemSep, enumSep // , knownEnumNames
                                           , DrawingPrecise::defPrecise, DrawingPrecise::pixelPrecise, DrawingPrecise::textPrecise, DrawingPrecise::smoothingPrecise
                                           )
                      );
 
     scriptText.append(
-                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , enumSep /* itemSep */ , enumSep // , knownEnumNames
+                      marty_simplesquirrel::makeEnumClassScriptString( prefix+".", "Colors", prefix+".Color"   , generationOptions // enumSep /* itemSep */ , enumSep // , knownEnumNames
                                           , EColorRawEnum::AliceBlue       , EColorRawEnum::AntiqueWhite   , EColorRawEnum::Aqua             , EColorRawEnum::Aquamarine          
                                           , EColorRawEnum::Azure           , EColorRawEnum::Beige          , EColorRawEnum::Bisque           , EColorRawEnum::Black               
                                           , EColorRawEnum::BlanchedAlmond  , EColorRawEnum::Blue           , EColorRawEnum::BlueViolet       , EColorRawEnum::Brown               
@@ -2220,19 +2898,20 @@ ssq::sqstring enumsExposeMakeScript(char itemSep, char enumSep, std::set<ssq::sq
 
 
 
-    if (pKnownEnumNames)
-    {
-        *pKnownEnumNames = knownEnumNames;
-    }
+    // if (pKnownEnumNames)
+    // {
+    //     *pKnownEnumNames = knownEnumNames;
+    // }
 
     return scriptText;
 }
 
 //----------------------------------------------------------------------------
 inline
-void exposeEnums(ssq::VM &vm, const std::string &prefix = "Drawing")
+void exposeEnums(ssq::VM &vm, const marty_simplesquirrel::EnumScriptGenerationOptions& generationOptions, const std::string &prefix = "Drawing")
 {
-    ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', 0, prefix);
+    //ssq::sqstring scriptText = enumsExposeMakeScript('\n', '\n', 0, prefix);
+    ssq::sqstring scriptText = enumsExposeMakeScript(generationOptions, prefix);
     ssq::Script script = vm.compileSource(scriptText.c_str());
     vm.run(script);
 }
@@ -2324,6 +3003,7 @@ Enum'ы у нас зарегистрированы как DrawContextEnumName (�
 //TODO: !!! Попробовать переделать через static поля классов - http://www.squirrel-lang.org/squirreldoc/reference/language/classes.html#static-variables
 Надо будет нагенерить классов
 */
+#if 0
 inline
 ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::string &prefix = "Drawing",  bool prependWithEnums = true)
 {
@@ -2428,6 +3108,7 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
     
     return scriptTextResult;
 }
+#endif
 
 
 //TODO: !!! Надо попробовать сериализацию флагов через enum_serialize, а не через enum_serialize_flags - 
@@ -2442,9 +3123,16 @@ ssq::sqstring prepareScriptEnums(const ssq::sqstring &scriptText, const std::str
 
 //----------------------------------------------------------------------------
 template<typename TVM>
-ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns)
+ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std::string &ns, const marty_simplesquirrel::EnumScriptGenerationOptions &generationOptions)
 {
-    ssq::sqstring preparedScriptText1 = marty_draw_context::simplesquirrel::prepareScriptEnums(scriptText, ns, true);
+    //ssq::sqstring preparedScriptText1 = marty_draw_context::simplesquirrel::prepareScriptEnums(scriptText, ns, true);
+    std::set<ssq::sqstring> knownEnumNames;
+    ssq::sqstring preparedScriptText1 = enumsExposeMakeScript( generationOptions
+                                                             //, &knownEnumNames
+                                                             , ns /* prefix */
+                                                             );
+    preparedScriptText1 += scriptText;
+
     ssq::sqstring sqNs = marty_simplesquirrel::to_sqstring(ns);
 
     // lout << encoding::toUtf8(preparedScriptText1);
@@ -2461,9 +3149,43 @@ ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std
     marty_draw_context::simplesquirrel::DrawingContext         ::expose(tDraw /*vm*/, _SC("Context"));
     marty_draw_context::simplesquirrel::DrawingColor           ::expose(tDraw /*vm*/, _SC("Color"));
 
+    exposeImageSize(tDraw);
+    exposeImageInfo(tDraw);
+
+#if defined(MDC_USE_DOTNUT)
+
+    ImageListWrapper::expose(tDraw);
+
+#endif
+
     return preparedScriptText1;
 }
 
+//----------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------
+inline
+marty_simplesquirrel::ClassInfo getDrawingCoreClassesInfo()
+{
+    //std::vector<marty_simplesquirrel::ClassInfo> res;
+    auto rootNs = marty_simplesquirrel::ClassInfo(true);
+
+    auto nsDrawing = marty_simplesquirrel::ClassInfo("Drawing", true);
+    //nsDrawing.addClass( DrawingColor                   ::getClassInfo("Color") );
+    //nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Coords") );
+    //nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Scale") );
+    //nsDrawing.addClass( DrawingFontParams              ::getClassInfo("FontParams") );
+    //nsDrawing.addClass( DrawingGradientParams          ::getClassInfo("GradientParams") );
+    //nsDrawing.addClass( DrawingPenParams               ::getClassInfo("PenParams") );
+    //nsDrawing.addClass( DrawingContext                 ::getClassInfo("Context") );
+
+    rootNs.addClass(nsDrawing);
+
+    return rootNs;
+}
 //----------------------------------------------------------------------------
 
 
@@ -2475,6 +3197,9 @@ ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std
 
 } // namespace marty_draw_context {
 
+
+
+#include "marty_simplesquirrel/warnings_restore.h"
 
 
 

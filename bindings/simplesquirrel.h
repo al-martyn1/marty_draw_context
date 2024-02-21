@@ -2318,20 +2318,26 @@ struct DrawingContext
         return DrawingCoords(pDc->reflectPoint(pos,relativeTo));
     }
 
-    // std::vector<DrawCoord> toDrawCoordsVector(ssq::Object &o, const SQChar *paramName) const
-    // virtual bool checkPolyCubicBezierNumPoints  (std::size_t numPoints) = 0;
-    // virtual bool checkPolyCubicBezierToNumPoints(std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyCubicBezier  (const std::vector<DrawCoord> &points) = 0;
-    // virtual bool polyCubicBezierTo(const std::vector<DrawCoord> &points) = 0;
-    //  
-    // virtual bool checkPolyQuadraticBezierNumPoints  (std::size_t numPoints) = 0;
-    // virtual bool checkPolyQuadraticBezierToNumPoints(std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezier  (const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezierTo(const DrawCoord * pPoints, std::size_t numPoints) = 0;
-    // virtual bool polyQuadraticBezier  (const std::vector<DrawCoord> &points) = 0;
-    // virtual bool polyQuadraticBezierTo(const std::vector<DrawCoord> &points) = 0;
+
+    bool drawImageSimple(ImageListWrapper imgListWrapper, int idx, DrawingCoords pos)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        return pDc->drawImageSimple(imgListWrapper.m_pImgList, idx, DrawCoord(pos) );
+    }
+
+    bool drawImageSimpleEx(ImageListWrapper imgListWrapper, int idx, DrawingCoords pos, ImageSize imgPartLeftTop, ImageSize imgPartSize)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        return pDc->drawImageSimpleEx(imgListWrapper.m_pImgList, idx, DrawCoord(pos), imgPartLeftTop, imgPartSize );
+    }
+
+
 
     static
     marty_simplesquirrel::ClassInfo getClassInfo(const std::string &clsName = "Context")
@@ -3168,13 +3174,13 @@ marty_simplesquirrel::ClassInfo getDrawingCoreClassesInfo()
     auto rootNs = marty_simplesquirrel::ClassInfo(true);
 
     auto nsDrawing = marty_simplesquirrel::ClassInfo("Drawing", true);
-    nsDrawing.addClass( DrawingColor                   ::getClassInfo("Color") );
-    nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Coords") );
-    nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Scale") );
-    nsDrawing.addClass( DrawingFontParams              ::getClassInfo("FontParams") );
-    nsDrawing.addClass( DrawingGradientParams          ::getClassInfo("GradientParams") );
-    nsDrawing.addClass( DrawingPenParams               ::getClassInfo("PenParams") );
-    nsDrawing.addClass( DrawingContext                 ::getClassInfo("Context") );
+    //nsDrawing.addClass( DrawingColor                   ::getClassInfo("Color") );
+    //nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Coords") );
+    //nsDrawing.addClass( DrawingCoords                  ::getClassInfo("Scale") );
+    //nsDrawing.addClass( DrawingFontParams              ::getClassInfo("FontParams") );
+    //nsDrawing.addClass( DrawingGradientParams          ::getClassInfo("GradientParams") );
+    //nsDrawing.addClass( DrawingPenParams               ::getClassInfo("PenParams") );
+    //nsDrawing.addClass( DrawingContext                 ::getClassInfo("Context") );
 
     rootNs.addClass(nsDrawing);
 

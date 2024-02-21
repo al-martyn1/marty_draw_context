@@ -28,13 +28,13 @@ namespace icon_helpers {
 template<typename T> inline
 void convertEndiannessToHost(T &t, Endianness srcEndianness)
 {
-    endianness::convertEndiannessToHost((std::uint8_t*)&t, sizeof(T), srcEndianness);
+    marty_draw_context::endianness::convertEndiannessToHost((std::uint8_t*)&t, sizeof(T), srcEndianness);
 }
 
 template<typename T> inline
 void convertEndiannessFromHost(T &t, Endianness srcEndianness)
 {
-    endianness::convertEndiannessFromHost((std::uint8_t*)&t, sizeof(T), srcEndianness);
+    marty_draw_context::endianness::convertEndiannessFromHost((std::uint8_t*)&t, sizeof(T), srcEndianness);
 }
 
 #include "pushpack1.h"

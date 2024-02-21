@@ -28,8 +28,8 @@ namespace marty_draw_context {
 //----------------------------------------------------------------------------
 struct ImageSize
 {
-    int width ; // xSize
-    int height; // ySize
+    int width  = 0; // xSize
+    int height = 0; // ySize
 
 
     int sizeDistance() const
@@ -119,7 +119,7 @@ struct IImageList
 
     // Only for images without alpha
     virtual bool createMaskRgb(int imageIdx, std::uint8_t r, std::uint8_t g, std::uint8_t b) = 0;
-    virtual bool createMaskColor(int imageIdx, ColorRef clr) = 0;
+    virtual bool createMaskByColor(int imageIdx, ColorRef clr) = 0;
     virtual bool createMaskByPos(int imageIdx, ImageSize maskColorPixelPos) = 0;
 
 

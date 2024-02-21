@@ -462,8 +462,10 @@ public:
     std::shared_ptr<IImageList> createSharedImageList() const override { return getActiveDc()->createSharedImageList(); }
 
     bool drawImageSimple( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos) override { return getActiveDc()->drawImageSimple(pImgList, idx, pos); }
-    bool drawImageSimple( IImageList *pImgList, int idx, const DrawCoord &pos) override                 { return getActiveDc()->drawImageSimple(pImgList, idx, pos); }
+    bool drawImageSimple( IImageList                 *pImgList, int idx, const DrawCoord &pos) override { return getActiveDc()->drawImageSimple(pImgList, idx, pos); }
 
+    bool drawImageSimpleEx( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgPartLeftTop, imgPartSize); }
+    bool drawImageSimpleEx( IImageList                 *pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgPartLeftTop, imgPartSize); };
 
 
     DrawCoord getCurPos( ) override                              { return getActiveDc()->getCurPos(); }

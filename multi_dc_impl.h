@@ -467,6 +467,9 @@ public:
     bool drawImageSimpleEx( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgPartLeftTop, imgPartSize); }
     bool drawImageSimpleEx( IImageList                 *pImgList, int idx, const DrawCoord &pos, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgPartLeftTop, imgPartSize); };
 
+    virtual bool drawImageScaled( IImageList                 *pImgList, int idx, const DrawCoord &pos, const DrawCoord &imgScreenSize, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgScreenSize, imgPartLeftTop, imgPartSize); };
+    virtual bool drawImageScaled( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, const DrawCoord &imgScreenSize, ImageSize imgPartLeftTop, ImageSize imgPartSize) override { return getActiveDc()->drawImageSimpleEx(pImgList, idx, pos, imgScreenSize, imgPartLeftTop, imgPartSize); };
+
 
     DrawCoord getCurPos( ) override                              { return getActiveDc()->getCurPos(); }
 

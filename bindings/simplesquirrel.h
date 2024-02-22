@@ -103,7 +103,7 @@ namespace simplesquirrel {
 //----------------------------------------------------------------------------
 ssq::Class exposeImageSize(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("ImageSize"))
 {
-    const bool staticMethod = true ;
+    //const bool staticMethod = true ;
     //const bool classMethod  = false;
 
     auto cls = vm.addClass( className.c_str()
@@ -129,7 +129,7 @@ ssq::Class exposeImageSize(ssq::Table /* VM */ & vm, const ssq::sqstring &classN
 //----------------------------------------------------------------------------
 ssq::Class exposeImageInfo(ssq::Table /* VM */ & vm, const ssq::sqstring &className = _SC("ImageInfo"))
 {
-    const bool staticMethod = true ;
+    //const bool staticMethod = true ;
     //const bool classMethod  = false;
 
     auto cls = vm.addClass( className.c_str()
@@ -2337,6 +2337,15 @@ struct DrawingContext
         return pDc->drawImageSimpleEx(imgListWrapper.m_pImgList, idx, DrawCoord(pos), imgPartLeftTop, imgPartSize );
     }
 
+    bool drawImageScaled(ImageListWrapper imgListWrapper, int idx, DrawingCoords pos, DrawingCoords targetSize, ImageSize imgPartLeftTop, ImageSize imgPartSize)
+    {
+        MARTY_DC_BIND_SQUIRREL_ASSERT(pDc);
+        if (!pDc)
+            return false;
+
+        return pDc->drawImageScaled(imgListWrapper.m_pImgList, idx, DrawCoord(pos), DrawCoord(targetSize), imgPartLeftTop, imgPartSize );
+    }
+
 
 
     static
@@ -2661,6 +2670,10 @@ struct DrawingContext
         cls.addFunc( _SC("polyCubicBezierTo")      , &DrawingContext::polyCubicBezierTo    );
         cls.addFunc( _SC("polyQuadraticBezier")    , &DrawingContext::polyQuadraticBezier  );
         cls.addFunc( _SC("polyQuadraticBezierTo")  , &DrawingContext::polyQuadraticBezierTo);
+
+        cls.addFunc( _SC("drawImageSimple")        , &DrawingContext::drawImageSimple);
+        cls.addFunc( _SC("drawImageSimpleEx")      , &DrawingContext::drawImageSimpleEx);
+        cls.addFunc( _SC("drawImageScaled")        , &DrawingContext::drawImageScaled);
 
 
         return cls;

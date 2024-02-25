@@ -34,3 +34,5 @@ umba-2c %CMN_OPTS% ajax_loader2.gif  ajax_loader2_gif.cpp
 umba-2c %CMN_OPTS% animated_mice.gif animated_mice_gif.cpp
 umba-2c %CMN_OPTS% animated_tits.gif animated_tits_gif.cpp
 
+umba-2c %CMN_OPTS% Animated_PNG_example_bouncing_beach_ball.png Animated_PNG_example_bouncing_beach_ball_png.cpp
+

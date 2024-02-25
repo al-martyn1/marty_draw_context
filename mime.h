@@ -183,6 +183,9 @@ std::unordered_map< std::string, std::string > makeMimeTypesMap()
 
         , { ".cdr"    , "image/x-cdr" }  /* corel draw http://filext.com/file-extension/CDR */
 
+        , { ".wdp"    , "image/vnd.ms-photo"   }
+        , { ".hdp"    , "image/vnd.ms-photo"   }
+
         , { ".cgm"    , "image/cgm"   }
         , { ".g3"     , "image/g3fax" }
         , { ".ief"    , "image/ief"   }

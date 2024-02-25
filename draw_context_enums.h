@@ -891,5 +891,37 @@ MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(CallbackResultFlags, std::set)
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(CallbackResultFlags, std::set)
 
+
+enum class ImgListBandFlags : std::uint32_t
+{
+    invalid             = (std::uint32_t)(-1),
+    unknown             = (std::uint32_t)(-1),
+    skipMinSizeFrames   = 0x00000001,
+    rescaleFrames       = 0x00000002,
+    cutFrames           = 0x00000004
+
+}; // enum class ImgListBandFlags : std::uint32_t
+
+MARTY_CPP_MAKE_ENUM_FLAGS(ImgListBandFlags)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( ImgListBandFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( ImgListBandFlags::rescaleFrames       , "RescaleFrames"     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( ImgListBandFlags::invalid             , "Invalid"           );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( ImgListBandFlags::skipMinSizeFrames   , "SkipMinSizeFrames" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( ImgListBandFlags::cutFrames           , "CutFrames"         );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( ImgListBandFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( ImgListBandFlags, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( ImgListBandFlags::rescaleFrames       , "rescaleframes"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( ImgListBandFlags::invalid             , "invalid"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( ImgListBandFlags::invalid             , "unknown"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( ImgListBandFlags::skipMinSizeFrames   , "skipminsizeframes" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( ImgListBandFlags::cutFrames           , "cutframes"         );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( ImgListBandFlags, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(ImgListBandFlags, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(ImgListBandFlags, std::set)
+
 } // namespace marty_draw_context
 

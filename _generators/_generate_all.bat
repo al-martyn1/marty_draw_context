@@ -104,6 +104,8 @@ umba-enum-gen %EXTRA% %HEX6% %UINT32% -E=ColorRawEnum -F=@color_raw_enum.txt ..\
 @set CALLBACKRESULTFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL% %FLAGENUM_EXTRA%
 @set CALLBACKRESULTFLAGS_DEF=invalid,unknown=-1;none=0;repaint=1;captureMouse;releaseCapture;disableTimerUpdate;enableTimerUpdate
 
+@set IMGLISTBANDFLAGS_GEN_FLAGS=--enum-flags=0 --enum-flags=type-decl,serialize,deserialize,lowercase,enum-class,flags,fmt-hex %VALUES_CAMEL% %SERIALIZE_PASCAL% %FLAGENUM_EXTRA%
+@set IMGLISTBANDFLAGS_DEF=invalid,unknown=-1;skipMinSizeFrames=1;rescaleFrames;cutFrames
 
 umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %ENDIANNESS_GEN_FLAGS%                  %UINT32% -E=Endianness                        -F=%ENDIANNESS_DEF%               ^
@@ -129,6 +131,7 @@ umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% ^
 %MOUSEBUTTONSTATEFLAGS_GEN_FLAGS%       %UINT32% -E=MouseButtonStateFlags            -F=%MOUSEBUTTONSTATEFLAGS_DEF% ^
 %MOUSEMOVEEVENTTYPE_GEN_FLAGS%          %UINT32% -E=MouseMoveEventType               -F=%MOUSEMOVEEVENTTYPE_DEF% ^
 %CALLBACKRESULTFLAGS_GEN_FLAGS%         %UINT32% -E=CallbackResultFlags              -F=%CALLBACKRESULTFLAGS_DEF% ^
+%IMGLISTBANDFLAGS_GEN_FLAGS%            %UINT32% -E=ImgListBandFlags                 -F=%IMGLISTBANDFLAGS_DEF% ^
 ..\draw_context_enums.h
 
 

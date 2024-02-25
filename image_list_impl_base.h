@@ -37,14 +37,14 @@ struct ImageListImplBase : public IImageList
     }
 
 
-    virtual int addImageBandFromMultipartImageByExtEx(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize frameMinSize, ImgListBandFlags flags, const std::vector<std::size_t> &frameList) override
+    virtual int addImageBandFromMultipartImageByExtEx(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, const std::vector<std::size_t> &frameList) override
     {
-        return addImageBandFromMultipartImageByMimeEx(imgDirectoryRawData, mime::getMimeTypeByExt(ext), frameMinSize, flags, frameList);
+        return addImageBandFromMultipartImageByMimeEx(imgDirectoryRawData, mime::getMimeTypeByExt(ext), frameMinSize, flags, pFrameSize, frameList);
     }
 
-    virtual int addImageBandFromMultipartImageByExt  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize frameMinSize, ImgListBandFlags flags) override
+    virtual int addImageBandFromMultipartImageByExt  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) override
     {
-        return addImageBandFromMultipartImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), frameMinSize, flags);
+        return addImageBandFromMultipartImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), frameMinSize, flags, pFrameSize);
     }
 
 

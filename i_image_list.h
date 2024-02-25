@@ -122,11 +122,11 @@ struct IImageList
     virtual bool createMaskByColor(int imageIdx, ColorRef clr) = 0;
     virtual bool createMaskByPos(int imageIdx, ImageSize maskColorPixelPos) = 0;
 
-    virtual int addImageBandFromMultipartImageByMimeEx (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags, const std::vector<std::size_t> &frameList) = 0;
-    virtual int addImageBandFromMultipartImageByExtEx  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags, const std::vector<std::size_t> &frameList) = 0;
+    virtual int addImageBandFromMultipartImageByMimeEx (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, const std::vector<std::size_t> &frameList) = 0;
+    virtual int addImageBandFromMultipartImageByExtEx  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, const std::vector<std::size_t> &frameList) = 0;
 
-    virtual int addImageBandFromMultipartImageByMime (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags) = 0;
-    virtual int addImageBandFromMultipartImageByExt  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags) = 0;
+    virtual int addImageBandFromMultipartImageByMime (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
+    virtual int addImageBandFromMultipartImageByExt  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
 
 
 

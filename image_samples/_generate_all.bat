@@ -29,3 +29,8 @@ umba-2c %CMN_OPTS% heroes.jpg     heroes_jpg.cpp
 
 umba-2c %CMN_OPTS% semi_transparent_red_circle.bmp semi_transparent_red_circle_bmp.cpp
 
+umba-2c %CMN_OPTS% ajax_loader1.gif  ajax_loader1_gif.cpp
+umba-2c %CMN_OPTS% ajax_loader2.gif  ajax_loader2_gif.cpp
+umba-2c %CMN_OPTS% animated_mice.gif animated_mice_gif.cpp
+umba-2c %CMN_OPTS% animated_tits.gif animated_tits_gif.cpp
+

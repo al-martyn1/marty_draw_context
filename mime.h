@@ -155,6 +155,7 @@ std::unordered_map< std::string, std::string > makeMimeTypesMap()
         /* category same as common mime-type */
         , { ".gif"    , "image/gif"     }
         , { ".png"    , "image/png"     }
+        , { ".apng"   , "image/png"     }
         , { ".jpg"    , "image/jpeg"    }
         , { ".ico"    , "image/x-icon"  }
         , { ".svg"    , "image/svg+xml" }

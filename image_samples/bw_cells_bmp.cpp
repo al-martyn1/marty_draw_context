@@ -16,4 +16,6 @@ static const unsigned char bw_cells_bmp[94] =
 
 static const unsigned bw_cells_bmp_size = 94;
 
+static const char* bw_cells_bmp_filename = "bw_cells.bmp";
+
 static const char* bw_cells_bmp_mime_type = "image/bmp";

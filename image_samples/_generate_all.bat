@@ -1,4 +1,4 @@
-@set CMN_OPTS=--mime --overwrite -q --size --bin --array 
+@set CMN_OPTS=--mime --filename --overwrite -q --size --bin --array 
 @rem --static
 
 umba-2c %CMN_OPTS% bulb01.ico     bulb01_ico.cpp

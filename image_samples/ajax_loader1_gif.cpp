@@ -211,4 +211,6 @@ static const unsigned char ajax_loader1_gif[3208] =
 
 static const unsigned ajax_loader1_gif_size = 3208;
 
+static const char* ajax_loader1_gif_filename = "ajax_loader1.gif";
+
 static const char* ajax_loader1_gif_mime_type = "image/gif";

@@ -40020,4 +40020,6 @@ static const unsigned char fx_power_shield_bmp[640150] =
 
 static const unsigned fx_power_shield_bmp_size = 640150;
 
+static const char* fx_power_shield_bmp_filename = "fx_power_shield.bmp";
+
 static const char* fx_power_shield_bmp_mime_type = "image/bmp";

@@ -12751,4 +12751,6 @@ static const unsigned char heroes_jpg[203852] =
 
 static const unsigned heroes_jpg_size = 203852;
 
+static const char* heroes_jpg_filename = "heroes.jpg";
+
 static const char* heroes_jpg_mime_type = "image/jpeg";

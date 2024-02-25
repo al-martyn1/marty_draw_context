@@ -5810,4 +5810,6 @@ static const unsigned char fx_power_shield_png[92785] =
 
 static const unsigned fx_power_shield_png_size = 92785;
 
+static const char* fx_power_shield_png_filename = "fx_power_shield.png";
+
 static const char* fx_power_shield_png_mime_type = "image/png";

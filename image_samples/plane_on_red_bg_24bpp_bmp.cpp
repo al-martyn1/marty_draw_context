@@ -5076,4 +5076,6 @@ static const unsigned char plane_on_red_bg_24bpp_bmp[81054] =
 
 static const unsigned plane_on_red_bg_24bpp_bmp_size = 81054;
 
+static const char* plane_on_red_bg_24bpp_bmp_filename = "plane_on_red_bg_24bpp.bmp";
+
 static const char* plane_on_red_bg_24bpp_bmp_mime_type = "image/bmp";

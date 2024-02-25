@@ -4078,4 +4078,6 @@ static const unsigned char plane_on_red_bg_320x200_bmp[65078] =
 
 static const unsigned plane_on_red_bg_320x200_bmp_size = 65078;
 
+static const char* plane_on_red_bg_320x200_bmp_filename = "plane_on_red_bg_320x200.bmp";
+
 static const char* plane_on_red_bg_320x200_bmp_mime_type = "image/bmp";

@@ -1044,4 +1044,6 @@ static const unsigned char semi_transparent_red_circle_bmp[16534] =
 
 static const unsigned semi_transparent_red_circle_bmp_size = 16534;
 
+static const char* semi_transparent_red_circle_bmp_filename = "semi_transparent_red_circle.bmp";
+
 static const char* semi_transparent_red_circle_bmp_mime_type = "image/bmp";

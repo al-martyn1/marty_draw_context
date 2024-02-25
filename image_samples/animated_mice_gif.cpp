@@ -216,4 +216,6 @@ static const unsigned char animated_mice_gif[3293] =
 
 static const unsigned animated_mice_gif_size = 3293;
 
+static const char* animated_mice_gif_filename = "animated_mice.gif";
+
 static const char* animated_mice_gif_mime_type = "image/gif";

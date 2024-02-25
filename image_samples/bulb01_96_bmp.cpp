@@ -1742,4 +1742,6 @@ static const unsigned char bulb01_96_bmp[27702] =
 
 static const unsigned bulb01_96_bmp_size = 27702;
 
+static const char* bulb01_96_bmp_filename = "bulb01_96.bmp";
+
 static const char* bulb01_96_bmp_mime_type = "image/bmp";

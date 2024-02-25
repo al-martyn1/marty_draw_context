@@ -2729,4 +2729,6 @@ static const unsigned char bulb01_ico[43502] =
 
 static const unsigned bulb01_ico_size = 43502;
 
+static const char* bulb01_ico_filename = "bulb01.ico";
+
 static const char* bulb01_ico_mime_type = "image/x-icon";

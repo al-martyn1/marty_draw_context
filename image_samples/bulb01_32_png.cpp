@@ -59,4 +59,6 @@ static const unsigned char bulb01_32_png[769] =
 
 static const unsigned bulb01_32_png_size = 769;
 
+static const char* bulb01_32_png_filename = "bulb01_32.png";
+
 static const char* bulb01_32_png_mime_type = "image/png";

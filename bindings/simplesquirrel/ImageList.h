@@ -251,6 +251,11 @@ struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
         return res;
     }
 
+    ssq::sqstring getMimeTypeByFileName(ssq::sqstring name) const
+    {
+        return marty_simplesquirrel::to_sqstring(getCheckedPtr("getMimeTypeByFileName")->getMimeTypeByFileName(marty_simplesquirrel::fromSqStringToUtf8(name)));
+    }
+
 
 // struct AddImageBandResult
 // {

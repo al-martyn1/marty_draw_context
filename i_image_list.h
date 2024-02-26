@@ -133,6 +133,9 @@ struct IImageList
 
     virtual bool saveImageAsBmp(int imageIdx, std::vector<std::uint8_t> &bmpData) = 0;
 
+    virtual std::string getMimeTypeByFileName(const std::string &fileName) = 0;
+    virtual std::wstring getMimeTypeByFileName(const std::wstring &fileName) = 0;
+
 
 
 }; // struct IImageList

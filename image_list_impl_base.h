@@ -1,8 +1,12 @@
 #pragma once
 
 #include "i_image_list.h"
+//
 #include "mime.h"
-
+//
+#include "umba/filename.h"
+#include "umba/utf8.h"
+//
 
 namespace marty_draw_context {
 
@@ -10,18 +14,27 @@ namespace marty_draw_context {
 struct ImageListImplBase : public IImageList
 {
 
+    virtual std::string getMimeTypeByFileName(const std::string &fileName) override
+    {
+        return marty_draw_context::mime::getMimeTypeByExt(umba::filename::getExt(fileName));
+    }
 
-    std::vector<ImageSize> getAvailSizesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     ) override
+    virtual std::wstring getMimeTypeByFileName(const std::wstring &fileName) override
+    {
+        return umba::fromUtf8(marty_draw_context::mime::getMimeTypeByExt(umba::toUtf8(umba::filename::getExt(fileName))));
+    }
+
+    virtual std::vector<ImageSize> getAvailSizesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     ) override
     {
         return getAvailSizesByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext));
     }
 
-    std::size_t getNumberOfImagesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     ) override
+    virtual std::size_t getNumberOfImagesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     ) override
     {
         return getNumberOfImagesByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext));
     }
 
-    std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize requestedSize, ImageSize *pFoundSize=0) override
+    virtual std::size_t findBestFitImageByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext, ImageSize requestedSize, ImageSize *pFoundSize=0) override
     {
         return findBestFitImageByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), requestedSize, pFoundSize);
     }

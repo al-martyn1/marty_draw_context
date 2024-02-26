@@ -307,6 +307,13 @@ struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
         cls.addFunc( _SC("addImageFitSizeByExt")               , &ImageListWrapper::addImageFitSizeByExt);
         cls.addFunc( _SC("createMaskByColor")                  , &ImageListWrapper::createMaskByColor);
         cls.addFunc( _SC("createMaskByPos")                    , &ImageListWrapper::createMaskByPos);
+        cls.addFunc( _SC("saveImageAsBmp")                     , &ImageListWrapper::saveImageAsBmp);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByMime")      , &ImageListWrapper::addImageBandFromMultipartImageByMime);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByExt")       , &ImageListWrapper::addImageBandFromMultipartImageByExt);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByMimeRange") , &ImageListWrapper::addImageBandFromMultipartImageByMimeRange);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByExtRange")  , &ImageListWrapper::addImageBandFromMultipartImageByExtRange);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByMimeEx")    , &ImageListWrapper::addImageBandFromMultipartImageByMimeEx);
+        cls.addFunc( _SC("addImageBandFromMultipartImageByExtEx")     , &ImageListWrapper::addImageBandFromMultipartImageByExtEx);
         //cls.addFunc( _SC("")     , &ImageListWrapper::);
 
         return cls;

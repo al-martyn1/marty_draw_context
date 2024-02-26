@@ -128,6 +128,11 @@ struct IImageList
     virtual int addImageBandFromMultipartImageByMime (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
     virtual int addImageBandFromMultipartImageByExt  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
 
+    virtual int addImageBandFromMultipartImageByMimeRange (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, std::size_t firstFrameIdx, std::size_t numFrames) = 0;
+    virtual int addImageBandFromMultipartImageByExtRange  (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, std::size_t firstFrameIdx, std::size_t numFrames) = 0;
+
+    virtual bool saveImageAsBmp(int imageIdx, std::vector<std::uint8_t> &bmpData) = 0;
+
 
 
 }; // struct IImageList

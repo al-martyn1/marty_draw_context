@@ -295,6 +295,7 @@ struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
         cls.addFunc( _SC("clear")                              , &ImageListWrapper::clear);
         cls.addFunc( _SC("size")                               , &ImageListWrapper::size);
         cls.addFunc( _SC("empty")                              , &ImageListWrapper::empty);
+        cls.addFunc( _SC("getMimeTypeByFileName")              , &ImageListWrapper::getMimeTypeByFileName);
         cls.addFunc( _SC("getImageInfo")                       , &ImageListWrapper::getImageInfo);
         cls.addFunc( _SC("getAvailSizesByMime")                , &ImageListWrapper::getAvailSizesByMime);
         cls.addFunc( _SC("getAvailSizesByExt")                 , &ImageListWrapper::getAvailSizesByExt);

@@ -66,7 +66,7 @@ struct IAnimation
 };
 
 
-struct ISpriteAnimation
+struct ISpriteAnimation : public IAnimation
 {
     virtual ~ISpriteAnimation() {}
 

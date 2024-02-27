@@ -97,6 +97,8 @@
 //
 #include "simplesquirrel/AddImageBandResult.h"
 //
+#include "simplesquirrel/AddImageAllFramesResult.h"
+//
 #include "simplesquirrel/ImageList.h"
 //
 #include "simplesquirrel/DrawingCoords.h"

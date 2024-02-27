@@ -256,6 +256,55 @@ struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
         return marty_simplesquirrel::to_sqstring(getCheckedPtr("getMimeTypeByFileName")->getMimeTypeByFileName(marty_simplesquirrel::fromSqStringToUtf8(name)));
     }
 
+    AddImageBandResult addImageBandFromImageListEx(ImageListWrapper imageList, ImageSize frameMinSize, int flags_, ssq::Object frames_)
+    {
+        std::vector<std::size_t> frames = marty_simplesquirrel::fromArrayObjectToVectorConvertEx<std::size_t,int>(frames_, _SC("frames"), false);
+        auto flags = (ImgListBandFlags)flags_;
+        AddImageBandResult res;
+        res.verticalBand = (flags & ImgListBandFlags::verticalBand)!=0;
+        res.imageId = getCheckedPtr("addImageBandFromImageListEx")->addImageBandFromImageListEx(imageList.m_pImgList.get(), frameMinSize, flags, &res.frameSize, frames);
+        return res;
+    }
+
+    AddImageBandResult addImageBandFromImageList(ImageListWrapper imageList, ImageSize frameMinSize, int flags_)
+    {
+        auto flags = (ImgListBandFlags)flags_;
+        AddImageBandResult res;
+        res.verticalBand = (flags & ImgListBandFlags::verticalBand)!=0;
+        res.imageId = getCheckedPtr("addImageBandFromImageList")->addImageBandFromImageList(imageList.m_pImgList.get(), frameMinSize, flags, &res.frameSize);
+        return res;
+    }
+
+    AddImageBandResult addImageBandFromImageListRange(ImageListWrapper imageList, ImageSize frameMinSize, int flags_, int firstFrameIdx, int numFrames)
+    {
+        auto flags = (ImgListBandFlags)flags_;
+        AddImageBandResult res;
+        res.verticalBand = (flags & ImgListBandFlags::verticalBand)!=0;
+        res.imageId = getCheckedPtr("addImageBandFromImageListRange")->addImageBandFromImageListRange(imageList.m_pImgList.get(), frameMinSize, flags, &res.frameSize, firstFrameIdx, (std::size_t)numFrames);
+        return res;
+    }
+
+    AddImageAllFramesResult addImageAllFramesByMime(dotNut::simplesquirrel::BinaryData imageData, ssq::sqstring mimeType)
+    {
+        AddImageAllFramesResult res;
+        std::string strType = marty_simplesquirrel::fromSqStringToUtf8(mimeType);
+        std::size_t numLoadedFrames = 0;
+        res.firstImageId = getCheckedPtr("addImageAllFramesByMime")->addImageAllFramesByMime(imageData.data, strType, &numLoadedFrames);
+        res.numberOfFrames = (int)numLoadedFrames;
+        return res;
+    }
+
+    AddImageAllFramesResult addImageAllFramesByExt(dotNut::simplesquirrel::BinaryData imageData, ssq::sqstring ext)
+    {
+        AddImageAllFramesResult res;
+        std::string strType = marty_simplesquirrel::fromSqStringToUtf8(ext);
+        std::size_t numLoadedFrames = 0;
+        res.firstImageId = getCheckedPtr("addImageAllFramesByExt")->addImageAllFramesByExt(imageData.data, strType, &numLoadedFrames);
+        res.numberOfFrames = (int)numLoadedFrames;
+        return res;
+    }
+
+
 
 // struct AddImageBandResult
 // {

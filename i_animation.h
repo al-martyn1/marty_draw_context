@@ -3,6 +3,8 @@
 #include "i_draw_context.h"
 #include "i_image_list.h"
 
+//
+#include <memory>
 
 /*
     Когда вызывать анимирование анимаций?
@@ -22,10 +24,12 @@
 namespace marty_draw_context {
 
 
+struct IAnimation;
+
 struct IAnimationDrawingHandler
 {
     virtual ~IAnimationDrawingHandler() {};
-    virtual bool drawFrame(IDrawContext *pdc, const DrawCoord &pos, const DrawCoord &size, int aniId, int frameNum) const = 0;
+    virtual bool drawFrame(IDrawContext *pdc, IAnimation *pAnimation, const DrawCoord &pos, const DrawCoord &size, int aniId, int frameNum) const = 0;
 
 }; // struct IAnimationDrawingHandler
 
@@ -45,7 +49,7 @@ struct IAnimation
     virtual bool setTargetSize    (const DrawCoord &size) = 0; // установка размера на экране
     virtual bool setTargetScaled  (bool allowScale) = 0; // влияет ли targetSize на отрсовку, или изображение переносится попиксельно как есть
 
-    virtual bool setAnimationDrawHandler( std::shared_pre<IAnimationDrawingHandler> pHandler) const = 0;
+    virtual bool setAnimationDrawHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) const = 0;
 
     virtual bool setCurrentAnimationEx(unsigned curTickMs, int aniId, int frameId) = 0;
     virtual bool setCurrentAnimation(unsigned curTickMs, int aniId) = 0;
@@ -66,15 +70,20 @@ struct ISpriteAnimation
 {
     virtual ~ISpriteAnimation() {}
 
-    virtual bool assignAnimationImage(IImageList *pImgList, int imgId) = 0; // Очищает также все списки анимаций
+    virtual bool assignAnimationCommonImage(std::shared_ptr<IImageList> pImgList, int imgId) = 0; // Очищает также все списки анимаций
 
     // Создаёт анимацию из вертикальной/горизонтальной ленты заданного изображения
 
     // Простая версия сама высчитывает количество кадров по размеру картинки
-    virtual int addAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
+    virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
 
     // Расширенная версия использует указанное число кадров, но не более, чем есть в изображении
-    virtual int addAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+    virtual int addSpriteAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+
+    // Создаёт анимацию без IImageList и индекса изображения, их надо будет установить отдельно для каждого кадра
+    virtual int addSpriteAnimationSimple(int numFrames) = 0;
+
+    virtual bool setSpriteAnimationFrameImage(std::shared_ptr<IImageList> pImgList, int imgId) = 0;
 
 }; // struct IAnimation
 

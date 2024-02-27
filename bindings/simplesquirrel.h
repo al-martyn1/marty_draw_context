@@ -616,6 +616,8 @@ ssq::sqstring performBinding(TVM &vm, const ssq::sqstring &scriptText, const std
     exposeImageSize(tDraw);
     exposeImageInfo(tDraw);
     marty_draw_context::simplesquirrel::AddImageBandResult     ::expose(tDraw /*vm*/, _SC("AddImageBandResult"));
+    marty_draw_context::simplesquirrel::AddImageAllFramesResult::expose(tDraw /*vm*/, _SC("AddImageAllFramesResult"));
+
 
 #if defined(MDC_USE_DOTNUT)
 

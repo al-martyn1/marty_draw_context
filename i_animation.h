@@ -45,23 +45,32 @@ struct IAnimation
     virtual bool drawFrame(IDrawContext *pdc, int aniId) const = 0; // отрисовка текущей фазы заданной анимации
     virtual bool drawCurrentFrame(IDrawContext *pdc, int ainId) const = 0; // отрисовка текущей фазы текущей анимации
 
-    virtual bool setTargetPosition(const DrawCoord &pos ) = 0; // установка положения на экране, left/top, используется скалинг DrawContext'а
+    virtual bool setTargetPosition(const DrawCoord &pos ) = 0; // установка положения на экране, left/top
     virtual bool setTargetSize    (const DrawCoord &size) = 0; // установка размера на экране
     virtual bool setTargetScaled  (bool allowScale) = 0; // влияет ли targetSize на отрсовку, или изображение переносится попиксельно как есть
+
+    virtual DrawCoord getTargetPosition() = 0;
+    virtual DrawCoord getTargetSize() = 0;
+    virtual bool getTargetScaled() = 0;
 
     virtual bool setAnimationDrawHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) const = 0;
 
     virtual bool setCurrentAnimationEx(unsigned curTickMs, int aniId, int frameId) = 0;
     virtual bool setCurrentAnimation(unsigned curTickMs, int aniId) = 0;
 
+    // Возвращает true, если кадр пересчелкнулся
     virtual bool performAnimationStep(unsigned curTickMs) = 0;
-    virtual bool pauseAnimation() = 0;
+    virtual bool pauseAnimation(bool bPause) = 0;
+    virtual bool getAnimationPaused() = 0;
 
     virtual int addSimpleAnimation(int numFrames) = 0;
 
     virtual bool setAnimationBaseTiming(int aniId, unsigned ms) = 0; // Также очищает все кастомные тайминги
 
     virtual bool setAnimationFrameTiming(int aniId, int frameId, unsigned ms) = 0; // Задаёт время отображения фрейма (кастомный тайминг фрейма)
+
+    virtual bool setAnimationLooping(int aniId, bool bLoop) = 0;
+    virtual bool getAnimationLooping(int aniId) = 0;
 
 };
 

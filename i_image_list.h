@@ -136,6 +136,10 @@ struct IImageList
     virtual std::string getMimeTypeByFileName(const std::string &fileName) = 0;
     virtual std::wstring getMimeTypeByFileName(const std::wstring &fileName) = 0;
 
+    virtual int addImageBandFromImageListEx   (const IImageList *pImageList, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, const std::vector<int> &frameList) = 0;
+    virtual int addImageBandFromImageList     (const IImageList *pImageList, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
+    virtual int addImageBandFromImageListRange(const IImageList *pImageList, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, int firstFrameIdx, std::size_t numFrames) = 0;
+
 
 
 }; // struct IImageList

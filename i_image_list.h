@@ -140,6 +140,9 @@ struct IImageList
     virtual int addImageBandFromImageList     (const IImageList *pImageList, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize) = 0;
     virtual int addImageBandFromImageListRange(const IImageList *pImageList, ImageSize frameMinSize, ImgListBandFlags flags, ImageSize *pFrameSize, int firstFrameIdx, std::size_t numFrames) = 0;
 
+    virtual int addImageAllFramesByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, std::size_t *pNumLoadedFrames) = 0;
+    virtual int addImageAllFramesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , std::size_t *pNumLoadedFrames) = 0;
+
 
 
 }; // struct IImageList

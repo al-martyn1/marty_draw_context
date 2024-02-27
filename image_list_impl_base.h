@@ -65,6 +65,46 @@ struct ImageListImplBase : public IImageList
         return addImageBandFromMultipartImageByMimeRange(imgDirectoryRawData, mime::getMimeTypeByExt(ext), frameMinSize, flags, pFrameSize, firstFrameIdx, numFrames);
     }
 
+    virtual int addImageAllFramesByExt (const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &ext     , std::size_t *pNumLoadedFrames) override
+    {
+        return addImageAllFramesByMime(imgDirectoryRawData, mime::getMimeTypeByExt(ext), pNumLoadedFrames);
+    }
+
+    virtual int addImageAllFramesByMime(const std::vector<std::uint8_t> &imgDirectoryRawData, const std::string &mimeType, std::size_t *pNumLoadedFrames) override
+    {
+        std::size_t numImages = getNumberOfImagesByMime(imgDirectoryRawData, mimeType);
+        int res = -1;
+        std::size_t numAddedImages = 0;
+
+        for(std::size_t i=0u; i!=numImages; ++i)
+        {
+            int newIdx = addImageByMime(imgDirectoryRawData, mimeType, i);
+            if (newIdx<0)
+            {
+                continue;
+            }
+
+            ++numAddedImages;
+
+            if (res<0)
+            {
+                res = newIdx;
+            }
+        
+        }
+
+        if (res>=0)
+        {
+            if (pNumLoadedFrames)
+            {
+                *pNumLoadedFrames = numAddedImages;
+            }
+        }
+
+        return res;
+    }
+
+
 
 }; // struct ImageListImplBase
 

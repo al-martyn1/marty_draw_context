@@ -258,7 +258,7 @@ struct ImageListWrapper : public dotNut::simplesquirrel::ObjectBase
 
     AddImageBandResult addImageBandFromImageListEx(ImageListWrapper imageList, ImageSize frameMinSize, int flags_, ssq::Object frames_)
     {
-        std::vector<std::size_t> frames = marty_simplesquirrel::fromArrayObjectToVectorConvertEx<std::size_t,int>(frames_, _SC("frames"), false);
+        std::vector<int> frames = marty_simplesquirrel::fromArrayObjectToVectorConvertEx<int,int>(frames_, _SC("frames"), false);
         auto flags = (ImgListBandFlags)flags_;
         AddImageBandResult res;
         res.verticalBand = (flags & ImgListBandFlags::verticalBand)!=0;

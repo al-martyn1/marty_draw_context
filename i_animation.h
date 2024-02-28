@@ -43,6 +43,10 @@ struct IAnimation
 
     virtual void clear() = 0; // Только список анимаций
 
+    // Невидимые анимации не будут рисоваться. С большой долей вероятности такая фича будет востребована, и, чтобы не хранить её отдельно, запилим сразу тут
+    bool setVisible(bool bVisible) = 0;
+    bool isVisible() const = 0;
+
     virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId, int frameNum) const = 0; // отрисовка конкретной фазы заданной анимации
     virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId) const = 0; // отрисовка текущей фазы заданной анимации
     virtual bool drawCurrentFrame(IDrawContext *pdc) const = 0; // отрисовка текущей фазы текущей анимации
@@ -79,7 +83,7 @@ struct IAnimation
 };
 
 
-struct ISpriteAnimation : public IAnimation
+struct ISpriteAnimation : public virtual IAnimation
 {
     virtual ~ISpriteAnimation() {}
 
@@ -89,20 +93,26 @@ struct ISpriteAnimation : public IAnimation
     // Создаёт анимацию из вертикальной/горизонтальной ленты заданного изображения
 
     // Простая версия сама высчитывает количество кадров по размеру картинки
-    virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
+    virtual int addSpriteAnimationCustomImageList  (std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
 
     // Расширенная версия использует указанное число кадров, но не более, чем есть в изображении
+    virtual int addSpriteAnimationCustomImageListEx(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+
+    virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
     virtual int addSpriteAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
 
-    // Создаёт анимацию без IImageList и индекса изображения, их надо будет установить отдельно для каждого кадра
-    virtual int addSpriteAnimationSimple(int numFrames) = 0;
+
+    // А оно надо? Есть же уже в родителе addSimpleAnimation
+    // // Создаёт анимацию без IImageList и индекса изображения, их надо будет установить отдельно для каждого кадра
+    // virtual int addSpriteAnimationSimple(int numFrames) = 0;
+    //  
 
     virtual bool setSpriteAnimationFrameImage(int aniId, int frameId, std::shared_ptr<IImageList> pImgList, int imgId) = 0;
 
-    virtual const IImageList* getSpriteAnimationFrameImageList(int aniId, int frameId) = 0;
-    virtual int               getSpriteAnimationFrameImageIndex(int aniId, int frameId) = 0;
-    virtual ImageSize         getSpriteAnimationFrameImagePos(int aniId, int frameId) = 0;
-    virtual ImageSize         getSpriteAnimationFrameImageSize(int aniId, int frameId) = 0;
+    virtual std::shared_ptr<IImageList> getSpriteAnimationFrameImageList (int aniId, int frameId) = 0;
+    virtual int                         getSpriteAnimationFrameImageIndex(int aniId, int frameId) = 0;
+    virtual ImageSize                   getSpriteAnimationFrameImagePos  (int aniId, int frameId) = 0;
+    virtual ImageSize                   getSpriteAnimationFrameImageSize (int aniId, int frameId) = 0;
 
 
 

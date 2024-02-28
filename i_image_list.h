@@ -62,8 +62,22 @@ struct ImageSize
         return oss.str();
     }
 
+    ImageSize operator+(const ImageSize s) const
+    {
+        return ImageSize{width+s.width, height+s.height};
+    }
+
+    ImageSize& operator+=(const ImageSize s) const
+    {
+        width  += s.width ;
+        height += s.height;
+        return *this;
+    }
+
 
 }; // struct ImageSize
+
+
 
 //----------------------------------------------------------------------------
 

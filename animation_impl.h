@@ -35,6 +35,11 @@ struct AnimationInfo
     std::atomic<int>                  pauseCounter        = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
 
 
+    bool isDone() const
+    {
+        return curFrame>=frames.size();
+    }
+
     void clearPausedState()
     {
         pauseCounter.store(0);
@@ -149,26 +154,27 @@ class AnimationImpl : public IAnimation
 
 protected:
 
-    std::shared_ptr<IAnimationDrawingHandler> m_pAnimationDrawingHandler;
-    std::vector<AnimationInfo>                m_animations;
-    std::size_t                               m_curAnimation                = 0;
-    DrawCoord                                 m_drawingPos                  = DrawCoord{0,0};
-    DrawCoord                                 m_drawingSize                 = DrawCoord{0,0};
-    bool                                      m_targetScaled                = false;
-    std::uint32_t                             m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
+    std::shared_ptr<IAnimationDrawingHandler>        m_pAnimationDrawingHandler;
+    std::shared_ptr<IAnimationFrameChangeHandler>    m_pAnimationFrameChangeHandler;
+    std::vector<AnimationInfo>                       m_animations;
+    std::size_t                                      m_curAnimation                = 0;
+    DrawCoord                                        m_drawingPos                  = DrawCoord{0,0};
+    DrawCoord                                        m_drawingSize                 = DrawCoord{0,0};
+    bool                                             m_targetScaled                = false;
+    std::uint32_t                                    m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
 
-    std::atomic<int>                          m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
+    std::atomic<int>                                 m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
 
 public:
 
 
-    bool isVisible() override
+    virtual bool isVisible() override
     {
         int vcVal = m_visibilityCounter.load();
         return vcVal>0;
     }
 
-    bool setVisible(bool bVisible) override
+    virtual bool setVisible(bool bVisible) override
     {
         bool prevVisibilityState = isPaused();
         if (bPause)
@@ -266,8 +272,21 @@ public:
         return true;
     }
 
+    virtual int getAnimationNumFrames(int aniId) const override
+    {
+        std::size_t aniId    = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return 0;
+
+        return (int)m_animations[aniId].frames.size();
+    }
+
     virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId_, int frameNum_) const override // отрисовка конкретной фазы заданной анимации
     {
+        if (!isVisible())
+            return false;
+
         if (!pdc)
             return false;
 
@@ -403,8 +422,33 @@ public:
         }
 
         //TODO: !!! Надо вызвать какой-то хэндлер, если изменился текущий фрейм
+        if (m_pAnimationFrameChangeHandler)
+        {
+            bool isDone = false;
+            if (restarted)
+            {
+                isDone = true;
+            }
+            else
+            {
+                isDone = m_animations[m_curAnimation].isDone();
+            }
+            
+            m_pAnimationFrameChangeHandler->onFrameChanged(this, (int)m_curAnimation, (int)m_animations[m_curAnimation].curFrame, isDone, restarted);
+        }
 
         return res;
+    }
+
+    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) const override
+    {
+        m_pAnimationFrameChangeHandler = pHandler;
+        return true;
+    }
+
+    virtual void clearAnimationFrameChangeHandler() override
+    {
+        m_pAnimationFrameChangeHandler = pHandler;
     }
 
     virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) override
@@ -559,13 +603,11 @@ public:
     // Простая версия сама высчитывает количество кадров по размеру картинки
     virtual int addSpriteAnimationCustomImageList  (std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
     {
-        if (!m_pCommonImageList)
-        {
+        if (!pImageList)
             return -1;
-        }
 
         ImageListImageInfo imageInfo;
-        if (!m_pCommonImageList->getImageInfo(m_commonImageId, &imageInfo))
+        if (!pImageList->getImageInfo(imgId, &imageInfo))
         {
             return -1;
         }
@@ -637,13 +679,11 @@ public:
     // Расширенная версия использует указанное число кадров, но не более, чем есть в изображении
     virtual int addSpriteAnimationCustomImageListEx(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) override
     {
-        if (!m_pCommonImageList)
-        {
+        if (!pImageList)
             return -1;
-        }
 
         ImageListImageInfo imageInfo;
-        if (!m_pCommonImageList->getImageInfo(m_commonImageId, &imageInfo))
+        if (!pImageList->getImageInfo(imgId, &imageInfo))
         {
             return -1;
         }
@@ -676,7 +716,6 @@ public:
                 break; // лимит на число кадров кончился
             }
 
-            int numFrames
             AnimationFrameInfo frame;
             frame.pImgList     = pImageList;
             frame.imgId        = imgId     ;
@@ -726,6 +765,92 @@ public:
     virtual int addSpriteAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) override
     {
         return addSpriteAnimationCustomImageListEx(m_pCommonImageList, m_commonImageId, basePos, frameSize, bVertical, numFrames);
+    }
+
+    virtual int addSpriteAnimationCustomImageListFramesList(std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList_) override
+    {
+        if (!pImageList)
+            return -1;
+
+        std::vector<int> frameList = frameList_;
+        if(frameList.empty())
+        {
+            int imgListSize = pImageList->size();
+            frameList.reserve((std::size_t)imgListSize);
+            for(int id=0; id<imgListSize; ++id)
+            {
+                frameList.emplace_back(id);
+            }
+        }
+
+        AnimationInfo newAnimationInfo;
+        newAnimationInfo.autoRestart        = false;
+        newAnimationInfo.curFrame           = 0;
+        newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
+        newAnimationInfo.startTick          = 0;
+        newAnimationInfo.pauseTick          = 0;
+        newAnimationInfo.pauseCounter       = 0;
+
+        std::vector<int> &frameList
+        for(int imgId : frameList)
+        {
+            ImageListImageInfo imageInfo;
+            if (!pImageList->getImageInfo(imgId, &imageInfo))
+                continue;
+
+            AnimationFrameInfo frame;
+            frame.pImgList     = pImageList;
+            frame.imgId        = imgId     ;
+            frame.imgPos       = ImageSize{0,0};
+            frame.imgSize      = imageInfo.imageSize;
+            frame.frameTiming  = m_animationsCommonFrameTiming;
+            frame.frameScale   = 1; // default - no scale
+
+            try
+            {
+                newAnimationInfo.frames.emplace_back(frame);
+            }
+            catch(...)
+            {
+                return -1;
+            }
+
+        }
+
+        if (newAnimationInfo.frames.empty())
+        {
+            return -1;
+        }
+
+        int res = (int)m_animations.size();
+
+        try
+        {
+            m_animations.emplace_back(newAnimationInfo);
+        }
+        catch(...)
+        {
+            return -1;
+        }
+
+        return res;
+
+    }
+
+    virtual int addSpriteAnimationCustomImageListFramesRange(std::shared_ptr<IImageList> pImageList, int firstFrameIdx, int numFrames) override
+    {
+        std::vector<int> frameList; frameList.reserve((std::size_t)numFrames);
+        for(int idx=0; idx<numFrames; ++idx)
+        {
+            frameList.emplace_back(firstFrameIdx+idx);
+        }
+
+        return addSpriteAnimationCustomImageListFramesList(pImageList, frameList);
+    }
+
+    virtual int addSpriteAnimationCustomImageListFramesAll(std::shared_ptr<IImageList> pImageList) override
+    {
+        return addSpriteAnimationCustomImageListFramesList(pImageList, std::vector<int>());
     }
 
     virtual bool setSpriteAnimationFrameImage(int aniId_, int frameId_, std::shared_ptr<IImageList> pImgList, int imgId) override

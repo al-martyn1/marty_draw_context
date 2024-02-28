@@ -29,9 +29,18 @@ struct IAnimation;
 struct IAnimationDrawingHandler
 {
     virtual ~IAnimationDrawingHandler() {};
-    virtual bool drawFrame(IDrawContext *pdc, const IAnimation *pAnimation, const DrawCoord &pos, const DrawCoord &size, bool useSize, int aniId, int frameNum) const = 0;
+    virtual bool drawFrame(IDrawContext *pdc, IAnimation* pAnimation, const DrawCoord &pos, const DrawCoord &size, bool useSize, int aniId, int frameNum) const = 0;
 
 }; // struct IAnimationDrawingHandler
+
+
+struct IAnimationFrameChangeHandler
+{
+    virtual ~IAnimationFrameChangeHandler() {}
+    virtual void onFrameChanged(IAnimation* pAnimation, int aniId, int newFrameId, bool bDone, bool bRestarted) = 0; // при bDone bRestarted может быть true/false, иначе игнор
+
+
+}; // struct IAnimationFrameChangeHandler
 
 
 struct IAnimation
@@ -44,8 +53,10 @@ struct IAnimation
     virtual void clear() = 0; // Только список анимаций
 
     // Невидимые анимации не будут рисоваться. С большой долей вероятности такая фича будет востребована, и, чтобы не хранить её отдельно, запилим сразу тут
-    bool setVisible(bool bVisible) = 0;
-    bool isVisible() const = 0;
+    virtual bool setVisible(bool bVisible) = 0;
+    virtual bool isVisible() const = 0;
+
+    virtual int getAnimationNumFrames(int aniId) const = 0;
 
     virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId, int frameNum) const = 0; // отрисовка конкретной фазы заданной анимации
     virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId) const = 0; // отрисовка текущей фазы заданной анимации
@@ -62,6 +73,9 @@ struct IAnimation
     
     virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) const = 0;
     virtual void clearAnimationDrawingHandler() = 0;
+
+    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) const = 0;
+    virtual void clearAnimationFrameChangeHandler() = 0;
 
     virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) = 0;
     virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) = 0;
@@ -100,6 +114,10 @@ struct ISpriteAnimation : public virtual IAnimation
 
     virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
     virtual int addSpriteAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+
+    virtual int addSpriteAnimationCustomImageListFramesList(std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList) = 0;
+    virtual int addSpriteAnimationCustomImageListFramesRange(std::shared_ptr<IImageList> pImageList, int firstFrameIdx, int numFrames) = 0;
+    virtual int addSpriteAnimationCustomImageListFramesAll(std::shared_ptr<IImageList> pImageList) = 0;
 
 
     // А оно надо? Есть же уже в родителе addSimpleAnimation

@@ -415,6 +415,11 @@ public:
 
     virtual int  addSimpleAnimation(int numFrames) override
     {
+        if (numFrames<0 || numFrames > 8192) // нельзя слишком много фреймов в одной анимации
+        {
+            return -1;
+        }
+
         int res = -1;
         try
         {
@@ -446,6 +451,33 @@ public:
 
         return true;
     }
+
+    virtual bool setAnimationLooping(int aniId_, bool bLoop) override
+    {
+        std::size_t aniId    = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return false;
+
+        m_animations[m_curAnimation].autoRestart = bLoop;
+
+        return true;
+    }
+
+    virtual bool getAnimationLooping(int aniId) override
+    {
+        std::size_t aniId    = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return false;
+
+        return m_animations[m_curAnimation].autoRestart;
+    }
+
+
+}; // class AnimationImpl
+
+
 
 
 
@@ -483,8 +515,6 @@ public:
 
 
 
-
-}; // class AnimationImpl
 
 
 

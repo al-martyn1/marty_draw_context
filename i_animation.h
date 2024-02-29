@@ -110,7 +110,7 @@ struct ISpriteAnimation : public virtual IAnimation
     virtual int addSpriteAnimationCustomImageList  (std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
 
     // Расширенная версия использует указанное число кадров, но не более, чем есть в изображении
-    virtual int addSpriteAnimationCustomImageListEx(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+    virtual int addSpriteAnimationCustomImageListEx(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) = 0;
 
     virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
     virtual int addSpriteAnimationEx(const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
@@ -120,6 +120,15 @@ struct ISpriteAnimation : public virtual IAnimation
     virtual int addSpriteAnimationCustomImageListFramesAll(std::shared_ptr<IImageList> pImageList) = 0;
 
 
+    // Версии для добавления кадров к существующим анимациям, возвращают aniId, если всё хорошо, или -1 при ошибке
+    virtual int appendSpriteAnimationCustomImageList  (int aniId, std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
+    virtual int appendSpriteAnimationCustomImageListEx(int aniId, std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) = 0;
+    virtual int appendSpriteAnimation  (int aniId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) = 0;
+    virtual int appendSpriteAnimationEx(int aniId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) = 0;
+    virtual int appendSpriteAnimationCustomImageListFramesList (int aniId, std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList) = 0;
+    virtual int appendSpriteAnimationCustomImageListFramesRange(int aniId, std::shared_ptr<IImageList> pImageList, int firstFrameIdx, int numFrames) = 0;
+    virtual int appendSpriteAnimationCustomImageListFramesAll  (int aniId, std::shared_ptr<IImageList> pImageList) = 0;
+
     // А оно надо? Есть же уже в родителе addSimpleAnimation
     // // Создаёт анимацию без IImageList и индекса изображения, их надо будет установить отдельно для каждого кадра
     // virtual int addSpriteAnimationSimple(int numFrames) = 0;
@@ -127,10 +136,12 @@ struct ISpriteAnimation : public virtual IAnimation
 
     virtual bool setSpriteAnimationFrameImage(int aniId, int frameId, std::shared_ptr<IImageList> pImgList, int imgId) = 0;
 
-    virtual std::shared_ptr<IImageList> getSpriteAnimationFrameImageList (int aniId, int frameId) = 0;
-    virtual int                         getSpriteAnimationFrameImageIndex(int aniId, int frameId) = 0;
-    virtual ImageSize                   getSpriteAnimationFrameImagePos  (int aniId, int frameId) = 0;
-    virtual ImageSize                   getSpriteAnimationFrameImageSize (int aniId, int frameId) = 0;
+    virtual std::shared_ptr<IImageList> getSpriteAnimationFrameImageList (int aniId, int frameId) const = 0;
+    virtual int                         getSpriteAnimationFrameImageIndex(int aniId, int frameId) const = 0;
+    virtual ImageSize                   getSpriteAnimationFrameImagePos  (int aniId, int frameId) const = 0;
+    virtual ImageSize                   getSpriteAnimationFrameImageSize (int aniId, int frameId) const = 0;
+    virtual ImageSize                   getSpriteAnimationFramePivotPoint(int aniId, int frameId) const = 0;
+    virtual bool                        setSpriteAnimationFramePivotPoint(int aniId, int frameId, ImageSize pivotPoint) = 0;
 
 
 

@@ -21,6 +21,7 @@ struct AnimationFrameInfo
     int                          imgId       ;
     ImageSize                    imgPos      ; // положение спрайта в картинке
     ImageSize                    imgSize     ; // размер спрайта в картинке
+    ImageSize                    pivotPoint  = ImageSize{0,0}; // базовая точка спрайта
     std::uint32_t                frameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
     DrawCoord::value_type        frameScale  = 1;
 
@@ -604,16 +605,19 @@ public:
 
     // Создаёт анимацию из вертикальной/горизонтальной ленты заданного изображения
 
-    // Простая версия сама высчитывает количество кадров по размеру картинки
-    virtual int addSpriteAnimationCustomImageList  (std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
+    std::vector<AnimationFrameInfo> makeAnimationFramesHelper(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) const
     {
+        std::vector<AnimationFrameInfo> resVec;
+
         if (!pImageList)
-            return -1;
+        {
+            return resVec;
+        }
 
         ImageListImageInfo imageInfo;
         if (!pImageList->getImageInfo(imgId, &imageInfo))
         {
-            return -1;
+            return resVec;
         }
 
         ImageSize curPos  = basePos;
@@ -627,18 +631,17 @@ public:
             posStep.width = frameSize.width;
         }
 
-        AnimationInfo newAnimationInfo;
-        newAnimationInfo.autoRestart        = false;
-        newAnimationInfo.curFrame           = 0;
-        newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
-        newAnimationInfo.startTick          = 0;
-        newAnimationInfo.pauseTick          = 0;
-        newAnimationInfo.pauseCounter       = 0;
-
-
         ImageSize nextPos = curPos + posStep;
         while(nextPos.width<imageInfo.imageSize.width && nextPos.height<imageInfo.imageSize.height)
         {
+            if (maxNumFrames>=0) // лимит задан
+            {
+                if ((std::size_t)maxNumFrames >= newAnimationInfo.frames.size())
+                {
+                    break; // лимит на число кадров кончился
+                }
+            }
+
             AnimationFrameInfo frame;
             frame.pImgList     = pImageList;
             frame.imgId        = imgId     ;
@@ -649,11 +652,11 @@ public:
 
             try
             {
-                newAnimationInfo.frames.emplace_back(frame);
+                resVec.emplace_back(frame);
             }
             catch(...)
             {
-                return -1;
+                return std::vector<AnimationFrameInfo>();
             }
 
             curPos  += posStep;
@@ -661,10 +664,77 @@ public:
 
         }
 
-        if (newAnimationInfo.frames.empty())
+        return resVec;
+    }
+
+    std::vector<AnimationFrameInfo> makeAnimationFramesHelper(std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList_) const
+    {
+        std::vector<AnimationFrameInfo> resVec;
+
+        if (!pImageList)
+            return resVec;
+
+        std::vector<int> frameList = frameList_;
+        if(frameList.empty())
         {
-            return -1;
+            int imgListSize = pImageList->size();
+            frameList.reserve((std::size_t)imgListSize);
+            for(int id=0; id<imgListSize; ++id)
+            {
+                frameList.emplace_back(id);
+            }
         }
+
+        for(int imgId : frameList)
+        {
+            ImageListImageInfo imageInfo;
+            if (!pImageList->getImageInfo(imgId, &imageInfo))
+                continue;
+
+            AnimationFrameInfo frame;
+            frame.pImgList     = pImageList;
+            frame.imgId        = imgId     ;
+            frame.imgPos       = ImageSize{0,0};
+            frame.imgSize      = imageInfo.imageSize;
+            frame.frameTiming  = m_animationsCommonFrameTiming;
+            frame.frameScale   = 1; // default - no scale
+
+            try
+            {
+                resVec.emplace_back(frame);
+            }
+            catch(...)
+            {
+                return std::vector<AnimationFrameInfo>();
+            }
+
+        }
+
+        return resVec;
+
+    }
+
+    AnimationInfo fillAnimationInfo() const
+    {
+        AnimationInfo newAnimationInfo;
+        newAnimationInfo.autoRestart        = false;
+        newAnimationInfo.curFrame           = 0;
+        newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
+        newAnimationInfo.startTick          = 0;
+        newAnimationInfo.pauseTick          = 0;
+        newAnimationInfo.pauseCounter       = 0;
+
+        return newAnimationInfo;
+    }
+
+
+    // Простая версия сама высчитывает количество кадров по размеру картинки
+    virtual int addSpriteAnimationCustomImageList  (std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
+    {
+        AnimationInfo newAnimationInfo = fillAnimationInfo();
+        newAnimationInfo.frames = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, -1 /* maxNumFrames */ );
+        if (newAnimationInfo.frames.empty())
+            return -1;
 
         int res = (int)m_animations.size();
 
@@ -683,69 +753,10 @@ public:
     // Расширенная версия использует указанное число кадров, но не более, чем есть в изображении
     virtual int addSpriteAnimationCustomImageListEx(std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) override
     {
-        if (!pImageList)
-            return -1;
-
-        ImageListImageInfo imageInfo;
-        if (!pImageList->getImageInfo(imgId, &imageInfo))
-        {
-            return -1;
-        }
-
-        ImageSize curPos  = basePos;
-        ImageSize posStep = ImageSize{0,0};
-        if (bVertical)
-        {
-            posStep.height = frameSize.height;
-        }
-        else
-        {
-            posStep.width = frameSize.width;
-        }
-
-        AnimationInfo newAnimationInfo;
-        newAnimationInfo.autoRestart        = false;
-        newAnimationInfo.curFrame           = 0;
-        newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
-        newAnimationInfo.startTick          = 0;
-        newAnimationInfo.pauseTick          = 0;
-        newAnimationInfo.pauseCounter       = 0;
-
-
-        ImageSize nextPos = curPos + posStep;
-        while(nextPos.width<imageInfo.imageSize.width && nextPos.height<imageInfo.imageSize.height)
-        {
-            if ((std::size_t)maxNumFrames >= newAnimationInfo.frames.size())
-            {
-                break; // лимит на число кадров кончился
-            }
-
-            AnimationFrameInfo frame;
-            frame.pImgList     = pImageList;
-            frame.imgId        = imgId     ;
-            frame.imgPos       = curPos;
-            frame.imgSize      = frameSize;
-            frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScale   = 1; // default - no scale
-
-            try
-            {
-                newAnimationInfo.frames.emplace_back(frame);
-            }
-            catch(...)
-            {
-                return -1;
-            }
-
-            curPos  += posStep;
-            nextPos += posStep;
-
-        }
-
+        AnimationInfo newAnimationInfo = fillAnimationInfo();
+        newAnimationInfo.frames        = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, maxNumFrames );
         if (newAnimationInfo.frames.empty())
-        {
             return -1;
-        }
 
         int res = (int)m_animations.size();
 
@@ -760,6 +771,50 @@ public:
 
         return res;
     }
+
+    virtual int appendSpriteAnimationCustomImageList  (int aniId_, std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
+    {
+        std::size_t aniId = 0;
+        if (!checkConvertAniIds(aniId_, aniId))
+            return -1;
+
+        AnimationInfo &animationInfo = m_animations[aniId];
+        auto frames = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, -1 /* maxNumFrames */ );
+
+        try
+        {
+            animationInfo.frames.insert(animationInfo.frames..end(), frames.begin(), frames.end());
+        }
+        catch(...)
+        {
+            return -1;
+        }
+
+        return res;
+    
+    }
+
+    virtual int appendSpriteAnimationCustomImageListEx(int aniId_, std::shared_ptr<IImageList> pImageList, int imgId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int maxNumFrames) override
+    {
+        std::size_t aniId = 0;
+        if (!checkConvertAniIds(aniId_, aniId))
+            return -1;
+
+        AnimationInfo &animationInfo = m_animations[aniId];
+        auto frames = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, maxNumFrames );
+
+        try
+        {
+            animationInfo.frames.insert(animationInfo.frames.end(), frames.begin(), frames.end());
+        }
+        catch(...)
+        {
+            return -1;
+        }
+
+        return aniId_;
+    }
+
 
     virtual int addSpriteAnimation  (const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
     {
@@ -771,55 +826,21 @@ public:
         return addSpriteAnimationCustomImageListEx(m_pCommonImageList, m_commonImageId, basePos, frameSize, bVertical, numFrames);
     }
 
-    virtual int addSpriteAnimationCustomImageListFramesList(std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList_) override
+    virtual int appendSpriteAnimation  (int aniId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical) override
     {
-        if (!pImageList)
-            return -1;
+        return appendSpriteAnimationCustomImageList(aniId, m_pCommonImageList, m_commonImageId, basePos, frameSize, bVertical);
+    }
 
-        std::vector<int> frameList = frameList_;
-        if(frameList.empty())
-        {
-            int imgListSize = pImageList->size();
-            frameList.reserve((std::size_t)imgListSize);
-            for(int id=0; id<imgListSize; ++id)
-            {
-                frameList.emplace_back(id);
-            }
-        }
+    virtual int appendSpriteAnimationEx(int aniId, const ImageSize &basePos, const ImageSize &frameSize, bool bVertical, int numFrames) override
+    {
+        return appendSpriteAnimationCustomImageListEx(aniId, m_pCommonImageList, m_commonImageId, basePos, frameSize, bVertical, numFrames);
+    }
 
-        AnimationInfo newAnimationInfo;
-        newAnimationInfo.autoRestart        = false;
-        newAnimationInfo.curFrame           = 0;
-        newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
-        newAnimationInfo.startTick          = 0;
-        newAnimationInfo.pauseTick          = 0;
-        newAnimationInfo.pauseCounter       = 0;
 
-        std::vector<int> &frameList
-        for(int imgId : frameList)
-        {
-            ImageListImageInfo imageInfo;
-            if (!pImageList->getImageInfo(imgId, &imageInfo))
-                continue;
-
-            AnimationFrameInfo frame;
-            frame.pImgList     = pImageList;
-            frame.imgId        = imgId     ;
-            frame.imgPos       = ImageSize{0,0};
-            frame.imgSize      = imageInfo.imageSize;
-            frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScale   = 1; // default - no scale
-
-            try
-            {
-                newAnimationInfo.frames.emplace_back(frame);
-            }
-            catch(...)
-            {
-                return -1;
-            }
-
-        }
+    virtual int addSpriteAnimationCustomImageListFramesList(std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList) override
+    {
+        AnimationInfo newAnimationInfo = fillAnimationInfo();
+        newAnimationInfo.frames = makeAnimationFramesHelper(pImageList, frameList);
 
         if (newAnimationInfo.frames.empty())
         {
@@ -838,7 +859,6 @@ public:
         }
 
         return res;
-
     }
 
     virtual int addSpriteAnimationCustomImageListFramesRange(std::shared_ptr<IImageList> pImageList, int firstFrameIdx, int numFrames) override
@@ -857,7 +877,45 @@ public:
         return addSpriteAnimationCustomImageListFramesList(pImageList, std::vector<int>());
     }
 
-    virtual bool setSpriteAnimationFrameImage(int aniId_, int frameId_, std::shared_ptr<IImageList> pImgList, int imgId) override
+    virtual int appendSpriteAnimationCustomImageListFramesList (int aniId_, std::shared_ptr<IImageList> pImageList, const std::vector<int> &frameList) override
+    {
+        std::size_t aniId = 0;
+        if (!checkConvertAniIds(aniId_, aniId))
+            return -1;
+
+        AnimationInfo &animationInfo = m_animations[aniId];
+        auto frames = makeAnimationFramesHelper(pImageList, frameList);
+
+        try
+        {
+            animationInfo.frames.insert(animationInfo.frames.end(), frames.begin(), frames.end());
+        }
+        catch(...)
+        {
+            return -1;
+        }
+
+        return aniId_;
+    }
+
+    virtual int appendSpriteAnimationCustomImageListFramesRange(int aniId, std::shared_ptr<IImageList> pImageList, int firstFrameIdx, int numFrames) override
+    {
+        std::vector<int> frameList; frameList.reserve((std::size_t)numFrames);
+        for(int idx=0; idx<numFrames; ++idx)
+        {
+            frameList.emplace_back(firstFrameIdx+idx);
+        }
+
+        return appendSpriteAnimationCustomImageListFramesList(aniId, pImageList, frameList);
+    }
+
+    virtual int appendSpriteAnimationCustomImageListFramesAll  (int aniId, std::shared_ptr<IImageList> pImageList) override
+    {
+        return appendSpriteAnimationCustomImageListFramesList(aniId, pImageList, std::vector<int>());
+    }
+
+
+    virtual bool setSpriteAnimationFrameImage(int aniId_, int frameId_, std::shared_ptr<IImageList> pImgList, int imgId) const override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -882,7 +940,7 @@ public:
     }
 
 
-    virtual std::shared_ptr<IImageList> getSpriteAnimationFrameImageList(int aniId_, int frameId_) override
+    virtual std::shared_ptr<IImageList> getSpriteAnimationFrameImageList(int aniId_, int frameId_) const override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -903,7 +961,7 @@ public:
         return fi.pImgList;
     }
 
-    virtual int               getSpriteAnimationFrameImageIndex(int aniId_, int frameId_) override
+    virtual int               getSpriteAnimationFrameImageIndex(int aniId_, int frameId_) const override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -924,7 +982,7 @@ public:
         return fi.imgId;
     }
 
-    virtual ImageSize         getSpriteAnimationFrameImagePos  (int aniId_, int frameId_) override
+    virtual ImageSize         getSpriteAnimationFrameImagePos  (int aniId_, int frameId_) const override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -945,7 +1003,7 @@ public:
         return fi.imgPos;
     }
 
-    virtual ImageSize         getSpriteAnimationFrameImageSize (int aniId_, int frameId_) override
+    virtual ImageSize         getSpriteAnimationFrameImageSize (int aniId_, int frameId_) const override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -966,8 +1024,54 @@ public:
         return fi.imgSize;
     }
 
+    virtual ImageSize                   getSpriteAnimationFramePivotPoint(int aniId_, int frameId_) const override
+    {
+        std::size_t aniId   = 0;
+        std::size_t frameId = 0;
 
-};
+        if (!checkConvertAniIds(aniId_, frameId_, aniId, frameId))
+            return ImageSize{0,0};
+
+        if (aniId>=m_animations.size())
+            return ImageSize{0,0};
+
+        const AnimationInfo &ani = m_animations[aniId];
+
+        if (frameId>=ani.frames.size())
+            return ImageSize{0,0};
+
+        const AnimationFrameInfo &fi = ani.frames[frameId];
+
+        return fi.pivotPoint;
+    }
+
+    virtual bool                        setSpriteAnimationFramePivotPoint(int aniId_, int frameId_, ImageSize pivotPoint) override
+    {
+        std::size_t aniId   = 0;
+        std::size_t frameId = 0;
+
+        if (!checkConvertAniIds(aniId_, frameId_, aniId, frameId))
+            return false;
+
+        if (aniId>=m_animations.size())
+            return false;
+
+        AnimationInfo &ani = m_animations[aniId];
+
+        if (frameId>=ani.frames.size())
+            return false;
+
+        const AnimationFrameInfo &fi = ani.frames[frameId];
+
+        if (pivotPoint.width>=fi.imgSize.width || pivotPoint.height>=fi.imgSize.height)
+            return false;
+
+        fi.pivotPoint = pivotPoint;
+
+        return true;
+    }
+
+}; // class SpriteAnimationImpl
 
 
     // std::shared_ptr<IAnimationDrawingHandler> m_pAnimationDrawingHandler;

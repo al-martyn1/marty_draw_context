@@ -67,7 +67,7 @@ struct ImageSize
         return ImageSize{width+s.width, height+s.height};
     }
 
-    ImageSize& operator+=(const ImageSize s) const
+    ImageSize& operator+=(const ImageSize s)
     {
         width  += s.width ;
         height += s.height;

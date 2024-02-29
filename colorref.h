@@ -420,6 +420,47 @@ struct ColorRef
             return fromUnsigned(crul);
         }
 
+        std::string strUpperTrimed = marty_cpp::toUpper(str);
+        strUpperTrimed = marty_cpp::simple_trim(strUpperTrimed, [](char ch) { return ch==' '; } );
+
+        if ( (strUpperTrimed.size()>7) // "RGB(,,)" - 7
+          && strUpperTrimed.compare( 0, 4, "RGB(" )==0
+          && strUpperTrimed.back()==')'
+           ) 
+        {
+            strUpperTrimed.erase(0,4); // remove leading "RGB("
+            strUpperTrimed.erase(strUpperTrimed.size()-1,1); // remove trailing ")"
+
+            std::vector<std::string> rgbStrings = marty_cpp::simple_string_split(strUpperTrimed, ",");
+            if (rgbStrings.size()!=3)
+            {
+                throw std::runtime_error("ColorRef::deserialize: bad RGB() value");
+            }
+
+            std::vector<std::uint8_t> urgbParts;
+            for(auto part : rgbStrings)
+            {
+                part = marty_cpp::simple_trim(part, [](char ch) { return ch==' '; } );
+                if (part.empty())
+                {
+                    throw std::runtime_error("ColorRef::deserialize: bad RGB() value");
+                }
+
+                std::string::size_type sz = 0;
+                unsigned long crul = std::stoul(part, &sz, 10);
+                if (sz!=part.size())
+                    throw std::runtime_error("ColorRef::deserialize: bad RGB() value");
+
+                if (crul>255)
+                    throw std::runtime_error("ColorRef::deserialize: bad RGB() value");
+
+                urgbParts.emplace_back((std::uint8_t)crul);
+            }
+
+            return ColorRef{ urgbParts[0u], urgbParts[1u], urgbParts[2u] };
+
+        }
+
         return fromUnsigned( (std::uint32_t)marty_draw_context::enum_deserialize_EColorRawEnum(str) );
     }
 

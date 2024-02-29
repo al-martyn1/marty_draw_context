@@ -4,7 +4,7 @@
 
 /*--------------------------------------------------------*/
 
-static const unsigned char hero_girl_animation_frames_14x6_png[451617] =
+static const unsigned char hero_girl_animation_frames_14x6_130px_130px_png[451617] =
     { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52
     , 0x00, 0x00, 0x07, 0x1C, 0x00, 0x00, 0x03, 0x0C, 0x08, 0x06, 0x00, 0x00, 0x00, 0x69, 0x08, 0xD2
     , 0x11, 0x00, 0x00, 0x00, 0x09, 0x70, 0x48, 0x59, 0x73, 0x00, 0x00, 0x10, 0xEB, 0x00, 0x00, 0x10
@@ -28235,8 +28235,8 @@ static const unsigned char hero_girl_animation_frames_14x6_png[451617] =
     };
 
 
-static const unsigned hero_girl_animation_frames_14x6_png_size = 451617;
+static const unsigned hero_girl_animation_frames_14x6_130px_130px_png_size = 451617;
 
-static const char* hero_girl_animation_frames_14x6_png_filename = "hero_girl_animation_frames_14x6.png";
+static const char* hero_girl_animation_frames_14x6_130px_130px_png_filename = "hero_girl_animation_frames_14x6_130px_130px.png";
 
-static const char* hero_girl_animation_frames_14x6_png_mime_type = "image/png";
+static const char* hero_girl_animation_frames_14x6_130px_130px_png_mime_type = "image/png";

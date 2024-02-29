@@ -34,7 +34,12 @@ umba-2c %CMN_OPTS% ajax_loader2.gif  ajax_loader2_gif.cpp
 umba-2c %CMN_OPTS% animated_mice.gif animated_mice_gif.cpp
 umba-2c %CMN_OPTS% animated_tits.gif animated_tits_gif.cpp
 
+umba-2c %CMN_OPTS% walking_girl.gif walking_girl.cpp
+
 umba-2c %CMN_OPTS% Animated_PNG_example_bouncing_beach_ball.png Animated_PNG_example_bouncing_beach_ball_png.cpp
 
-umba-2c %CMN_OPTS% hero_girl_animation_frames_14x6.png hero_girl_animation_frames_14x6_png.cpp
+umba-2c %CMN_OPTS% hero_girl_animation_frames_14x6_130px_130px.png hero_girl_animation_frames_14x6_130px_130px_png.cpp
+umba-2c %CMN_OPTS% hero_girl_with_pivot_markers.png                hero_girl_with_pivot_markers_png.cpp
+umba-2c %CMN_OPTS% running_monster_10x8_128px_128px.png            running_monster_10x8_128px_128px_png.cpp
+umba-2c %CMN_OPTS% running_monster_10x8_128px_128px.jpg            running_monster_10x8_128px_128px_jpg.cpp
 

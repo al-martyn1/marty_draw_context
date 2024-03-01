@@ -22,9 +22,9 @@ namespace marty_draw_context {
 struct AnimationFrameInfo
 {
     std::shared_ptr<IImageList>  pImgList    ;
-    int                          imgId       ;
-    ImageSize                    imgPos      ; // положение спрайта в картинке
-    ImageSize                    imgSize     ; // размер спрайта в картинке
+    int                          imgId       = -1;
+    ImageSize                    imgPos      = ImageSize{0,0}; // положение спрайта в картинке
+    ImageSize                    imgSize     = ImageSize{0,0}; // размер спрайта в картинке
     ImageSize                    pivotPoint  = ImageSize{0,0}; // базовая точка спрайта
     std::uint32_t                frameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
     int                          frameScalePercent  = 100;

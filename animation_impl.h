@@ -64,6 +64,7 @@ struct AnimationInfo
     std::vector<AnimationFrameInfo>   frames              ;
     bool                              autoRestart         = false;
     std::size_t                       curFrame            = 0; // если >= frames.size() - то анимация дошла до конца и рисуем последний фрейм
+    bool                              hasPivots           = false;
     std::uint32_t                     commonFrameTaiming  = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
     std::uint32_t                     startTick           = 0;
     std::uint32_t                     pauseTick           = 0;
@@ -168,6 +169,22 @@ struct AnimationInfo
 
 #endif
 
+
+    bool updatePivotsSummaryCache()
+    {
+        hasPivots = false;
+
+        for(const auto &fi: frames)
+        {
+            if (fi.pivotPoint.width!=0 || fi.pivotPoint.height!=0)
+            {
+                hasPivots = true;
+                break;
+            }
+        }
+
+        return hasPivots;
+    }
 
     // Возвращает true при смене кадра
     bool performStep(std::uint32_t curTickMs, bool *pRestarted = 0)
@@ -374,13 +391,17 @@ public:
 
         const AnimationInfo &animationInfo = m_animations[aniId];
 
-        if (animationInfo.frames.empty())
+        if (tmp_frameNum>=animationInfo.frames.size())
             return false;
 
-        if (tmp_frameNum>=animationInfo.frames.size())
-        {
-            tmp_frameNum = animationInfo.frames.size()-1; // рисуем последний кадр
-        }
+        // рисование только в одном месте, а frameNum должен влезать в диапазон во всех остальных местах
+        // if (animationInfo.frames.empty())
+        //     return false;
+        //  
+        // if (tmp_frameNum>=animationInfo.frames.size())
+        // {
+        //     tmp_frameNum = animationInfo.frames.size()-1; // рисуем последний кадр
+        // }
 
         aniId    = tmp_aniId   ;
         frameNum = tmp_frameNum;
@@ -423,12 +444,24 @@ public:
         std::size_t aniId    = 0;
         std::size_t frameNum = 0;
 
-        if (!checkConvertAniIds(aniId_, frameNum_, aniId, frameNum))
+        if (!checkConvertAniIds(aniId_, aniId))
             return false;
+
+        const AnimationInfo &animationInfo = m_animations[aniId];
+        frameNum = (std::size_t)frameNum_;
+
+        if (animationInfo.frames.empty())
+            return false;
+
+        if (frameNum>=animationInfo.frames.size())
+        {
+            frameNum = animationInfo.frames.size()-1; // рисуем последний кадр
+        }
 
         const AnimationFrameInfo &frameInfo = m_animations[aniId].frames[frameNum];
         MARTY_ARG_USED(frameInfo);
         MARTY_ARG_USED(scale);
+
 
 // struct AnimationFrameInfo
 // {
@@ -456,7 +489,8 @@ public:
          */
 
         bool targetScaled = m_targetScaled;
-        if (frameInfo.pivotPoint.width!=0 || frameInfo.pivotPoint.height!=0)
+        //if (frameInfo.pivotPoint.width!=0 || frameInfo.pivotPoint.height!=0)
+        if (animationInfo.hasPivots)
         {
             targetScaled = true;
         }
@@ -899,6 +933,7 @@ public:
         AnimationInfo newAnimationInfo;
         newAnimationInfo.autoRestart        = false;
         newAnimationInfo.curFrame           = 0;
+        newAnimationInfo.hasPivots          = false;
         newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
         newAnimationInfo.startTick          = 0;
         newAnimationInfo.pauseTick          = 0;
@@ -1253,6 +1288,8 @@ public:
             return false;
 
         fi.pivotPoint = pivotPoint;
+
+        ani.updatePivotsSummaryCache();
 
         return true;
     }

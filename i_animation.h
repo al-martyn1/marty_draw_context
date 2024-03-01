@@ -43,8 +43,7 @@ struct IAnimationDrawingHandler
 struct IAnimationFrameChangeHandler
 {
     virtual ~IAnimationFrameChangeHandler() {}
-    virtual void onAnimationFrameChanged(IAnimation* pAnimation, int aniId, int newFrameId, bool bDone, bool bRestarted) = 0; // при bDone bRestarted может быть true/false, иначе игнор
-
+    virtual void onAnimationFrameChanged(IAnimation* pAnimation, std::uint32_t curTickMs, int aniId, int newFrameId, bool bDone, bool bRestarted) = 0; // при bDone bRestarted может быть true/false, иначе игнор
 
 }; // struct IAnimationFrameChangeHandler
 
@@ -87,7 +86,7 @@ struct IAnimation
     virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) = 0;
 
     // Возвращает true, если кадр пересчелкнулся
-    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pRestarted) = 0;
+    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pDone=0, bool *pRestarted=0) = 0;
     virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) = 0; // returns true if paused
     virtual bool isCurrentAnimationPaused() const = 0;
 
@@ -157,8 +156,88 @@ struct ISpriteAnimation : public virtual IAnimation
 
 }; // struct IAnimation
 
+//----------------------------------------------------------------------------
 
+
+
+
+//----------------------------------------------------------------------------
+struct SpriteAnimationDrawer : public IAnimationDrawingHandler
+{
+    virtual bool drawAnimationFrame( IDrawContext *pdc, IAnimation* pAnimation, IImageList* pImgList, int imgId
+                                   , const DrawCoord &screenPos, const DrawCoord &screenSize
+                                   , ImageSize imgPartLeftTop, ImageSize imgPartSize
+                                   ) const override
+    {
+        if (!pdc  /* || !pAnimation */  || !pImgList)
+            return false;
+
+        MARTY_ARG_USED(pAnimation);
+
+        pdc->drawImageScaled( pImgList, imgId, screenPos, screenSize, imgPartLeftTop, imgPartSize);
+
+        return true;
+    }
+
+}; // struct SpriteAnimationDrawer
+
+//----------------------------------------------------------------------------
+inline
+std::shared_ptr<IAnimationDrawingHandler> createSharedSpriteAnimationDrawer()
+{
+    auto pDrawerImpl = std::make_shared<SpriteAnimationDrawer>();
+    return std::static_pointer_cast<IAnimationDrawingHandler>(pDrawerImpl);
+}
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
+template<typename THandler>
+class AnimationFrameChangeHandler : public IAnimationFrameChangeHandler
+{
+protected:
+
+    THandler   handler;
+
+    void onAnimationFrameChanged(IAnimation* pAnimation, std::uint32_t curTickMs, int aniId, int newFrameId, bool bDone, bool bRestarted) override // при bDone bRestarted может быть true/false, иначе игнор
+    {
+        handler(pAnimation, curTickMs, aniId, newFrameId, bDone, bRestarted);
+    }
+
+public:
+
+    AnimationFrameChangeHandler(THandler h) : handler(h) {}
+
+    AnimationFrameChangeHandler(const AnimationFrameChangeHandler&) = delete;
+    AnimationFrameChangeHandler& operator=(const AnimationFrameChangeHandler&) = delete;
+
+    AnimationFrameChangeHandler(AnimationFrameChangeHandler&&) = default;
+    AnimationFrameChangeHandler& operator=(AnimationFrameChangeHandler&&) = default;
+
+}; // class AnimationFrameChangeHandler
+
+//----------------------------------------------------------------------------
+template<typename THandler> inline
+std::shared_ptr<IAnimationFrameChangeHandler> createSharedAnimationFrameChangeHandler(THandler h)
+{
+    auto impl = std::make_shared< AnimationFrameChangeHandler<THandler> >(h);
+    return std::static_pointer_cast<IAnimationFrameChangeHandler>(impl);
+}
+
+//----------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------
 
 
 } // namespace marty_draw_context
+
 

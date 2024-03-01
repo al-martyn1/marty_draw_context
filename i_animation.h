@@ -29,7 +29,13 @@ struct IAnimation;
 struct IAnimationDrawingHandler
 {
     virtual ~IAnimationDrawingHandler() {};
-    virtual bool drawFrame(IDrawContext *pdc, IAnimation* pAnimation, const DrawCoord &pos, const DrawCoord &size, bool useSize, int aniId, int frameNum) const = 0;
+    virtual bool drawAnimationFrame( IDrawContext *pdc, IAnimation* pAnimation, IImageList* pImgList, int imgId
+                                   , const DrawCoord &screenPos, const DrawCoord &screenSize
+                                   , ImageSize imgPartLeftTop, ImageSize imgPartSize
+                                   ) const = 0;
+
+    // Почти напрямую можно вызывать
+    // bool IDrawContext::drawImageScaled( std::shared_ptr<IImageList> pImgList, int idx, const DrawCoord &pos, const DrawCoord &imgScreenSize, ImageSize imgPartLeftTop, ImageSize imgPartSize) = 0;
 
 }; // struct IAnimationDrawingHandler
 
@@ -37,7 +43,7 @@ struct IAnimationDrawingHandler
 struct IAnimationFrameChangeHandler
 {
     virtual ~IAnimationFrameChangeHandler() {}
-    virtual void onFrameChanged(IAnimation* pAnimation, int aniId, int newFrameId, bool bDone, bool bRestarted) = 0; // при bDone bRestarted может быть true/false, иначе игнор
+    virtual void onAnimationFrameChanged(IAnimation* pAnimation, int aniId, int newFrameId, bool bDone, bool bRestarted) = 0; // при bDone bRestarted может быть true/false, иначе игнор
 
 
 }; // struct IAnimationFrameChangeHandler
@@ -58,23 +64,23 @@ struct IAnimation
 
     virtual int getAnimationNumFrames(int aniId) const = 0;
 
-    virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId, int frameNum) const = 0; // отрисовка конкретной фазы заданной анимации
-    virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId) const = 0; // отрисовка текущей фазы заданной анимации
-    virtual bool drawCurrentFrame(IDrawContext *pdc) const = 0; // отрисовка текущей фазы текущей анимации
+    virtual bool drawAnimationFrame       (IDrawContext *pdc, int aniId, int frameNum, const DrawCoord &scale=DrawCoord{1,1}) const = 0; // отрисовка конкретной фазы заданной анимации
+    virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId, const DrawCoord &scale=DrawCoord{1,1}) const = 0; // отрисовка текущей фазы заданной анимации
+    virtual bool drawCurrentFrame         (IDrawContext *pdc, const DrawCoord &scale=DrawCoord{1,1}) const = 0; // отрисовка текущей фазы текущей анимации
 
     virtual bool setTargetPosition(const DrawCoord &pos ) = 0; // установка положения на экране, left/top
     virtual DrawCoord getTargetPosition() = 0;
-    virtual bool setTargetSize    (const DrawCoord &size) = 0; // установка размера на экране
-    virtual DrawCoord getTargetSize() = 0;
-    virtual bool setTargetScaled  (bool allowScale) = 0; // влияет ли targetSize на отрисовку, или изображение переносится попиксельно как есть
-    virtual bool getTargetScaled() = 0;
+    virtual bool setTargetScale    (const DrawCoord &scale) = 0; // установка размера на экране
+    virtual DrawCoord getTargetScale() const = 0;
+    virtual bool setTargetScaledOnOff(bool allowScale) = 0; // влияет ли targetSize на отрисовку, или изображение переносится попиксельно как есть
+    virtual bool getTargetScaledOnOff() const = 0;
 
-    virtual bool setAnimationFrameScale(int aniId, int frameNum, DrawCoord::value_type scale) = 0;
+    virtual bool setAnimationFrameScalePercent(int aniId, int frameNum, int precent) = 0;
     
-    virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) const = 0;
+    virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) = 0;
     virtual void clearAnimationDrawingHandler() = 0;
 
-    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) const = 0;
+    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) = 0;
     virtual void clearAnimationFrameChangeHandler() = 0;
 
     virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) = 0;
@@ -102,7 +108,7 @@ struct ISpriteAnimation : public virtual IAnimation
     virtual ~ISpriteAnimation() {}
 
     virtual bool setSpriteAnimationCommonImage(std::shared_ptr<IImageList> pImgList, int imgId) = 0;
-    virtual bool clearAll() = 0; // Очищает все списки анимаций, а также CommonImage
+    virtual void clearAll() = 0; // Очищает все списки анимаций, а также CommonImage
 
     // Создаёт анимацию из вертикальной/горизонтальной ленты заданного изображения
 

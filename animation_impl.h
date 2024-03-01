@@ -12,6 +12,10 @@
 //TODO: !!! При биндинге эти колбеки принимают IAnimation, надо будет сделать из этого указателя shared_ptr и передать стандартную обёртку, но пользователь ССЗБ, если будет это где-то сохранять
 //TODO: !!! Нужно сделать append версии всех addSpriteAnimation* методов
 
+
+// #define MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC
+
+
 namespace marty_draw_context {
 
 
@@ -23,13 +27,40 @@ struct AnimationFrameInfo
     ImageSize                    imgSize     ; // размер спрайта в картинке
     ImageSize                    pivotPoint  = ImageSize{0,0}; // базовая точка спрайта
     std::uint32_t                frameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
-    DrawCoord::value_type        frameScale  = 1;
+    int                          frameScalePercent  = 100;
+
+protected:
+
+    ImageSize scaleImageSize(ImageSize sz) const
+    {
+        return ImageSize{sz.width*frameScalePercent/100, sz.height*frameScalePercent/100};
+    }
+
+public:
+
+    ImageSize getScaledSize() const
+    {
+        return scaleImageSize(imgSize);
+    }
+
+    ImageSize getScaledPivotPoint() const
+    {
+        return scaleImageSize(pivotPoint);
+    }
+
+
 
 }; // struct AnimationFrameInfo
 
 
 struct AnimationInfo
 {
+    AnimationInfo() = default;
+    AnimationInfo(const AnimationInfo&) = default;
+    AnimationInfo& operator=(const AnimationInfo&) = default;
+    AnimationInfo(AnimationInfo&&) = default;
+    AnimationInfo& operator=(AnimationInfo&&) = default;
+
     std::vector<AnimationFrameInfo>   frames              ;
     bool                              autoRestart         = false;
     std::size_t                       curFrame            = 0; // если >= frames.size() - то анимация дошла до конца и рисуем последний фрейм
@@ -37,14 +68,18 @@ struct AnimationInfo
     std::uint32_t                     startTick           = 0;
     std::uint32_t                     pauseTick           = 0;
     //int                               pauseCounter        = 0;
+#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
     std::atomic<int>                  pauseCounter        = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
-
+#else
+    int                               pauseCounter        = 0;
+#endif
 
     bool isDone() const
     {
         return curFrame>=frames.size();
     }
 
+#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
     void clearPausedState()
     {
         pauseCounter.store(0);
@@ -90,6 +125,48 @@ struct AnimationInfo
 
         return curPausedState;
     }
+#else
+    void clearPausedState()
+    {
+        pauseCounter = 0;
+    }
+
+    bool isPaused() const
+    {
+        return pauseCounter>0;
+    }
+
+    // returns true if paused
+    bool doPause(std::uint32_t curTickMs, bool bPause)
+    {
+        bool prevPausedState = isPaused();
+
+        pauseCounter += bPause ? +1 : -1;
+
+        bool curPausedState = isPaused();
+
+        if (prevPausedState!=curPausedState)
+        {
+            // состояние паузы изменилось
+            if (curPausedState)
+            {
+                // стали в паузу, сохраняем тик
+                pauseTick = curTickMs;
+            }
+            else
+            {
+                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
+                std::uint32_t pauseTickDelta = curTickMs - pauseTick;
+                startTick += pauseTickDelta;
+            }
+
+        }
+
+        return curPausedState;
+
+    }
+
+#endif
 
 
     // Возвращает true при смене кадра
@@ -102,7 +179,7 @@ struct AnimationInfo
         int curTickDelta = (int)(curTickMs - startTick);
 
         std::size_t timingFrameIdx = 0;
-        for(; timingFrameIdx!=timingFrameIdx.size(); ++timingFrameIdx)
+        for(; timingFrameIdx!=frames.size(); ++timingFrameIdx)
         {
             std::uint32_t curFrameTiming = frames[timingFrameIdx].frameTiming;
             if (curFrameTiming<5)
@@ -164,16 +241,28 @@ protected:
     std::vector<AnimationInfo>                       m_animations;
     std::size_t                                      m_curAnimation                = 0;
     DrawCoord                                        m_drawingPos                  = DrawCoord{0,0};
-    DrawCoord                                        m_drawingSize                 = DrawCoord{0,0};
+    DrawCoord                                        m_drawingScale                 = DrawCoord{0,0};
     bool                                             m_targetScaled                = false;
     std::uint32_t                                    m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
 
+#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
     std::atomic<int>                                 m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
+#else
+    int                                              m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
+#endif
 
 public:
 
+    AnimationImpl() = default;
+    AnimationImpl(const AnimationImpl&) = delete;
+    AnimationImpl& operator=(const AnimationImpl&) = delete;
+    AnimationImpl(AnimationImpl&&) = delete;
+    AnimationImpl& operator=(AnimationImpl&&) = delete;
 
-    virtual bool isVisible() override
+
+#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
+
+    virtual bool isVisible() const override
     {
         int vcVal = m_visibilityCounter.load();
         return vcVal>0;
@@ -181,8 +270,8 @@ public:
 
     virtual bool setVisible(bool bVisible) override
     {
-        bool prevVisibilityState = isPaused();
-        if (bPause)
+        bool prevVisibilityState = isVisible();
+        if (!bVisible)
         {
             m_visibilityCounter.fetch_add(1 /* , std::memory_order_acquire */ );
         }
@@ -191,7 +280,40 @@ public:
             m_visibilityCounter.fetch_sub(1 /* , std::memory_order_acquire */ );
         }
 
-        bool curVisibilityState = isPaused();
+        bool curVisibilityState = isVisible();
+
+        if (prevVisibilityState!=curVisibilityState)
+        {
+            // состояние паузы изменилось
+            if (curVisibilityState)
+            {
+                // стали в паузу, сохраняем тик
+                //pauseTick = curTickMs;
+            }
+            else
+            {
+                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
+                // std::uint32_t pauseTickDelta = curTickMs - pauseTick;
+                // startTick += pauseTickDelta;
+            }
+
+        }
+
+        return curVisibilityState;
+    }
+#else
+    virtual bool isVisible() const override
+    {
+        return m_visibilityCounter>0;
+    }
+
+    virtual bool setVisible(bool bVisible) override
+    {
+        bool prevVisibilityState = isVisible();
+
+        m_visibilityCounter += !bVisible ? +1 : -1;
+
+        bool curVisibilityState = isVisible();
 
         if (prevVisibilityState!=curVisibilityState)
         {
@@ -213,8 +335,9 @@ public:
         return curVisibilityState;
     }
 
+#endif
 
-    virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) const override
+    virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) override
     {
         m_pAnimationDrawingHandler = pHandler;
         return true;
@@ -222,23 +345,23 @@ public:
 
     virtual void clearAnimationDrawingHandler() override
     {
-        m_pAnimationDrawingHandler.reset(0);
+        m_pAnimationDrawingHandler.reset();
     }
 
 
     virtual int  size()  const override
     {
-        return (int)animations.size();
+        return (int)m_animations.size();
     }
 
     virtual bool empty() const override
     {
-        return animations.empty();
+        return m_animations.empty();
     }
 
     virtual void clear() override // Только список анимаций
     {
-        return animations.clear();
+        return m_animations.clear();
     }
 
     bool checkConvertAniIds(int aniId_, int frameNum_, std::size_t &aniId, std::size_t &frameNum) const
@@ -246,8 +369,6 @@ public:
         std::size_t tmp_aniId = (std::size_t)aniId_;
         if (tmp_aniId>=m_animations.size())
             return false;
-
-        aniId = tmp_aniId;
 
         std::size_t tmp_frameNum = (std::size_t)frameNum_;
 
@@ -261,6 +382,7 @@ public:
             tmp_frameNum = animationInfo.frames.size()-1; // рисуем последний кадр
         }
 
+        aniId    = tmp_aniId   ;
         frameNum = tmp_frameNum;
 
         return true;
@@ -277,7 +399,7 @@ public:
         return true;
     }
 
-    virtual int getAnimationNumFrames(int aniId) const override
+    virtual int getAnimationNumFrames(int aniId_) const override
     {
         std::size_t aniId    = 0;
 
@@ -287,7 +409,7 @@ public:
         return (int)m_animations[aniId].frames.size();
     }
 
-    virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId_, int frameNum_) const override // отрисовка конкретной фазы заданной анимации
+    virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId_, int frameNum_, const DrawCoord &scale=DrawCoord{1,1}) const override // отрисовка конкретной фазы заданной анимации
     {
         if (!isVisible())
             return false;
@@ -305,35 +427,86 @@ public:
             return false;
 
         const AnimationFrameInfo &frameInfo = m_animations[aniId].frames[frameNum];
+        MARTY_ARG_USED(frameInfo);
+        MARTY_ARG_USED(scale);
 
-        if (!m_targetScaled)
-        {
-            return m_pAnimationDrawingHandler->drawFrame(pdc, static_cast<const IAnimation*>(this), m_drawingPos, m_drawingSize, m_targetScaled, (int)aniId, (int)frameNum);
-        }
-        else
-        {
-            DrawCoord::value_type frameScale = frameInfo.frameScale;
-            DrawCoord drawingSize        = m_drawingSize*DrawCoord{frameScale,frameScale};
-            DrawCoord drawingSizeDelta   = drawingSize - m_drawingSize; // допустим, было увеличение, значит, позицию надо уменьшать
-            DrawCoord drawingSizeDelta2  = drawingSizeDelta / DrawCoord{2,2};
-            DrawCoord drawingPos         = m_drawingPos - drawingSizeDelta2;
+// struct AnimationFrameInfo
+// {
+//     std::shared_ptr<IImageList>  pImgList    ;
+//     int                          imgId       ;
+//     ImageSize                    imgPos      ; // положение спрайта в картинке
+//     ImageSize                    imgSize     ; // размер спрайта в картинке
+//     ImageSize                    pivotPoint  = ImageSize{0,0}; // базовая точка спрайта
+//     std::uint32_t                frameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
+//     int                          frameScalePercent  = 100;
+//  
+// }; // struct AnimationFrameInfo
 
-            return m_pAnimationDrawingHandler->drawFrame(pdc, static_cast<const IAnimation*>(this), drawingPos, drawingSize, m_targetScaled, (int)aniId, (int)frameNum);
+
+        /*
+            scale используется, если установлено m_targetScaled
+            Если установлено m_targetScaled, то используется также и скалинг DrawContext'а
+
+            Но если pivot point задан, то мы не можем просто так смещать базовую точку для отрисовки спрайта, 
+            потому что pivot point может быть разный, и без учета масштабирования будет гавно
+
+            Проблема с масштабированием - это то, что оно работает медленнее, чем тупое копирование.
+            Другой вопрос, что у нас спрайты с анимацией из PNG, а там альфаканал, а функция AlphaBlend всё равно не быстрая.
+        
+         */
+
+        bool targetScaled = m_targetScaled;
+        if (frameInfo.pivotPoint.width!=0 || frameInfo.pivotPoint.height!=0)
+        {
+            targetScaled = true;
         }
+
+        // Тут пока используется масштабирование отдельного спрайта в процентах
+        ImageSize spriteSize = frameInfo.getScaledSize();
+        ImageSize pivotPoint = frameInfo.getScaledPivotPoint();
+
+        DrawCoord targetSize  = DrawCoord{spriteSize.width,spriteSize.height};
+        DrawCoord targetPivot = DrawCoord{pivotPoint.width,pivotPoint.height};
+
+        if (targetScaled)
+        {
+            DrawScale dcScale = pdc->getScale();
+
+            targetSize  *= dcScale;
+            targetSize  *= scale  ;
+
+            targetPivot *= dcScale;
+            targetPivot *= scale  ;
+        }
+
+        DrawCoord targetPos = m_drawingPos - targetPivot;
+
+        auto ncThis = const_cast<AnimationImpl*>(this);
+
+        return m_pAnimationDrawingHandler->drawAnimationFrame( pdc, static_cast<IAnimation*>(ncThis), frameInfo.pImgList.get(), frameInfo.imgId
+                                                             , targetPos, targetSize
+                                                             , frameInfo.imgPos, frameInfo.imgSize
+                                                             );
+
+        // virtual bool drawAnimationFrame( IDrawContext *pdc, IAnimation* pAnimation, IImageList* pImgList, int imgId
+        //                                , const DrawCoord &screenPos, const DrawCoord &screenSize
+        //                                , ImageSize imgPartLeftTop, ImageSize imgPartSize
+        //                                ) const = 0;
+
     }
 
-    virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId_) const override // отрисовка текущей фазы заданной анимации
+    virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId_, const DrawCoord &scale=DrawCoord{1,1}) const override // отрисовка текущей фазы заданной анимации
     {
         std::size_t aniId = 0;
         if (!checkConvertAniIds(aniId_, aniId))
             return false;
 
-        return drawAnimationFrame(pdc, aniId_, (int)m_animations[aniId].curFrame);
+        return drawAnimationFrame(pdc, aniId_, (int)m_animations[aniId].curFrame, scale);
     }
 
-    virtual bool drawCurrentFrame(IDrawContext *pdc) const override // отрисовка текущей фазы текущей анимации
+    virtual bool drawCurrentFrame(IDrawContext *pdc, const DrawCoord &scale=DrawCoord{1,1}) const override // отрисовка текущей фазы текущей анимации
     {
-        return drawAnimationCurrentFrame(pdc, (int)m_curAnimation);
+        return drawAnimationCurrentFrame(pdc, (int)m_curAnimation, scale);
     }
 
     virtual bool setTargetPosition(const DrawCoord &pos ) override // установка положения на экране, left/top
@@ -347,29 +520,29 @@ public:
         return m_drawingPos;
     }
 
-    virtual bool setTargetSize    (const DrawCoord &size) override // установка размера на экране
+    virtual bool setTargetScale    (const DrawCoord &scale) override // установка размера на экране
     {
-        m_drawingSize = size;
+        m_drawingScale = scale;
         return true;
     }
 
-    virtual DrawCoord getTargetSize() override
+    virtual DrawCoord getTargetScale() const override
     {
-        return m_drawingSize;
+        return m_drawingScale;
     }
 
-    virtual bool setTargetScaled  (bool allowScale) override // влияет ли targetSize на отрисовку, или изображение переносится попиксельно как есть
+    virtual bool setTargetScaledOnOff  (bool allowScale) override // влияет ли targetSize на отрисовку, или изображение переносится попиксельно как есть
     {
         m_targetScaled = allowScale;
         return true;
     };
 
-    virtual bool getTargetScaled() override
+    virtual bool getTargetScaledOnOff() const override
     {
         return m_targetScaled;
     }
 
-    virtual bool setAnimationFrameScale(int aniId_, int frameNum_, DrawCoord::value_type scale) override
+    virtual bool setAnimationFrameScalePercent(int aniId_, int frameNum_, int percent) override
     {
         std::size_t aniId    = 0;
         std::size_t frameNum = 0;
@@ -377,12 +550,12 @@ public:
         if (!checkConvertAniIds(aniId_, frameNum_, aniId, frameNum))
             return false;
 
-        m_animations[aniId].frames[frameNum].frameScale = scale;
+        m_animations[aniId].frames[frameNum].frameScalePercent = percent;
 
         return true;
     }
 
-    virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId_, int frameId_) override
+    virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId_, int frameNum_) override
     {
         std::size_t aniId    = 0;
         std::size_t frameNum = 0;
@@ -391,14 +564,14 @@ public:
             return false;
 
         m_curAnimation = aniId;
-        m_animations[aniId].frames[frameNum].curFrame = frameNum;
+        m_animations[aniId].curFrame  = frameNum;
         m_animations[aniId].startTick = curTickMs;
         m_animations[aniId].clearPausedState();
 
         return true;
     }
 
-    virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) override
+    virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId_) override
     {
         std::size_t aniId    = 0;
 
@@ -406,7 +579,7 @@ public:
             return false;
 
         m_curAnimation = aniId;
-        m_animations[aniId].frames[frameNum].curFrame = 0;
+        m_animations[aniId].curFrame  = 0;
         m_animations[aniId].startTick = curTickMs;
         m_animations[aniId].clearPausedState();
 
@@ -439,13 +612,13 @@ public:
                 isDone = m_animations[m_curAnimation].isDone();
             }
             
-            m_pAnimationFrameChangeHandler->onFrameChanged(this, (int)m_curAnimation, (int)m_animations[m_curAnimation].curFrame, isDone, restarted);
+            m_pAnimationFrameChangeHandler->onAnimationFrameChanged(this, (int)m_curAnimation, (int)m_animations[m_curAnimation].curFrame, isDone, restarted);
         }
 
         return res;
     }
 
-    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) const override
+    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) override
     {
         m_pAnimationFrameChangeHandler = pHandler;
         return true;
@@ -453,7 +626,7 @@ public:
 
     virtual void clearAnimationFrameChangeHandler() override
     {
-        m_pAnimationFrameChangeHandler = pHandler;
+        m_pAnimationFrameChangeHandler.reset();
     }
 
     virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) override
@@ -532,7 +705,7 @@ public:
         return res;
     }
 
-    virtual bool setAnimationFrameTiming(int aniId_, int frameId_, std::uint32_t ms) override // Задаёт время отображения фрейма (кастомный тайминг фрейма)
+    virtual bool setAnimationFrameTiming(int aniId_, int frameNum_, std::uint32_t ms) override // Задаёт время отображения фрейма (кастомный тайминг фрейма)
     {
         std::size_t aniId    = 0;
         std::size_t frameNum = 0;
@@ -560,7 +733,7 @@ public:
         return true;
     }
 
-    virtual bool getAnimationLooping(int aniId) override
+    virtual bool getAnimationLooping(int aniId_) override
     {
         std::size_t aniId    = 0;
 
@@ -578,6 +751,7 @@ public:
 
 
 class SpriteAnimationImpl : public AnimationImpl
+                          , public ISpriteAnimation
 {
 
 protected:
@@ -588,6 +762,12 @@ protected:
 
 public:
 
+    SpriteAnimationImpl() = default;
+    SpriteAnimationImpl(const SpriteAnimationImpl&) = delete;
+    SpriteAnimationImpl& operator=(const SpriteAnimationImpl&) = delete;
+    SpriteAnimationImpl(SpriteAnimationImpl&&) = delete;
+    SpriteAnimationImpl& operator=(SpriteAnimationImpl&&) = delete;
+
     virtual bool setSpriteAnimationCommonImage(std::shared_ptr<IImageList> pImgList, int imgId) override
     {
         m_pCommonImageList = pImgList;
@@ -596,11 +776,11 @@ public:
     }
 
 
-    virtual bool clearAll() override // Очищает все списки анимаций, а также CommonImage
+    virtual void clearAll() override // Очищает все списки анимаций, а также CommonImage
     {
         m_pCommonImageList = std::shared_ptr<IImageList>();
         m_commonImageId    = -1;
-        clear();
+        AnimationImpl::clear();
     }
 
     // Создаёт анимацию из вертикальной/горизонтальной ленты заданного изображения
@@ -636,7 +816,7 @@ public:
         {
             if (maxNumFrames>=0) // лимит задан
             {
-                if ((std::size_t)maxNumFrames >= newAnimationInfo.frames.size())
+                if ((std::size_t)maxNumFrames >= resVec.size())
                 {
                     break; // лимит на число кадров кончился
                 }
@@ -648,7 +828,7 @@ public:
             frame.imgPos       = curPos;
             frame.imgSize      = frameSize;
             frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScale   = 1; // default - no scale
+            frame.frameScalePercent = 1; // default - no scale
 
             try
             {
@@ -697,7 +877,7 @@ public:
             frame.imgPos       = ImageSize{0,0};
             frame.imgSize      = imageInfo.imageSize;
             frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScale   = 1; // default - no scale
+            frame.frameScalePercent = 1; // default - no scale
 
             try
             {
@@ -780,17 +960,19 @@ public:
 
         AnimationInfo &animationInfo = m_animations[aniId];
         auto frames = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, -1 /* maxNumFrames */ );
+        if (frames.empty())
+            return -1;
 
         try
         {
-            animationInfo.frames.insert(animationInfo.frames..end(), frames.begin(), frames.end());
+            animationInfo.frames.insert(animationInfo.frames.end(), frames.begin(), frames.end());
         }
         catch(...)
         {
             return -1;
         }
 
-        return res;
+        return aniId_;
     
     }
 
@@ -802,6 +984,8 @@ public:
 
         AnimationInfo &animationInfo = m_animations[aniId];
         auto frames = makeAnimationFramesHelper(pImageList, imgId, basePos, frameSize, bVertical, maxNumFrames );
+        if (frames.empty())
+            return -1;
 
         try
         {
@@ -885,6 +1069,8 @@ public:
 
         AnimationInfo &animationInfo = m_animations[aniId];
         auto frames = makeAnimationFramesHelper(pImageList, frameList);
+        if (frames.empty())
+            return -1;
 
         try
         {
@@ -915,7 +1101,7 @@ public:
     }
 
 
-    virtual bool setSpriteAnimationFrameImage(int aniId_, int frameId_, std::shared_ptr<IImageList> pImgList, int imgId) const override
+    virtual bool setSpriteAnimationFrameImage(int aniId_, int frameId_, std::shared_ptr<IImageList> pImgList, int imgId) override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -1061,7 +1247,7 @@ public:
         if (frameId>=ani.frames.size())
             return false;
 
-        const AnimationFrameInfo &fi = ani.frames[frameId];
+        AnimationFrameInfo &fi = ani.frames[frameId];
 
         if (pivotPoint.width>=fi.imgSize.width || pivotPoint.height>=fi.imgSize.height)
             return false;
@@ -1071,6 +1257,54 @@ public:
         return true;
     }
 
+
+    //------------------------------
+    virtual int  size()  const override                                                          { return AnimationImpl::size(); }
+    virtual bool empty() const override                                                          { return AnimationImpl::empty(); }
+
+    virtual void clear() override                                                                { return AnimationImpl::clear(); }
+
+    virtual bool setVisible(bool bVisible) override                                              { return AnimationImpl::setVisible(bVisible); }
+    virtual bool isVisible() const override                                                      { return AnimationImpl::isVisible(); }
+
+    virtual int getAnimationNumFrames(int aniId) const override                                  { return AnimationImpl::getAnimationNumFrames(aniId); }
+
+    virtual bool drawAnimationFrame(IDrawContext *pdc, int aniId, int frameNum, const DrawCoord &scale=DrawCoord{1,1}) const override   { return AnimationImpl::drawAnimationFrame(pdc, aniId, frameNum, scale); }
+    virtual bool drawAnimationCurrentFrame(IDrawContext *pdc, int aniId, const DrawCoord &scale=DrawCoord{1,1}) const override          { return AnimationImpl::drawAnimationCurrentFrame(pdc, aniId, scale); }
+    virtual bool drawCurrentFrame(IDrawContext *pdc, const DrawCoord &scale=DrawCoord{1,1}) const override                              { return AnimationImpl::drawCurrentFrame(pdc, scale); }
+
+    virtual bool setTargetPosition(const DrawCoord &pos ) override                               { return AnimationImpl::setTargetPosition(pos); }
+    virtual DrawCoord getTargetPosition() override                                               { return AnimationImpl::getTargetPosition(); }
+    virtual bool setTargetScale    (const DrawCoord &scale) override                             { return AnimationImpl::setTargetScale(scale); }
+    virtual DrawCoord getTargetScale() const override                                            { return AnimationImpl::getTargetScale(); }
+    virtual bool setTargetScaledOnOff(bool allowScale) override                                  { return AnimationImpl::setTargetScaledOnOff(allowScale); }
+    virtual bool getTargetScaledOnOff() const override                                           { return AnimationImpl::getTargetScaledOnOff(); }
+
+    virtual bool setAnimationFrameScalePercent(int aniId, int frameNum, int precent) override    { return AnimationImpl::setAnimationFrameScalePercent(aniId, frameNum, precent); }
+    
+    virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) override { return AnimationImpl::setAnimationDrawingHandler(pHandler); }
+    virtual void clearAnimationDrawingHandler() override                                         { return AnimationImpl::clearAnimationDrawingHandler(); }
+
+    virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) override { return AnimationImpl::setAnimationFrameChangeHandler(pHandler); }
+    virtual void clearAnimationFrameChangeHandler() override                                     { return AnimationImpl::clearAnimationFrameChangeHandler(); }
+
+    virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) override { return AnimationImpl::setCurrentAnimationEx(curTickMs, aniId, frameId); }
+    virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) override                { return AnimationImpl::setCurrentAnimation(curTickMs, aniId); }
+
+    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pRestarted) override { return AnimationImpl::performCurrentAnimationStep(curTickMs, pRestarted); }
+    virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) override            { return AnimationImpl::pauseCurrentAnimation(curTickMs, bPause); }
+    virtual bool isCurrentAnimationPaused() const override                                       { return AnimationImpl::isCurrentAnimationPaused(); }
+
+    virtual bool setAnimationsCommonFrameTiming(std::uint32_t ms) override                       { return AnimationImpl::setAnimationsCommonFrameTiming(ms); }
+    virtual std::uint32_t getAnimationsCommonFrameTiming() const override                        { return AnimationImpl::getAnimationsCommonFrameTiming(); }
+    virtual bool setAnimationFramesTiming(int aniId, std::uint32_t ms) override                  { return AnimationImpl::setAnimationFramesTiming(aniId, ms); }
+    virtual int  addSimpleAnimation(int numFrames) override                                      { return AnimationImpl::addSimpleAnimation(numFrames); }
+    virtual bool setAnimationFrameTiming(int aniId, int frameId, std::uint32_t ms) override      { return AnimationImpl::setAnimationFrameTiming(aniId, frameId, ms); }
+
+    virtual bool setAnimationLooping(int aniId, bool bLoop) override                             { return AnimationImpl::setAnimationLooping(aniId, bLoop); }
+    virtual bool getAnimationLooping(int aniId) override                                         { return AnimationImpl::getAnimationLooping(aniId); }
+
+
 }; // class SpriteAnimationImpl
 
 
@@ -1078,7 +1312,7 @@ public:
     // std::vector<AnimationInfo>                m_animations;
     // std::size_t                               m_curAnimation = 0;
     // DrawCoord                                 m_drawingPos   = DrawCoord{0,0};
-    // DrawCoord                                 m_drawingSize  = DrawCoord{0,0};
+    // DrawCoord                                 m_drawingScale  = DrawCoord{0,0};
     // bool                                      m_targetScaled = false;
     // std::uint32_t                             m_animationsCommonTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
 

@@ -1294,6 +1294,53 @@ public:
         return true;
     }
 
+    virtual bool                        setSpriteAnimationPivotPoint(int aniId_, ImageSize pivotPoint) override
+    {
+        std::size_t aniId   = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return false;
+
+        AnimationInfo &ani = m_animations[aniId];
+
+        for(auto &fi : ani.frames)
+        {
+            fi.pivotPoint = pivotPoint;
+        }
+
+        ani.updatePivotsSummaryCache();
+
+        return true;
+    }
+
+    virtual bool                        setSpriteAnimationPivotPointToCenter(int aniId_, bool bVerticalCenter) override
+    {
+        std::size_t aniId   = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return false;
+
+        AnimationInfo &ani = m_animations[aniId];
+
+        for(auto &fi : ani.frames)
+        {
+            if (bVerticalCenter)
+            {
+                fi.pivotPoint.height = fi.imgSize.height/2;
+            }
+            else
+            {
+                fi.pivotPoint.width = fi.imgSize.width/2;
+            }
+            //fi.pivotPoint = pivotPoint;
+        }
+
+        ani.updatePivotsSummaryCache();
+
+        return true;
+    }
+
+
 
     //------------------------------
     virtual int  size()  const override                                                          { return AnimationImpl::size(); }

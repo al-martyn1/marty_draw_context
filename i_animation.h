@@ -149,6 +149,9 @@ struct ISpriteAnimation : public virtual IAnimation
     virtual ImageSize                   getSpriteAnimationFramePivotPoint(int aniId, int frameId) const = 0;
     virtual bool                        setSpriteAnimationFramePivotPoint(int aniId, int frameId, ImageSize pivotPoint) = 0;
 
+    virtual bool                        setSpriteAnimationPivotPoint(int aniId, ImageSize pivotPoint) = 0;
+    virtual bool                        setSpriteAnimationPivotPointToCenter(int aniId, bool bVerticalCenter) = 0;
+
 
 
 }; // struct IAnimation

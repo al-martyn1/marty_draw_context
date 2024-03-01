@@ -1266,7 +1266,7 @@ public:
         return fi.pivotPoint;
     }
 
-    virtual bool                        setSpriteAnimationFramePivotPoint(int aniId_, int frameId_, ImageSize pivotPoint) override
+    virtual bool setSpriteAnimationFramePivotPoint(int aniId_, int frameId_, ImageSize pivotPoint) override
     {
         std::size_t aniId   = 0;
         std::size_t frameId = 0;
@@ -1294,7 +1294,7 @@ public:
         return true;
     }
 
-    virtual bool                        setSpriteAnimationPivotPoint(int aniId_, ImageSize pivotPoint) override
+    virtual bool setSpriteAnimationPivotPoint(int aniId_, ImageSize pivotPoint) override
     {
         std::size_t aniId   = 0;
 
@@ -1313,7 +1313,7 @@ public:
         return true;
     }
 
-    virtual bool                        setSpriteAnimationPivotPointToCenter(int aniId_, bool bVerticalCenter) override
+    virtual bool setSpriteAnimationPivotPointToCenter(int aniId_, bool bVerticalCenter) override
     {
         std::size_t aniId   = 0;
 
@@ -1332,13 +1332,39 @@ public:
             {
                 fi.pivotPoint.width = fi.imgSize.width/2;
             }
-            //fi.pivotPoint = pivotPoint;
         }
 
         ani.updatePivotsSummaryCache();
 
         return true;
     }
+
+    virtual bool setSpriteAnimationPivotPointCoord(int aniId_, bool bVerticalCoord, int coordValue) override
+    {
+        std::size_t aniId   = 0;
+
+        if (!checkConvertAniIds(aniId_, aniId))
+            return false;
+
+        AnimationInfo &ani = m_animations[aniId];
+
+        for(auto &fi : ani.frames)
+        {
+            if (bVerticalCoord)
+            {
+                fi.pivotPoint.height = coordValue;
+            }
+            else
+            {
+                fi.pivotPoint.width = coordValue;
+            }
+        }
+
+        ani.updatePivotsSummaryCache();
+
+        return true;
+    }
+
 
 
 

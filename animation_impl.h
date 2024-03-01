@@ -69,6 +69,14 @@ struct AnimationInfo
     std::uint32_t                     startTick           = 0;
     std::uint32_t                     pauseTick           = 0;
     //int                               pauseCounter        = 0;
+
+
+    // По хорошему, это надо перенести в контейнер анимаций, а не паузить анимации по отдельности
+    // Все равно при смене анимации пауза автоматом сбрасывается
+    // Пока оставим так.
+    // А может ли быть такое, что нам нужно сменить анимацию во время паузы, и что бы режим паузы остался?
+    // Вот если понадобится, тогда и переедем.
+
 #if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
     std::atomic<int>                  pauseCounter        = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
 #else
@@ -187,7 +195,7 @@ struct AnimationInfo
     }
 
     // Возвращает true при смене кадра
-    bool performStep(std::uint32_t curTickMs, bool *pRestarted = 0)
+    bool performStep(std::uint32_t curTickMs, bool *pDone = 0, bool *pRestarted = 0)
     {
         if (isPaused())
             return false;
@@ -219,11 +227,21 @@ struct AnimationInfo
             *pRestarted = false;
         }
 
+        if (pDone)
+        {
+            *pDone = false;
+        }
+
         if (curFrame!=timingFrameIdx)
         {
             // произошла смена кадра
             if (timingFrameIdx>=frames.size())
             {
+                if (pDone)
+                {
+                    *pDone = true;
+                }
+
                 if (autoRestart)
                 {
                     curFrame = 0;
@@ -459,22 +477,6 @@ public:
         }
 
         const AnimationFrameInfo &frameInfo = m_animations[aniId].frames[frameNum];
-        MARTY_ARG_USED(frameInfo);
-        MARTY_ARG_USED(scale);
-
-
-// struct AnimationFrameInfo
-// {
-//     std::shared_ptr<IImageList>  pImgList    ;
-//     int                          imgId       ;
-//     ImageSize                    imgPos      ; // положение спрайта в картинке
-//     ImageSize                    imgSize     ; // размер спрайта в картинке
-//     ImageSize                    pivotPoint  = ImageSize{0,0}; // базовая точка спрайта
-//     std::uint32_t                frameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
-//     int                          frameScalePercent  = 100;
-//  
-// }; // struct AnimationFrameInfo
-
 
         /*
             scale используется, если установлено m_targetScaled
@@ -591,13 +593,20 @@ public:
 
     virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId_, int frameNum_) override
     {
-        std::size_t aniId    = 0;
-        std::size_t frameNum = 0;
-
-        if (!checkConvertAniIds(aniId_, frameNum_, aniId, frameNum))
-            return false;
+        std::size_t aniId = (std::size_t)aniId_;
+        if (aniId>=m_animations.size())
+        {
+            aniId = 0;
+        }
 
         m_curAnimation = aniId;
+
+        std::size_t frameNum = (std::size_t)frameNum_;
+        if (frameNum>=m_animations[aniId].frames.size())
+        {
+            frameNum = 0;
+        }
+
         m_animations[aniId].curFrame  = frameNum;
         m_animations[aniId].startTick = curTickMs;
         m_animations[aniId].clearPausedState();
@@ -607,26 +616,22 @@ public:
 
     virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId_) override
     {
-        std::size_t aniId    = 0;
-
-        if (!checkConvertAniIds(aniId_, aniId))
-            return false;
-
-        m_curAnimation = aniId;
-        m_animations[aniId].curFrame  = 0;
-        m_animations[aniId].startTick = curTickMs;
-        m_animations[aniId].clearPausedState();
-
-        return true;
+        return setCurrentAnimationEx(curTickMs, aniId_, 0);
     }
 
-    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pRestarted) override
+    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pDone=0, bool *pRestarted=0) override
     {
         if (m_curAnimation>=m_animations.size())
             return false;
 
         bool restarted = false;
-        bool res = m_animations[m_curAnimation].performStep(curTickMs, &restarted);
+        bool done      = false;
+        bool res = m_animations[m_curAnimation].performStep(curTickMs, &done, &restarted);
+
+        if (pDone)
+        {
+            *pDone = done;
+        }
 
         if (pRestarted)
         {
@@ -636,17 +641,7 @@ public:
         //TODO: !!! Надо вызвать какой-то хэндлер, если изменился текущий фрейм
         if (m_pAnimationFrameChangeHandler)
         {
-            bool isDone = false;
-            if (restarted)
-            {
-                isDone = true;
-            }
-            else
-            {
-                isDone = m_animations[m_curAnimation].isDone();
-            }
-            
-            m_pAnimationFrameChangeHandler->onAnimationFrameChanged(this, (int)m_curAnimation, (int)m_animations[m_curAnimation].curFrame, isDone, restarted);
+            m_pAnimationFrameChangeHandler->onAnimationFrameChanged(this, curTickMs, (int)m_curAnimation, (int)m_animations[m_curAnimation].curFrame, done, restarted);
         }
 
         return res;
@@ -1401,7 +1396,7 @@ public:
     virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) override { return AnimationImpl::setCurrentAnimationEx(curTickMs, aniId, frameId); }
     virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) override                { return AnimationImpl::setCurrentAnimation(curTickMs, aniId); }
 
-    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pRestarted) override { return AnimationImpl::performCurrentAnimationStep(curTickMs, pRestarted); }
+    virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pDone=0, bool *pRestarted=0) override { return AnimationImpl::performCurrentAnimationStep(curTickMs, pDone, pRestarted); }
     virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) override            { return AnimationImpl::pauseCurrentAnimation(curTickMs, bPause); }
     virtual bool isCurrentAnimationPaused() const override                                       { return AnimationImpl::isCurrentAnimationPaused(); }
 

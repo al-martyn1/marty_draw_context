@@ -4,6 +4,9 @@
 #include "i_animation.h"
 
 //
+#include "dc_debug/uw_log.h"
+
+//
 #include <atomic>
 
 //TODO: !!! Осталось сделать реализацию IAnimationDrawingHandler, которая отрисовывает картинки
@@ -77,64 +80,13 @@ struct AnimationInfo
     // А может ли быть такое, что нам нужно сменить анимацию во время паузы, и что бы режим паузы остался?
     // Вот если понадобится, тогда и переедем.
 
-#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
-    std::atomic<int>                  pauseCounter        = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
-#else
     int                               pauseCounter        = 0;
-#endif
 
     bool isDone() const
     {
         return curFrame>=frames.size();
     }
 
-#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
-    void clearPausedState()
-    {
-        pauseCounter.store(0);
-    }
-
-    bool isPaused() const
-    {
-        int pcVal = pauseCounter.load();
-        return pcVal>0;
-    }
-
-    // returns true if paused
-    bool doPause(std::uint32_t curTickMs, bool bPause)
-    {
-        bool prevPausedState = isPaused();
-        if (bPause)
-        {
-            pauseCounter.fetch_add(1 /* , std::memory_order_acquire */ );
-        }
-        else
-        {
-            pauseCounter.fetch_sub(1 /* , std::memory_order_acquire */ );
-        }
-
-        bool curPausedState = isPaused();
-
-        if (prevPausedState!=curPausedState)
-        {
-            // состояние паузы изменилось
-            if (curPausedState)
-            {
-                // стали в паузу, сохраняем тик
-                pauseTick = curTickMs;
-            }
-            else
-            {
-                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
-                std::uint32_t pauseTickDelta = curTickMs - pauseTick;
-                startTick += pauseTickDelta;
-            }
-
-        }
-
-        return curPausedState;
-    }
-#else
     void clearPausedState()
     {
         pauseCounter = 0;
@@ -175,8 +127,6 @@ struct AnimationInfo
 
     }
 
-#endif
-
 
     bool updatePivotsSummaryCache()
     {
@@ -200,8 +150,17 @@ struct AnimationInfo
         if (isPaused())
             return false;
 
+        if (startTick==0)
+        {
+            startTick = curTickMs;
+        }
+
         //std::uint32_t tickDelta = curTickMs - startTick;
         int curTickDelta = (int)(curTickMs - startTick);
+
+        //UW_LOG() << "   ---\n";
+
+        //UW_LOG() << "performStep, startTick: " << startTick << ", curTickDelta: " << curTickDelta << ", curFrame: " << curFrame << "\n";
 
         std::size_t timingFrameIdx = 0;
         for(; timingFrameIdx!=frames.size(); ++timingFrameIdx)
@@ -212,15 +171,25 @@ struct AnimationInfo
                 curFrameTiming = 5; // не более 200 кадров в секунду
             }
 
+            //UW_LOG() << "curFrameTiming: " << curFrameTiming << "\n";
+
             int newTickDelta = curTickDelta - (int)curFrameTiming;
+
+            //UW_LOG() << "curFrameTiming: " << curFrameTiming << ", newTickDelta: " << newTickDelta << ", curTickDelta: " << curTickDelta << "\n";
+
             if (newTickDelta<0)
             {
-                // мы находимся в процессе демонстрации текущего кадра
+                //UW_LOG() << "Shown frame #" << timingFrameIdx << ", break" << "\n";
+                // нашли текущий отображаемый кадр
                 break;
             }
 
+            //UW_LOG() << "Go to checking next frame\n";
+
             curTickDelta = newTickDelta;
         }
+
+        //UW_LOG() << "* Found active frame: " << timingFrameIdx << "\n";
 
         if (pRestarted)
         {
@@ -234,6 +203,8 @@ struct AnimationInfo
 
         if (curFrame!=timingFrameIdx)
         {
+            //UW_LOG() << "! Frame change\n";
+
             // произошла смена кадра
             if (timingFrameIdx>=frames.size())
             {
@@ -250,11 +221,12 @@ struct AnimationInfo
                         *pRestarted = true;
                     }
                 }
-                else
-                {
-                    curFrame = timingFrameIdx;
-                }
+                // else
+                // {
+                // }
             }
+
+            curFrame = timingFrameIdx;
 
             return true; // сигнализируем о смене кадра
         }
@@ -280,11 +252,7 @@ protected:
     bool                                             m_targetScaled                = false;
     std::uint32_t                                    m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
 
-#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
-    std::atomic<int>                                 m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
-#else
-    int                                              m_visibilityCounter              = 0;  // Нафига я стал тут возится с атомиком? Всё равно, по идее, если и будет многопоточность какая-то, то анимации все целиком, или, как минимум, каждая целиком, будут защищаться
-#endif
+    int                                              m_visibilityCounter              = 0;
 
 public:
 
@@ -295,48 +263,6 @@ public:
     AnimationImpl& operator=(AnimationImpl&&) = delete;
 
 
-#if defined(MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC)
-
-    virtual bool isVisible() const override
-    {
-        int vcVal = m_visibilityCounter.load();
-        return vcVal>0;
-    }
-
-    virtual bool setVisible(bool bVisible) override
-    {
-        bool prevVisibilityState = isVisible();
-        if (!bVisible)
-        {
-            m_visibilityCounter.fetch_add(1 /* , std::memory_order_acquire */ );
-        }
-        else
-        {
-            m_visibilityCounter.fetch_sub(1 /* , std::memory_order_acquire */ );
-        }
-
-        bool curVisibilityState = isVisible();
-
-        if (prevVisibilityState!=curVisibilityState)
-        {
-            // состояние паузы изменилось
-            if (curVisibilityState)
-            {
-                // стали в паузу, сохраняем тик
-                //pauseTick = curTickMs;
-            }
-            else
-            {
-                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
-                // std::uint32_t pauseTickDelta = curTickMs - pauseTick;
-                // startTick += pauseTickDelta;
-            }
-
-        }
-
-        return curVisibilityState;
-    }
-#else
     virtual bool isVisible() const override
     {
         return m_visibilityCounter>0;
@@ -346,7 +272,7 @@ public:
     {
         bool prevVisibilityState = isVisible();
 
-        m_visibilityCounter += !bVisible ? +1 : -1;
+        m_visibilityCounter += bVisible ? +1 : -1;
 
         bool curVisibilityState = isVisible();
 
@@ -369,8 +295,6 @@ public:
 
         return curVisibilityState;
     }
-
-#endif
 
     virtual bool setAnimationDrawingHandler( std::shared_ptr<IAnimationDrawingHandler> pHandler) override
     {
@@ -397,6 +321,31 @@ public:
     virtual void clear() override // Только список анимаций
     {
         return m_animations.clear();
+    }
+
+    virtual std::uint32_t getCurTick() const override
+    {
+        #if defined(WIN32) || defined(_WIN32)
+
+            return (std::uint32_t)GetTickCount();
+
+        #else
+
+            // тупая заглушка, которая выдаёт новый инкрементируемый тик при каждом вызове
+            static std::uint32_t counter = 0;
+
+            std::uint32_t res = counter;
+            ++counter;
+            return res;
+
+        #endif
+    }
+
+    virtual std::uint32_t getCheckedCurTick(std::uint32_t tick) const override
+    {
+        if (tick==0)
+            tick = getCurTick();
+        return tick;
     }
 
     bool checkConvertAniIds(int aniId_, int frameNum_, std::size_t &aniId, std::size_t &frameNum) const
@@ -487,6 +436,8 @@ public:
 
             Проблема с масштабированием - это то, что оно работает медленнее, чем тупое копирование.
             Другой вопрос, что у нас спрайты с анимацией из PNG, а там альфаканал, а функция AlphaBlend всё равно не быстрая.
+
+
         
          */
 
@@ -508,10 +459,12 @@ public:
         {
             DrawScale dcScale = pdc->getScale();
 
-            targetSize  *= dcScale;
+            // На DC Scale надо тут делить, оно потом обратно отмасштабируется при отрисовке
+
+            //targetSize  /= dcScale;
             targetSize  *= scale  ;
 
-            targetPivot *= dcScale;
+            //targetPivot /= dcScale;
             targetPivot *= scale  ;
         }
 
@@ -593,6 +546,8 @@ public:
 
     virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId_, int frameNum_) override
     {
+        curTickMs = getCheckedCurTick(curTickMs);
+
         std::size_t aniId = (std::size_t)aniId_;
         if (aniId>=m_animations.size())
         {
@@ -623,6 +578,8 @@ public:
     {
         if (m_curAnimation>=m_animations.size())
             return false;
+
+        curTickMs = getCheckedCurTick(curTickMs);
 
         bool restarted = false;
         bool done      = false;
@@ -662,6 +619,8 @@ public:
     {
         if (m_curAnimation>=m_animations.size())
             return false;
+
+        curTickMs = getCheckedCurTick(curTickMs);
 
         return m_animations[m_curAnimation].doPause(curTickMs, bPause);
     }
@@ -857,7 +816,7 @@ public:
             frame.imgPos       = curPos;
             frame.imgSize      = frameSize;
             frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScalePercent = 1; // default - no scale
+            frame.frameScalePercent = 100; // default - no scale
 
             try
             {
@@ -906,7 +865,7 @@ public:
             frame.imgPos       = ImageSize{0,0};
             frame.imgSize      = imageInfo.imageSize;
             frame.frameTiming  = m_animationsCommonFrameTiming;
-            frame.frameScalePercent = 1; // default - no scale
+            frame.frameScalePercent = 100; // default - no scale
 
             try
             {
@@ -1368,6 +1327,9 @@ public:
     virtual bool empty() const override                                                          { return AnimationImpl::empty(); }
 
     virtual void clear() override                                                                { return AnimationImpl::clear(); }
+
+    virtual std::uint32_t getCurTick() const                                                     { return AnimationImpl::getCurTick(); }
+    virtual std::uint32_t getCheckedCurTick(std::uint32_t tick) const                            { return AnimationImpl::getCheckedCurTick(tick); }
 
     virtual bool setVisible(bool bVisible) override                                              { return AnimationImpl::setVisible(bVisible); }
     virtual bool isVisible() const override                                                      { return AnimationImpl::isVisible(); }

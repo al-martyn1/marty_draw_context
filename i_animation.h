@@ -57,6 +57,9 @@ struct IAnimation
 
     virtual void clear() = 0; // Только список анимаций
 
+    virtual std::uint32_t getCurTick() const = 0;
+    virtual std::uint32_t getCheckedCurTick(std::uint32_t tick) const = 0;
+
     // Невидимые анимации не будут рисоваться. С большой долей вероятности такая фича будет востребована, и, чтобы не хранить её отдельно, запилим сразу тут
     virtual bool setVisible(bool bVisible) = 0;
     virtual bool isVisible() const = 0;

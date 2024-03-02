@@ -9,14 +9,11 @@
 //
 #include <atomic>
 
-//TODO: !!! Осталось сделать реализацию IAnimationDrawingHandler, которая отрисовывает картинки
-//TODO: !!! Затем биндинги в белку, IAnimationDrawingHandler не особо и нужно пока
+//TODO: !!! Затем биндинги в белку
 //TODO: !!! А IAnimationFrameChangeHandler нужен в белке, это либо класс, либо свободная функция, с возможностью использования и того и другого
 //TODO: !!! При биндинге эти колбеки принимают IAnimation, надо будет сделать из этого указателя shared_ptr и передать стандартную обёртку, но пользователь ССЗБ, если будет это где-то сохранять
-//TODO: !!! Нужно сделать append версии всех addSpriteAnimation* методов
 
 
-// #define MARTY_DRAW_CONTEXT_ANIMATION_IMPL_USE_ATOMIC
 
 
 namespace marty_draw_context {

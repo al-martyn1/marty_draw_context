@@ -390,6 +390,10 @@ struct ColorRef
             throw std::runtime_error("ColorRef::deserialize: empty input");
         }
 
+        if (str.size()==1 && str.front()=='0')
+        {
+            return fromUnsigned(0u);
+        }
 
         if (str[0]=='#')
         {

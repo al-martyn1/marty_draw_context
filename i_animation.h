@@ -235,6 +235,62 @@ struct ISpriteAnimation : public virtual IAnimation
 
 
 //----------------------------------------------------------------------------
+//! Отрисовка безспрайтовой анимации
+template<typename THandler>
+struct AnimationDrawer : public IAnimationDrawingHandler
+{
+protected:
+
+    THandler   handler;
+
+    virtual bool drawAnimationFrame( IDrawContext *pdc, IAnimation* pAnimation, IImageList* pImgList, int imgId
+                                   , const DrawCoord &screenPos, const DrawCoord &screenSize
+                                   , ImageSize imgPartLeftTop, ImageSize imgPartSize
+                                   ) const override
+    {
+        if (!pdc  || !pAnimation /* || !pImgList */ )
+            return false;
+
+        MARTY_ARG_USED(pImgList);
+        MARTY_ARG_USED(imgId);
+        MARTY_ARG_USED(imgPartLeftTop);
+        MARTY_ARG_USED(imgPartSize);
+        // MARTY_ARG_USED();
+
+        handler(pdc, pAnimation, screenPos, screenSize); // Нам для обычной анимации не нужны IImageList*, imgId, imgPartLeftTop и imgPartSize
+
+        return true;
+    }
+
+public:
+
+    AnimationDrawer(THandler h) : handler(h) {}
+
+    AnimationDrawer(const AnimationDrawer&) = delete;
+    AnimationDrawer& operator=(const AnimationDrawer&) = delete;
+
+    AnimationDrawer(AnimationDrawer&&) = default;
+    AnimationDrawer& operator=(AnimationDrawer&&) = default;
+
+
+}; // struct SpriteAnimationDrawer
+
+//----------------------------------------------------------------------------
+template<typename THandler>
+inline
+std::shared_ptr<IAnimationDrawingHandler> createSharedAnimationDrawer(THandler handler)
+{
+    auto pDrawerImpl = std::make_shared< AnimationDrawer<> >(handler);
+    return std::static_pointer_cast<IAnimationDrawingHandler>(pDrawerImpl);
+}
+
+//----------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------
+//! Отрисовка безспрайтовой анимации
 struct SpriteAnimationDrawer : public IAnimationDrawingHandler
 {
     virtual bool drawAnimationFrame( IDrawContext *pdc, IAnimation* pAnimation, IImageList* pImgList, int imgId

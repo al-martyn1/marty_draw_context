@@ -149,8 +149,8 @@ struct IAnimation
     virtual bool setAnimationFrameChangeHandler( std::shared_ptr<IAnimationFrameChangeHandler> pHandler) = 0;
     virtual void clearAnimationFrameChangeHandler() = 0;
 
-    virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) = 0;
-    virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) = 0;
+    virtual bool setCurrentAnimationEx(std::uint32_t curTickMs, int aniId, int frameId) = 0; // также сбрасывает режим паузы
+    virtual bool setCurrentAnimation(std::uint32_t curTickMs, int aniId) = 0; // также сбрасывает режим паузы
 
     // Возвращает true, если кадр пересчелкнулся
     virtual bool performCurrentAnimationStep(std::uint32_t curTickMs, bool *pDone=0, bool *pRestarted=0) = 0;

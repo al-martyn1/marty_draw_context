@@ -66,64 +66,11 @@ struct AnimationInfo
     std::size_t                       curFrame            = 0; // если >= frames.size() - то анимация дошла до конца и рисуем последний фрейм
     bool                              hasPivots           = false;
     std::uint32_t                     commonFrameTaiming  = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
-    std::uint32_t                     startTick           = 0;
-    std::uint32_t                     pauseTick           = 0;
-    //int                               pauseCounter        = 0;
-
-
-    // По хорошему, это надо перенести в контейнер анимаций, а не паузить анимации по отдельности
-    // Все равно при смене анимации пауза автоматом сбрасывается
-    // Пока оставим так.
-    // А может ли быть такое, что нам нужно сменить анимацию во время паузы, и что бы режим паузы остался?
-    // Вот если понадобится, тогда и переедем.
-
-    int                               pauseCounter        = 0;
 
     bool isDone() const
     {
         return curFrame>=frames.size();
     }
-
-    void clearPausedState()
-    {
-        pauseCounter = 0;
-    }
-
-    bool isPaused() const
-    {
-        return pauseCounter>0;
-    }
-
-    // returns true if paused
-    bool doPause(std::uint32_t curTickMs, bool bPause)
-    {
-        bool prevPausedState = isPaused();
-
-        pauseCounter += bPause ? +1 : -1;
-
-        bool curPausedState = isPaused();
-
-        if (prevPausedState!=curPausedState)
-        {
-            // состояние паузы изменилось
-            if (curPausedState)
-            {
-                // стали в паузу, сохраняем тик
-                pauseTick = curTickMs;
-            }
-            else
-            {
-                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
-                std::uint32_t pauseTickDelta = curTickMs - pauseTick;
-                startTick += pauseTickDelta;
-            }
-
-        }
-
-        return curPausedState;
-
-    }
-
 
     bool updatePivotsSummaryCache()
     {
@@ -141,28 +88,97 @@ struct AnimationInfo
         return hasPivots;
     }
 
-    // Возвращает true при смене кадра
-    bool performStep(std::uint32_t curTickMs, bool *pDone = 0, bool *pRestarted = 0)
-    {
-        if (isPaused())
-            return false;
 
-        if (startTick==0)
+}; // struct AnimationInfo
+
+
+
+class AnimationImpl : public IAnimation
+{
+
+protected:
+
+    std::shared_ptr<IAnimationDrawingHandler>        m_pAnimationDrawingHandler;
+    std::shared_ptr<IAnimationFrameChangeHandler>    m_pAnimationFrameChangeHandler;
+    std::vector<AnimationInfo>                       m_animations;
+    std::size_t                                      m_curAnimation                = 0;
+    DrawCoord                                        m_drawingPos                  = DrawCoord{0,0};
+    DrawCoord                                        m_drawingScale                 = DrawCoord{0,0};
+    bool                                             m_targetScaled                = false;
+    std::uint32_t                                    m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
+
+    int                                              m_visibilityCounter              = 0;
+
+    std::uint32_t                                    m_startTick           = 0;
+    std::uint32_t                                    m_pauseTick           = 0;
+    int                                              m_pauseCounter        = 1;
+
+
+    void clearPausedState()
+    {
+        m_pauseCounter = 0;
+    }
+
+    bool isPaused() const
+    {
+        return m_pauseCounter>0;
+    }
+
+    // returns true if paused
+    bool doPause(std::uint32_t curTickMs, bool bPause)
+    {
+        bool prevPausedState = isPaused();
+
+        m_pauseCounter += bPause ? +1 : -1;
+
+        bool curPausedState = isPaused();
+
+        if (prevPausedState!=curPausedState)
         {
-            startTick = curTickMs;
+            // состояние паузы изменилось
+            if (curPausedState)
+            {
+                // стали в паузу, сохраняем тик
+                m_pauseTick = curTickMs;
+            }
+            else // вышли из паузы
+            {
+                // нужно прибавить к стартовому тику столько, сколько мы висели в паузе, чтобы фаза анимации не перескочила
+                std::uint32_t pauseTickDelta = curTickMs - m_pauseTick;
+                m_startTick += pauseTickDelta;
+            }
+
+        }
+
+        return curPausedState;
+
+    }
+
+    // Возвращает true при смене кадра
+    bool performStepImpl(AnimationInfo &ani, std::uint32_t curTickMs, bool *pDone = 0, bool *pRestarted = 0)
+    {
+        //UW_LOG() << "   ---\n";
+
+        if (isPaused())
+        {
+            //UW_LOG() << "! Animation is paused\n";
+            return false;
+        }
+
+        if (m_startTick==0)
+        {
+            m_startTick = curTickMs;
         }
 
         //std::uint32_t tickDelta = curTickMs - startTick;
-        int curTickDelta = (int)(curTickMs - startTick);
+        int curTickDelta = (int)(curTickMs - m_startTick);
 
-        //UW_LOG() << "   ---\n";
-
-        //UW_LOG() << "performStep, startTick: " << startTick << ", curTickDelta: " << curTickDelta << ", curFrame: " << curFrame << "\n";
+        //UW_LOG() << "performStep, startTick: " << m_startTick << ", curTickDelta: " << curTickDelta << ", curFrame: " << ani.curFrame << "\n";
 
         std::size_t timingFrameIdx = 0;
-        for(; timingFrameIdx!=frames.size(); ++timingFrameIdx)
+        for(; timingFrameIdx!=ani.frames.size(); ++timingFrameIdx)
         {
-            std::uint32_t curFrameTiming = frames[timingFrameIdx].frameTiming;
+            std::uint32_t curFrameTiming = ani.frames[timingFrameIdx].frameTiming;
             if (curFrameTiming<5)
             {
                 curFrameTiming = 5; // не более 200 кадров в секунду
@@ -198,21 +214,26 @@ struct AnimationInfo
             *pDone = false;
         }
 
-        if (curFrame!=timingFrameIdx)
+        if (ani.curFrame!=timingFrameIdx)
         {
             //UW_LOG() << "! Frame change\n";
 
             // произошла смена кадра
-            if (timingFrameIdx>=frames.size())
+            if (timingFrameIdx>=ani.frames.size())
             {
+                //UW_LOG() << "! Animation is done\n";
+
                 if (pDone)
                 {
                     *pDone = true;
                 }
 
-                if (autoRestart)
+                ani.curFrame = timingFrameIdx;
+
+                if (ani.autoRestart)
                 {
-                    curFrame = 0;
+                    //UW_LOG() << "! Animation was restarted\n";
+                    ani.curFrame = 0;
                     if (pRestarted)
                     {
                         *pRestarted = true;
@@ -222,8 +243,10 @@ struct AnimationInfo
                 // {
                 // }
             }
-
-            curFrame = timingFrameIdx;
+            else
+            {
+                ani.curFrame = timingFrameIdx;
+            }
 
             return true; // сигнализируем о смене кадра
         }
@@ -231,25 +254,6 @@ struct AnimationInfo
         return false;
     }
 
-}; // struct AnimationInfo
-
-
-
-class AnimationImpl : public IAnimation
-{
-
-protected:
-
-    std::shared_ptr<IAnimationDrawingHandler>        m_pAnimationDrawingHandler;
-    std::shared_ptr<IAnimationFrameChangeHandler>    m_pAnimationFrameChangeHandler;
-    std::vector<AnimationInfo>                       m_animations;
-    std::size_t                                      m_curAnimation                = 0;
-    DrawCoord                                        m_drawingPos                  = DrawCoord{0,0};
-    DrawCoord                                        m_drawingScale                 = DrawCoord{0,0};
-    bool                                             m_targetScaled                = false;
-    std::uint32_t                                    m_animationsCommonFrameTiming = 1000/20; // базовый тайминг для фреймов - 50мс/20 кадров в секунду
-
-    int                                              m_visibilityCounter              = 0;
 
 public:
 
@@ -560,8 +564,10 @@ public:
         }
 
         m_animations[aniId].curFrame  = frameNum;
-        m_animations[aniId].startTick = curTickMs;
-        m_animations[aniId].clearPausedState();
+        //m_animations[aniId].
+        m_startTick = curTickMs;
+        //m_animations[aniId].
+        clearPausedState();
 
         return true;
     }
@@ -580,7 +586,8 @@ public:
 
         bool restarted = false;
         bool done      = false;
-        bool res = m_animations[m_curAnimation].performStep(curTickMs, &done, &restarted);
+        //bool res = m_animations[m_curAnimation].performStep(curTickMs, &done, &restarted);
+        bool res = performStepImpl(m_animations[m_curAnimation], curTickMs, &done, &restarted);
 
         if (pDone)
         {
@@ -614,20 +621,22 @@ public:
 
     virtual bool pauseCurrentAnimation(std::uint32_t curTickMs, bool bPause) override
     {
-        if (m_curAnimation>=m_animations.size())
-            return false;
+        // if (m_curAnimation>=m_animations.size())
+        //     return false;
 
         curTickMs = getCheckedCurTick(curTickMs);
 
-        return m_animations[m_curAnimation].doPause(curTickMs, bPause);
+        //return m_animations[m_curAnimation].doPause(curTickMs, bPause);
+        return doPause(curTickMs, bPause);
     }
 
     virtual bool isCurrentAnimationPaused() const override
     {
-        if (m_curAnimation>=m_animations.size())
-            return false;
+        // if (m_curAnimation>=m_animations.size())
+        //     return false;
 
-        return m_animations[m_curAnimation].isPaused();
+        // return m_animations[m_curAnimation].isPaused();
+        return isPaused();
     }
 
 
@@ -886,9 +895,9 @@ public:
         newAnimationInfo.curFrame           = 0;
         newAnimationInfo.hasPivots          = false;
         newAnimationInfo.commonFrameTaiming = m_animationsCommonFrameTiming;
-        newAnimationInfo.startTick          = 0;
-        newAnimationInfo.pauseTick          = 0;
-        newAnimationInfo.pauseCounter       = 0;
+        // newAnimationInfo.startTick          = 0;
+        // newAnimationInfo.pauseTick          = 0;
+        // newAnimationInfo.pauseCounter       = 0;
 
         return newAnimationInfo;
     }
